@@ -33,15 +33,10 @@ jobs:
         flake8 ./analytic-solution --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --format=html --htmldir=flake-report
 
     - name: Display Flake8 HTML report
-      uses: dorny/paths-filter@v2
-      id: filter
+      uses: peaceiris/actions-html@v1
       with:
-        paths: "flake_report/**/*.html"
-
-    - name: Render HTML report
-      uses: github-actions-html-output@v1
-      with:
-        file: ${{ steps.filter.outputs.paths }}
+        directory: flake_report
+        index: index.html
 
 #    - name: Test with pytest
 #      run: |
