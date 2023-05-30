@@ -32,11 +32,14 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --format=html --htmldir=flake-report
 
+    - name: Create Flake8 HTML report
+      run: |
+        echo '::set-output name=html_report::flake_report/index.html'
+      id: create_report
+
     - name: Display Flake8 HTML report
-      uses: peaceiris/actions-html@v1
-      with:
-        directory: flake_report
-        index: index.html
+      run: |
+        echo "Flake8 HTML report available at: ${{ steps.create_report.outputs.html_report }}"
 
 #    - name: Test with pytest
 #      run: |
