@@ -1,17 +1,14 @@
 # ! /usr/bin/env python
-from main import app, api
-
-from settings import settings
-from flask import request, jsonify
 import requests
-
-from views.v1.admin import (check_role, create_role, get_roles, get_user_roles, delete_role,  # noqa: F401
-                            change_role, grant_role, revoke_role)
-
-from views.v1.auth import (login_user, logout_user, user_sessions, reg_user, update_user,  # noqa: F401
-                           check_email, refresh_token)
-
+from flask import jsonify, request
 from helios import initialize
+from main import api, app
+from settings import settings
+from views.v1.admin import (change_role, check_role, create_role,  # noqa: F401
+                            delete_role, get_roles, get_user_roles, grant_role,
+                            revoke_role)
+from views.v1.auth import (check_email, login_user, logout_user,  # noqa: F401
+                           refresh_token, reg_user, update_user, user_sessions)
 
 initialize(
     api_token=settings.helios_api_token,

@@ -1,10 +1,8 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-
 from core.config import settings
-from models.models import Genre
-from models.models import ResponseList
+from fastapi import APIRouter, Depends, HTTPException, Query
+from models.models import Genre, ResponseList
 from services import messages
 from services.genre import GenreService, get_genre_service
 

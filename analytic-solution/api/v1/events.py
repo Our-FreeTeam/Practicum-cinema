@@ -1,33 +1,41 @@
 from datetime import datetime
 
-
-from db.kafka import get_producer
-from fastapi import APIRouter, Depends, Request
-
 from auth_service import is_authorized
-
+from fastapi import APIRouter, Depends, Request
 from models.models import Event
 from pydantic import StrictBool
 from settings import settings
+
+from db.kafka import get_producer
 
 router = APIRouter()
 
 
 @router.post('/create', response_model=StrictBool)
 @is_authorized
-async def create_event(request: Request,
-                       event: Event,
-                       kafka_producer=Depends(get_producer)) -> StrictBool:
+async def create_event(
+    request: Request,
+    event: Event,
+    kafka_producer=Depends(get_producer),
+) -> StrictBool:
     """
-       Create event in Kafka:
-       - **user_id**: ID of user. Used as a part of key
-       - **movie_id**: ID of movie. Used as a part of key
-       - **message**: published message
+    Create event in Kafka.
+
+    Parameters:
+        event: consists of user_id, movie_id and message
+        request: FastAPI request
+        kafka_producer: dependency injection for Kafka
+
+    Returns:
+        result (StrictBool): True if there were no errors
     """
     key = f'{str(event.user_id)}+{str(event.movie_id)}'
+    now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    kafka_value = f'{key},{event.message},{now_date}'.encode()
     await kafka_producer.send_and_wait(
         topic=settings.topic_name,
-        value=f'{key},{event.message},{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'.encode(),
-        key=key.encode())
+        value=kafka_value,
+        key=key.encode(),
+    )
 
     return True

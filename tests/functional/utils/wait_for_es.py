@@ -1,6 +1,5 @@
 import backoff
 import elasticsearch
-
 from settings import test_settings
 
 

@@ -1,26 +1,27 @@
 import json
 from datetime import datetime
 
-import keycloak
-from flask import make_response, jsonify, request
-from flask_pydantic_spec import Response, Request
-from keycloak import KeycloakPostError, KeycloakAuthenticationError
-from main import app, api
-
 import messages
-from keycloak_conn import keycloak_conn, keycloak_admin
-from models.models import BoolResponse, Login, OnlyLogin, SessionList, RegInfo, TokensResp, ErrorStr
-from utils import check_session
-
+from flask import jsonify, make_response, request
+from flask_pydantic_spec import Request, Response
+from keycloak_conn import keycloak_admin, keycloak_conn
+from main import api, app
+from models.models import (BoolResponse, ErrorStr, Login, OnlyLogin, RegInfo,
+                           SessionList, TokensResp)
 from redis_bucket_conn import rate_limiter
 from settings import settings
+from utils import check_session
+
+import keycloak
+from keycloak import KeycloakAuthenticationError, KeycloakPostError
 
 
 @app.route('/v1/auth/login', methods=['POST'])
 @rate_limiter(settings.rate_limit, settings.time_period)
-@api.validate(body=Request(Login),
-              resp=Response(HTTP_200=BoolResponse, HTTP_400=None, HTTP_401=None,
-                            HTTP_429=ErrorStr), tags=['auth'])
+@api.validate(
+    body=Request(Login),
+    resp=Response(HTTP_200=BoolResponse, HTTP_400=None, HTTP_401=None,
+                  HTTP_429=ErrorStr), tags=['auth'])
 def login_user():
     """
         Выполнить авторизацию по логину и паролю

@@ -1,7 +1,7 @@
-import pytest
-import requests
 import os
 
+import pytest
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()

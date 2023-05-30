@@ -1,9 +1,7 @@
 from datetime import datetime
-
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
-
 from models.models import StatusModel
 from services import messages
 from services.film import FilmService, get_film_service

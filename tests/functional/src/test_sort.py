@@ -1,5 +1,4 @@
 import pytest
-
 from helpers import make_get_request
 
 

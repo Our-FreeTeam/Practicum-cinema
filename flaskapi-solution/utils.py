@@ -1,11 +1,11 @@
 import json
 from functools import wraps
 
-from flask import request
-from keycloak import KeycloakPostError
-
 import messages
+from flask import request
 from keycloak_conn import keycloak_conn
+
+from keycloak import KeycloakPostError
 
 
 def check_session(func):

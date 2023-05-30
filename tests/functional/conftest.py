@@ -1,10 +1,10 @@
-import pytest
 import json
+
+import pytest
 from elasticsearch import AsyncElasticsearch
 from redis.asyncio import Redis
-
-from testdata.es_data_collection import test_data
 from settings import test_settings
+from testdata.es_data_collection import test_data
 
 
 @pytest.fixture(scope='session')

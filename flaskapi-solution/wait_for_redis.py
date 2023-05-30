@@ -1,8 +1,8 @@
+import logging
 import socket
 from time import sleep
 
 from settings import settings
-import logging
 
 
 def is_redis_ready(host, port, timeout=1):

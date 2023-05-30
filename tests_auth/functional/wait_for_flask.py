@@ -1,8 +1,8 @@
-import backoff
-import requests
 import logging
 import time
 
+import backoff
+import requests
 from settings import settings
 
 

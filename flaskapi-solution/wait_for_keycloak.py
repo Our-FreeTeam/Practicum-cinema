@@ -1,8 +1,8 @@
+import logging
+
 import backoff
 import requests
-
 from settings import settings
-import logging
 
 
 @backoff.on_exception(backoff.expo,

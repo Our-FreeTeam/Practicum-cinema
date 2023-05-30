@@ -1,9 +1,9 @@
-import backoff
-import requests
+import logging
 import time
 
+import backoff
+import requests
 from settings import settings
-import logging
 
 
 @backoff.on_exception(backoff.expo,

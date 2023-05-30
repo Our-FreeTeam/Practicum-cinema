@@ -1,10 +1,9 @@
 import hashlib
-from abc import abstractmethod, ABC
-
-from pydantic import BaseModel
-from redis.asyncio.client import Redis
+from abc import ABC, abstractmethod
 
 from core.config import settings
+from pydantic import BaseModel
+from redis.asyncio.client import Redis
 
 
 def get_hash(elem_id: str = "") -> str:

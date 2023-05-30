@@ -7,10 +7,11 @@ Create Date: 2023-03-08 14:01:03.635129
 """
 from alembic import op
 from sqlalchemy import DDL
+
 from db.data.film_work import insert_film_work
 from db.data.genre import insert_genre
-from db.data.person import insert_person
 from db.data.genre_film_work import insert_genre_film_work
+from db.data.person import insert_person
 from db.data.person_film_work import insert_person_film_work
 
 # revision identifiers, used by Alembic.

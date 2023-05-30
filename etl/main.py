@@ -1,15 +1,16 @@
 import logging
-from contextlib import contextmanager, closing
+from contextlib import closing, contextmanager
 
 import psycopg2 as psycopg2
-from psycopg2.extras import DictCursor
 from elasticsearch import Elasticsearch
-
-from etl_upload.elastic_upload import MovieUploader, PersonUploader, GenreUploader
-from etl_upload.postgres_extractor import MovieExtractor, PersonExtractor, GenreExtractor
+from etl_upload.elastic_upload import (GenreUploader, MovieUploader,
+                                       PersonUploader)
 from etl_upload.etl_process import EtlProcess
-from storage_config import pgdb, es_host, settings
-from utils import log, backoff
+from etl_upload.postgres_extractor import (GenreExtractor, MovieExtractor,
+                                           PersonExtractor)
+from psycopg2.extras import DictCursor
+from storage_config import es_host, pgdb, settings
+from utils import backoff, log
 
 
 @log

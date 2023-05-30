@@ -1,9 +1,10 @@
+import os
+
 import pytest
 import requests
-import os
 from dotenv import load_dotenv
 
-from keycloak import KeycloakOpenIDConnection, KeycloakAdmin
+from keycloak import KeycloakAdmin, KeycloakOpenIDConnection
 
 load_dotenv()
 

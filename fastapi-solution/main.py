@@ -1,16 +1,14 @@
-import uvicorn
 import requests
-
-from elasticsearch import AsyncElasticsearch
-from fastapi import FastAPI, Request
-from fastapi.responses import ORJSONResponse, JSONResponse
-from redis.asyncio import Redis
-
+import uvicorn
 from api.v1 import films, genres, persons, status
 from core.config import settings
-from db import elastic, redis
-
+from elasticsearch import AsyncElasticsearch
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, ORJSONResponse
 from helios import initialize
+from redis.asyncio import Redis
+
+from db import elastic, redis
 
 initialize(
     api_token=settings.helios_api_token,

@@ -1,12 +1,12 @@
+from core.config import settings
 from dotenv import load_dotenv
 from elasticsearch import AsyncElasticsearch, NotFoundError
-from pydantic import BaseModel
-
-from core.config import settings
 from models.models import ResponseList
-from services.elastic_query_collection import (
-    prep_full_query, prep_text_query, prep_genre_query,
-    prep_search_after_query)
+from pydantic import BaseModel
+from services.elastic_query_collection import (prep_full_query,
+                                               prep_genre_query,
+                                               prep_search_after_query,
+                                               prep_text_query)
 
 load_dotenv()
 

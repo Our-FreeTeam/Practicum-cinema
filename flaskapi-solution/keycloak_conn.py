@@ -1,6 +1,6 @@
-from keycloak import KeycloakOpenID, KeycloakOpenIDConnection, KeycloakAdmin
-
 from settings import settings
+
+from keycloak import KeycloakAdmin, KeycloakOpenID, KeycloakOpenIDConnection
 
 keycloak_conn = KeycloakOpenID(server_url=settings.keycloak_url,
                                client_id=settings.client_id,

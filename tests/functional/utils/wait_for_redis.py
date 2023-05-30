@@ -1,6 +1,5 @@
-import redis
 import backoff
-
+import redis
 from settings import test_settings
 
 

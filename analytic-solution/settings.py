@@ -14,6 +14,8 @@ class Settings(BaseSettings):
 
     auth_url: str = Field(..., env='AUTH_URL')
 
+    request_timeout: int = Field(..., env='REQUEST_TIMEOUT')
+
 
 class Config:
     env_file = '.env'

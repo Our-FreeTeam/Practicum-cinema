@@ -1,9 +1,8 @@
-import redis
 import time
-
 from functools import wraps
-from flask import request, jsonify
 
+import redis
+from flask import jsonify, request
 from settings import settings
 
 redis_client = redis.Redis(host=settings.redis_host, port=settings.redis_port, db=0)

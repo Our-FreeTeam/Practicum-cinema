@@ -1,13 +1,11 @@
 import os
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
+from storage_config import pgdb, settings
 
 from db.models import *
-from storage_config import pgdb, settings
 
 target_metadata = Base.metadata
 

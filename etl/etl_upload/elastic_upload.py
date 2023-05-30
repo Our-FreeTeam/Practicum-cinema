@@ -1,11 +1,10 @@
-import logging
 import datetime
+import logging
 
 import elastic_transport
 import elasticsearch
 from elasticsearch import Elasticsearch
-
-from utils import log, backoff
+from utils import backoff, log
 
 
 class ElasticUpload:

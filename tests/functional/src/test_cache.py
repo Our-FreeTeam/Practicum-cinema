@@ -1,7 +1,7 @@
-import pytest
 import hashlib
-from helpers import make_get_request
 
+import pytest
+from helpers import make_get_request
 from settings import test_settings
 
 

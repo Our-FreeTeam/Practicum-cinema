@@ -1,5 +1,4 @@
 import aiohttp
-
 from settings import test_settings
 
 

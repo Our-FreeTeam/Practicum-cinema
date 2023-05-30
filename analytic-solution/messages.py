@@ -1,1 +1,1 @@
-INCORRECT_TOKEN = 'Incorrect token'
+INCORRECT_TOKEN = 'Incorrect token'  # noqa: S105

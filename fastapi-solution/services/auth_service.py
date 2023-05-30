@@ -4,10 +4,8 @@ from functools import wraps
 import aiohttp
 import backoff
 import requests
-
-from fastapi import HTTPException
-
 from core.config import settings
+from fastapi import HTTPException
 
 
 def check_role(roles: list[str]):

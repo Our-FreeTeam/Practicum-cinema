@@ -1,9 +1,8 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-
 from core.config import settings
-from models.models import ResponseList, Person, PersonFilmsResponse
+from fastapi import APIRouter, Depends, HTTPException, Query
+from models.models import Person, PersonFilmsResponse, ResponseList
 from services import messages
 from services.person import PersonService, get_person_service
 

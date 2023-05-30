@@ -2,24 +2,20 @@ import json
 import logging
 
 import requests
-
 from settings import settings
 
 
 def create_topic(topic_name: str):
     # Get cluster
     cluster_url = f'{settings.kafka_interface_url}/2.0/clusters/kafka/display/cluster_management'
-    print(cluster_url)
-    cluster_response = requests.get(cluster_url)
+    cluster_response = requests.get(cluster_url, timeout=settings.request_timeout)
     cluster_id = cluster_response.json()["defaultClusterId"]
 
     # Create topic
     topic_url = f'{settings.kafka_interface_url}/2.0/kafka/{cluster_id}/topics?validate=false'
-    headers = {
-        "Content-Type": "application/json"
-    }
+    headers = {"Content-Type": "application/json"}
     # Default settings
-    data = {
+    topic_settings = {
         "name": topic_name,
         "numPartitions": "6",
         "replicationFactor": "1",
@@ -65,10 +61,11 @@ def create_topic(topic_name: str):
             "confluent.key.schema.validation": "false",
             "segment.ms": "604800000",
             "message.timestamp.difference.max.ms": "9223372036854775807",
-            "segment.index.bytes": "10485760"
-        }
+            "segment.index.bytes": "10485760",
+        },
     }
-    requests.put(topic_url, data=json.dumps(data), headers=headers)
+    topic_settings = json.dumps(topic_settings)
+    requests.put(topic_url, data=topic_settings, headers=headers, timeout=settings.request_timeout)
 
     return True
 

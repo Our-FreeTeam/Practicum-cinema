@@ -2,12 +2,10 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 
 import psycopg2
-
-from sql import sql_movies, sql_persons, sql_genres
-from etl_models import Movie, Person, Genre
-from utils import log, backoff
-
-from etl_models import PreparedPersonForMovie, PreparedMovie, PersonEtl, PersonMovieList
+from etl_models import (Genre, Movie, Person, PersonEtl, PersonMovieList,
+                        PreparedMovie, PreparedPersonForMovie)
+from sql import sql_genres, sql_movies, sql_persons
+from utils import backoff, log
 
 
 class AbstractPostgresExtractor(ABC):

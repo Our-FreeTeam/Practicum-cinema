@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic
+from typing import Generic, TypeVar
 from uuid import UUID
 
 from orjson import orjson
