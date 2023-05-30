@@ -1,0 +1,30 @@
+@startuml
+
+actor User as Client
+actor Admin as Admin
+
+package "Data Layer" {
+  [Postgres1] -down-> [ETL]
+  [ETL] --> [Elasticsearch]
+
+}
+
+
+package "Main Service" {
+  [NGINX] <--> [FastAPI] : client requests
+  [NGINX] <--> [FlaskAPI] : client requests
+  [FastAPI] <--> [Redis Cache]
+  [FastAPI] <--> [Elasticsearch]
+  [FastAPI] <--> [FlaskAPI]: Authorization
+  [FlaskAPI] <--> [Keycloak] : api for manage users
+  [Keycloak] <--> [Postgres2] : store user accounts
+}
+
+
+[Client] <--> [NGINX]: API requests
+[Admin] <--> [NGINX]: Web interface
+
+
+
+
+@enduml

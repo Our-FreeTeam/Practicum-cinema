@@ -1,0 +1,27 @@
+@startuml
+
+actor User as Client
+actor Admin as Admin
+actor Analyst as Analyst
+
+package "Data Layer" {
+  [Postgres1] -down-> [ETL]
+  [ETL] --> [Elasticsearch]
+}
+
+
+package "UGC Layer" {
+  [FastAPI2] <--> [Kafka]
+  [Kafka] <--> [ClickHouse]
+  [FastAPI2] <--> [Redis cluster] : last timestamp
+}
+
+
+
+
+[Client] <--> [Main Service]: API requests
+[Admin] <--> [Main Service]: Web interface
+[Analyst] <--> [UGC Layer]: view/edit statistic
+[Client] --> [UGC Layer]: save UGC data
+
+@enduml

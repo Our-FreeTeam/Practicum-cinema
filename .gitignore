@@ -1,0 +1,6 @@
+.idea
+/venv
+.env
+.pytest_cache
+/etl_old/
+/_*

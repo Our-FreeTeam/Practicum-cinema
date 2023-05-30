@@ -1,0 +1,16 @@
+flask==2.2.5
+flask-oidc==1.4.0
+Flask-Pydantic==0.11.0
+python-dotenv==0.21.1
+python-keycloak==2.15.3
+gevent==22.10.2
+redis==4.4.2
+flask-restplus==0.13.0
+Werkzeug==2.2.3
+gunicorn==20.1
+flask-swagger-ui==4.11.1
+pydantic[email]==1.10.7
+flask-pydantic-spec==0.4.4
+backoff==2.2.1
+requests==2.31.0
+helios-opentelemetry-sdk==1.0.77

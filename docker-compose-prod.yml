@@ -1,0 +1,208 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:15.2-alpine
+    volumes:
+      - ./_postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    hostname: db
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${DB_NAME}", "-U", "${DB_USER}"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - cinema_network
+
+  redis_cache:
+    build: redis_config
+    hostname: redis
+    volumes:
+      - ./_redis_data:/opt/redis/db
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    networks:
+      - cinema_network
+
+  elasticsearch:
+    image: elasticsearch:7.17.9
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms700m -Xmx700m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    hostname: elasticsearch
+    volumes:
+      - ./_es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+    networks:
+      - cinema_network
+
+
+  etl_service_films:
+    build: etl
+    env_file:
+      - .env
+    environment:
+      - UPLOADED_INDEX=films
+    volumes:
+      - ./db:/opt/app/db:ro
+      - ./structure_migration:/opt/app/structure_migration:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - cinema_network
+
+  etl_service_genres:
+    build: etl
+    env_file:
+      - .env
+    environment:
+      - UPLOADED_INDEX=genres
+    volumes:
+      - ./db:/opt/app/db:ro
+      - ./structure_migration:/opt/app/structure_migration:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - cinema_network
+
+  etl_service_persons:
+    build: etl
+    env_file:
+      - .env
+    environment:
+      - UPLOADED_INDEX=persons
+    volumes:
+      - ./db:/opt/app/db:ro
+      - ./structure_migration:/opt/app/structure_migration:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - cinema_network
+
+
+  fastapi_service:
+    build: fastapi-solution
+    image: fastapi-image
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+      redis_cache:
+        condition: service_healthy
+    healthcheck:
+      test: curl -s http://localhost:8000/api/v1/status >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+    networks:
+      - cinema_network
+
+
+  nginx_service:
+    image: nginx:1.23
+    hostname: nginx
+    volumes:
+      - ./nginx_config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx_config/conf.d:/etc/nginx/conf.d:ro
+    ports:
+      - "80:80"
+    restart: on-failure
+    depends_on:
+      fastapi_service:
+        condition: service_healthy
+    healthcheck:
+      test: curl -s http://localhost:80/api/v1/status >/dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - cinema_network
+
+  keycloak-postgres:
+    image: postgres:15.2-alpine
+    hostname: keycloak-postgres
+    volumes:
+      - ./_postgres_data_cloak:/var/lib/postgresql/data/
+    restart: on-failure
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: pg_isready -d postgres
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - cinema_network
+
+  keycloak:
+    build: keycloak
+    container_name: keycloak
+    hostname: keycloak
+    command:
+      - start --auto-build --db postgres --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm --spi-user-profile-legacy-user-profile-read-only-attributes *_RES_ACCESS_MODE
+    env_file:
+      - .env
+    volumes:
+      - type: bind
+        source: ./keycloak/import/realm-export.json
+        target: /opt/keycloak/data/import/realm-export.json
+        read_only: true
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+    networks:
+      - cinema_network
+
+  flaskapi-solution:
+    build: flaskapi-solution
+    hostname: flaskapi
+    env_file:
+      - .env
+    depends_on:
+      keycloak-postgres:
+        condition: service_healthy
+    networks:
+      - cinema_network
+
+
+volumes:
+  _postgres_data:
+  _es_data:
+  _redis_data:
+  _postgres_data_cloak:
+  tests_auth:
+
+networks:
+  cinema_network:
+    driver: bridge
