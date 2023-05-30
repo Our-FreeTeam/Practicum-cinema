@@ -27,9 +27,9 @@ jobs:
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
-        flake8 ./analytic-solution --count --show-source --statistics --format=html
+        flake8 ./analytic-solution --count --show-source --statistics --format=html --htmldir=flake-report
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 ./analytic-solution --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --format=html
+        flake8 ./analytic-solution --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --format=html --htmldir=flake-report
 
 #    - name: Test with pytest
 #      run: |
