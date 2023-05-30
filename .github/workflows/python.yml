@@ -32,6 +32,17 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --format=html --htmldir=flake-report
 
+    - name: Display Flake8 HTML report
+      uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        paths: "flake_report/**/*.html"
+
+    - name: Render HTML report
+      uses: github-actions-html-output@v1
+      with:
+        file: ${{ steps.filter.outputs.paths }}
+
 #    - name: Test with pytest
 #      run: |
 #        pytest tests/unit
