@@ -16,4 +16,4 @@ def connect_check(client):
 
 if __name__ == '__main__':
     es_client = elasticsearch.Elasticsearch(hosts=test_settings.elastic_url)
-    connect_check(es_client)
+    connect_check(es_client)  # test commit
