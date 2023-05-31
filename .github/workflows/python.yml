@@ -32,7 +32,7 @@ jobs:
       run: |
         mkdir -p flake-report
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
+        flake8 ./analytic-solution --count --statistics --format=html --htmldir=flake-report
 
   notify:
     runs-on: ubuntu-latest
@@ -52,8 +52,7 @@ jobs:
           <b>Yandex cinema</b>
           <b>Build is finished</b>
           Repository: ${{ github.repository }}
-          Commit: 
-          <a href="${{ github.event.head_commit.url }}">${{ github.event.head_commit.message }}</a>
+          Commit: <a href="${{ github.event.head_commit.url }}">${{ github.event.head_commit.message }}</a>
           Author: ${{ github.actor }}
           Status: ${{ needs.build.result }}
           <a href="https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}">Run details</a>
