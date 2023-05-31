@@ -34,6 +34,10 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --statistics --format=html --htmldir=flake-report
 
+    - name: Check mypy
+      run: |
+        mypy ./analytic-solution
+
   notify:
     runs-on: ubuntu-latest
     if: always()
