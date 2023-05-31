@@ -37,13 +37,15 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        format: markdown
-        message: |
-          *Results of the build*
-          *Yandex cinema*
-          Branch: *${{ github.ref }}*
-          Repository: *${{ github.repository }}*
-          Owner: *${{ github.repository_owner }}*
+        format: html
+        message_file: flake-report/index.html
+
+#        message: |
+#          *Results of the build*
+#          *Yandex cinema*
+#          Branch: *${{ github.ref }}*
+#          Repository: *${{ github.repository }}*
+#          Owner: *${{ github.repository_owner }}*
 
 #    - name: HTML Preview
 #      id: html_preview
