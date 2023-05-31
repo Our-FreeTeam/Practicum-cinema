@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      python:
+      matrix:
         version: [ "3.7", "3.8", "3.9", "3.10" ]
 
     steps:
@@ -21,7 +21,7 @@ jobs:
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ python.version }}
+        python-version: ${{ matrix.version }}
 
     - name: Install dependencies
       run: |
