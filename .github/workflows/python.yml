@@ -37,7 +37,7 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        format: markdown
+        format: html
         message_file: flake-report/index.html
 
 #        message: |
