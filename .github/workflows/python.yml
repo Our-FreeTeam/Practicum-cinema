@@ -30,11 +30,26 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
 
-    - name: HTML Preview
-      id: html_preview
-      uses: pavi2410/html-preview-action@v2
+    - name: Send Telegram Message Ok
+      uses: appleboy/telegram-action@master
+      env:
+        GITHUB_CONTEXT: ${{ toJSON(github) }}
       with:
-        html_file: 'flake-report/index.html'
+        to: ${{ secrets.TELEGRAM_ID }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        format: markdown
+        message: |
+          *Results of the build*
+          *Yandex cinema*
+          Branch: *${{ github.ref }}*
+          Repository: *${{ github.repository }}*
+          Owner: *${{ github.repository_owner }}*
+
+#    - name: HTML Preview
+#      id: html_preview
+#      uses: pavi2410/html-preview-action@v2
+#      with:
+#        html_file: 'flake-report.index.html'
 
 #    - name: Test with pytest
 #      run: |
