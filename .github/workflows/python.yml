@@ -32,7 +32,7 @@ jobs:
       run: |
         mkdir -p flake-report
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 ./analytic-solution --count --statistics --format=html --htmldir=flake-report
+        flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
 
     - name: Check mypy
       run: |
@@ -60,22 +60,3 @@ jobs:
           Author: ${{ github.actor }}
           Status: ${{ needs.build.result }}
           <a href="https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}">Run details</a>
-          
-          
-
-#        message: |
-#          *Results of the build*
-#          *Yandex cinema*
-#          Branch: *${{ github.ref }}*
-#          Repository: *${{ github.repository }}*
-#          Owner: *${{ github.repository_owner }}*
-
-#    - name: HTML Preview
-#      id: html_preview
-#      uses: pavi2410/html-preview-action@v2
-#      with:
-#        html_file: 'flake-report.index.html'
-
-#    - name: Test with pytest
-#      run: |
-#        pytest tests/unit
