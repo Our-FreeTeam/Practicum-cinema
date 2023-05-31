@@ -11,13 +11,17 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      python:
+        version: [ "3.7", "3.8", "3.9", "3.10" ]
+
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: "3.10"
+        python-version: ${{ python.version }}
 
     - name: Install dependencies
       run: |
@@ -30,6 +34,7 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
 
+    #TODO: При смене format=html возникает ошибка Bad Request: can't parse entities: Unsupported start tag "!doctype" at byte offset 0
     - name: Send Telegram Message Ok
       uses: appleboy/telegram-action@master
       env:
@@ -37,7 +42,7 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        format: html
+        format: markdown
         message_file: flake-report/index.html
 
 #        message: |
