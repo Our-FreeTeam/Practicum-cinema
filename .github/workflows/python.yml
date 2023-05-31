@@ -34,7 +34,12 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
 
-    #TODO: При смене format=html возникает ошибка Bad Request: can't parse entities: Unsupported start tag "!doctype" at byte offset 0
+  notify:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: build
+
+    steps:
     - name: Send Telegram Message Ok
       uses: appleboy/telegram-action@master
       env:
@@ -42,8 +47,17 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        format: markdown
-        document: flake-report/index.html
+        format: html
+        message: |
+          *Yandex cinema*
+          *Build is finished*
+          Repository: *${{ github.repository }}*
+          Commit: 
+          <a href="${{ github.event.head_commit.url }}">${{ github.event.head_commit.message }} />
+          Author: ${{ github.actor }}
+          Status: ${{ needs.build.result }}
+          
+          
 
 #        message: |
 #          *Results of the build*
