@@ -49,11 +49,11 @@ jobs:
         token: ${{ secrets.TELEGRAM_TOKEN }}
         format: html
         message: |
-          *Yandex cinema*
-          *Build is finished*
-          Repository: *${{ github.repository }}*
+          <b>Yandex cinema</b>
+          <b>Build is finished</b>
+          Repository: ${{ github.repository }}
           Commit: 
-          <a href="${{ github.event.head_commit.url }}">${{ github.event.head_commit.message }} />
+          <a href="${{ github.event.head_commit.url }}">${{ github.event.head_commit.message }}</a>
           Author: ${{ github.actor }}
           Status: ${{ needs.build.result }}
           
