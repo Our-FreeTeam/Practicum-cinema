@@ -34,6 +34,12 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
 
+    - name: HTML Preview
+      id: html_preview
+      uses: pavi2410/html-preview-action@v2
+      with:
+        html_file: 'flake-report/index.html'
+
     - name: Check mypy
       run: |
         mypy ./analytic-solution
