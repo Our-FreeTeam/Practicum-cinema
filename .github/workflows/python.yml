@@ -35,11 +35,11 @@ jobs:
         flake8 ./analytic-solution --count --exit-zero --statistics --format=html --htmldir=flake-report
 
     - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: flake-reports
-          path: |
-            flake-report
+      uses: actions/upload-artifact@v3
+      with:
+        name: flake-reports
+        path: |
+          flake-report
 
     - name: Check mypy
       run: |
