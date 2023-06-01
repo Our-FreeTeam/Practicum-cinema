@@ -64,8 +64,8 @@ def create_topic(topic_name: str):
             "segment.index.bytes": "10485760",
         },
     }
-    topic_settings = json.dumps(topic_settings)
-    requests.put(topic_url, data=topic_settings, headers=headers, timeout=settings.request_timeout)
+    topic_settings_json = json.dumps(topic_settings)
+    requests.put(topic_url, data=topic_settings_json, headers=headers, timeout=settings.request_timeout)
 
     return True
 

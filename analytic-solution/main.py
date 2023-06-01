@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     )
     await kafka.producer.start()
     await kafka.consumer.start()
-    redis.redis = Redis(host=settings.redis_host, port=settings.redis_port)
+    redis.redis = Redis(host=settings.redis_host, port=int(settings.redis_port))
 
     yield
 

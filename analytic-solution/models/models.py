@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from orjson import orjson
+import orjson
 from pydantic import BaseModel
 
 
