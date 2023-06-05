@@ -163,8 +163,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
       PGUSER: postgres
+      PGPORT: 5433
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: [ "CMD", "pg_isready", "-p", "5433" ]
       interval: 3s
       timeout: 5s
       retries: 30
@@ -180,13 +181,17 @@ services:
     container_name: keycloak
     hostname: keycloak
     command:
-      - start --db postgres --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm --spi-user-profile-legacy-user-profile-read-only-attributes *_RES_ACCESS_MODE
+      - start --hostname-strict-https false --hostname-strict false --proxy edge --http-enabled true --import-realm --spi-user-profile-legacy-user-profile-read-only-attributes *_RES_ACCESS_MODE
     env_file:
       - .env
     volumes:
       - type: bind
         source: ./keycloak/import/realm-export.json
         target: /opt/keycloak/data/import/realm-export.json
+        read_only: true
+      - type: bind
+        source: ./keycloak/keycloak.conf
+        target: /opt/keycloak/conf/keycloak.conf
         read_only: true
     ports:
       - "8080:8080"
@@ -229,12 +234,55 @@ services:
     networks:
       - cinema_network
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.10.2
+    depends_on:
+      - elasticsearch
+    environment:
+      XPACK_MONITORING_ENABLED: "false"
+      ES_HOST: "eslogs:9201"
+    ports:
+      - "5044:5044/udp"
+    volumes:
+      - ./logstash/logstash.conf:/config/logstash.conf:ro
+    command: logstash -f /config/logstash.conf
+    networks:
+      - cinema_network
+
+  elasticsearch_logs:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
+    hostname: eslogs
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - http.port=9201 #different port
+      - "ES_JAVA_OPTS=-Xms900m -Xmx900m"
+    ports:
+      - "9201:9201"
+    volumes:
+      - /_es_data_logs:/tmp/elasticsearch/data
+    networks:
+      - cinema_network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.2
+    ports:
+      - "5601:5601"
+    environment:
+      elasticsearch.hosts: "elasticsearch:9201"
+    depends_on:
+      - elasticsearch_logs
+    networks:
+      - cinema_network
+
 volumes:
   _postgres_data:
   _es_data:
   _redis_data:
   _postgres_data_cloak:
   tests_auth:
+  _es_data_logs:
+  logstash:
 
 networks:
   cinema_network:

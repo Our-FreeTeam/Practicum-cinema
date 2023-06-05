@@ -49,4 +49,3 @@ async def request_auth(*args, **kwargs):
                 )
             exec_func = kwargs.pop('exec_func')
             return await exec_func(*args, **kwargs)
-

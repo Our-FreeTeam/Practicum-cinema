@@ -1,11 +1,12 @@
-# Проектная работа 8 спринта (UGC-1) v1
+# Проектная работа 9 спринта (UGC-2) v1
 
-Задание с Kafka и ClickHouse
+Задание с EKL
 
 Для разворачивания проекта использовать env.example и 
 docker-compose-prod.yml,
 docker-compose-kafka.yml,
 docker-compose-clickhouse.yml
+
 
 ** Наша команда оказалась без одного человека, добавленный (третий) коллега, две недели обещал, 
 говорил что работает, в результате в день демо сказал что не смог ничего сделать. 
@@ -156,6 +157,15 @@ docker-compose-clickhouse.yml
         ├── wait_for_flask.py               # Вейтер запуска flask
         ├── wait_for_keycloak.py            # Вейтер запуска KeyCloak
         ├── conftest.py                     # Хелперы
+
+
+├── tests_analytic/                         # Папка с комплектов тестов для UTG-1
+    ├── functional/                         # Функциональные тесты
+        ├── src                             # Папка с тестами
+            ├── test_add_timestamp.py       # тесты добавления таймштампа на фильм
+        ├── requirements.txt                # Зависимости для тестов
+        ├── settings.py                     # Файл настроек
+        ├── wait_for_fastapi.py             # Вейтер запуска FastAPI
 
 
 ├── nginx_config/                   # Папка с настройками nginx
