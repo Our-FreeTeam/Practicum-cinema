@@ -7,8 +7,8 @@ from alembic import context
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from src.config.settings import settings
-from src.db.postgres import metadata as metadata_event
+from config.settings import settings
+from db.postgres import metadata as metadata_event
 
 config = context.config
 p = settings.postgres_settings
@@ -18,7 +18,7 @@ config.set_section_option(section, "POSTGRES_DB", p.dbname)
 config.set_section_option(section, "POSTGRES_USER", p.user)
 config.set_section_option(section, "POSTGRES_PASSWORD", p.password)
 config.set_section_option(section, "DB_HOST", p.host)
-config.set_section_option(section, "DB_PORT", p.port)
+config.set_section_option(section, "DB_PORT", str(p.port))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -3,8 +3,7 @@ import smtplib
 from email.message import EmailMessage
 import uuid
 
-
-from config.settings import settings
+from config.settings import email_server_settings
 from models.models import EmailTemplate, Notification
 from services.abstract_database_service import AbstractNotificationDatabaseService
 from services.abstract_sender import AbstractSender
@@ -14,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class EmailSender(AbstractSender):
     """Управляет отправкой емэйл-писем"""
-    def __init__(self, email_params: settings.email_server_settings, database: AbstractNotificationDatabaseService):
+    def __init__(self, email_params: email_server_settings, database: AbstractNotificationDatabaseService):
         self.email_params = email_params
         self.database = database
 

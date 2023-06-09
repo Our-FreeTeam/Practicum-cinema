@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+
+  sender:
+    container_name: sender
+#    restart: always
+    build:
+      context: .
+      dockerfile: ./rabbit_api/sender/Dockerfile
+    env_file:
+      - ./rabbit_api/sender/.env
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_HOST: "db_postgres"
+    networks:
+      - cinema_network
+
+networks:
+  cinema_network:
+    driver: bridge

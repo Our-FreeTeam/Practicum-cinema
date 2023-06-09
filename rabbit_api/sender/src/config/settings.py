@@ -1,14 +1,5 @@
-import logging
-
-from dotenv import find_dotenv
 from pydantic import BaseSettings, Field
 from logging import config as logging_config
-
-
-# Применяем настройки логирования
-from config.logger import LOGGING
-
-logging_config.dictConfig(LOGGING)
 
 
 class Postgres(BaseSettings):
@@ -16,7 +7,7 @@ class Postgres(BaseSettings):
     dbname: str = Field("notifications", env="POSTGRES_DB")
     user: str = Field("postgres", env="POSTGRES_USER")
     password: str = Field("password", env="POSTGRES_PASSWORD")
-    host: str = Field("db", env="POSTGRES_HOST")
+    host: str = Field("localhost", env="POSTGRES_HOST")
     port: int = Field(5432, env="POSTGRES_PORT")
 
 
@@ -36,21 +27,7 @@ class Sender(BaseSettings):
     password: str = Field("password", env="EMAIL_PASSWORD")
 
 
-class Settings(BaseSettings):
-
-    log_level: int = logging.DEBUG
-    logging_config: dict = LOGGING
-
-    project_name: str = Field("RabbitService", env="PROJECT_NAME")
-
-    email_server_settings = Sender()
-    postgres_settings = Postgres()
-    rabbit_settings = RabbitMQ()
-
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        use_enum_values = True
-
-
-settings = Settings(_env_file=find_dotenv(), _env_file_encoding="utf-8")
+# Загружаем настройки
+email_server_settings = Sender()
+postgres_settings = Postgres()
+rabbit_settings = RabbitMQ()

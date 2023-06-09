@@ -37,7 +37,7 @@ class RabbitConsumer():
             auto_delete=False,
             callback=self.on_queue_declared)
 
-    def on_queue_declared(self):
+    def on_queue_declared(self, frame):
         self.channel.basic_consume(self.params.queue, self.handle_delivery)
 
     def handle_delivery(self, channel, method, properties, body):

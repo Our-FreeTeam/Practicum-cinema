@@ -4,8 +4,9 @@ import logging
 import pika
 import pika.exceptions
 
-from config.settings import settings
 from services.abstract_sender import AbstractSender
+
+from config.settings import rabbit_settings
 from utils.backoff import backoff
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 class Worker:
     """Занимается получением сообщений из очереди RabbitMQ """
-    def __init__(self, rabbit_params: settings.rabbit_settings, sender: AbstractSender, template) -> None:
+    def __init__(self, rabbit_params: rabbit_settings, sender: AbstractSender, template) -> None:
         self.rabbit_params = rabbit_params
         self.sender = sender
         self.template_to_send = template
@@ -37,7 +38,7 @@ class Worker:
             auto_delete=False,
             callback=self.on_queue_declared)
 
-    def on_queue_declared(self):
+    def on_queue_declared(self, frame):
         # Получение сообщений из очереди
         self.channel.basic_consume(self.rabbit_params.queue, self.handle_delivery)
 
