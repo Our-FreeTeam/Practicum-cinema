@@ -8,6 +8,7 @@ from models.models import EmailTemplate
 from utils.postgres_service import NotificationPostgresService
 
 if __name__ == "__main__":
+    s = settings.postgres_settings.dict()
     with create_pg_conn(**settings.postgres_settings.dict(), cursor_factory=DictCursor) as pg_conn:
         # Подключаемся к БД
         postgres_service = NotificationPostgresService(connection=pg_conn, tablename="notifications")

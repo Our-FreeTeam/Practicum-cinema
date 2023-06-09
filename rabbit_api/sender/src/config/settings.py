@@ -14,9 +14,9 @@ logging_config.dictConfig(LOGGING)
 class Postgres(BaseSettings):
     # Настройки Redis
     dbname: str = Field("notifications", env="POSTGRES_DB")
-    user: str = Field("admin", env="POSTGRES_USER")
-    password: str = Field("123qwe", env="POSTGRES_PASSWORD")
-    host: str = Field("localhost", env="POSTGRES_HOST")
+    user: str = Field("postgres", env="POSTGRES_USER")
+    password: str = Field("password", env="POSTGRES_PASSWORD")
+    host: str = Field("db", env="POSTGRES_HOST")
     port: int = Field(5432, env="POSTGRES_PORT")
 
 
@@ -32,8 +32,8 @@ class RabbitMQ(BaseSettings):
 class Sender(BaseSettings):
     address: str = Field("smtp.yandex.ru", env="SERVER_ADDRESS")
     port: int = Field(465, env="SERVER_PORT")
-    login: str = Field(..., env="EMAIL_LOGIN")
-    password: str = Field(..., env="EMAIL_PASSWORD")
+    login: str = Field("login", env="EMAIL_LOGIN")
+    password: str = Field("password", env="EMAIL_PASSWORD")
 
 
 class Settings(BaseSettings):

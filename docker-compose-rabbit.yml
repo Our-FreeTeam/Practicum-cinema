@@ -2,7 +2,6 @@ version: '3.9'
 
 volumes:
   postgres_volume:
-  notifications_db_volume:
 
 services:
   rabbitmq:
@@ -11,14 +10,27 @@ services:
     ports:
       - "127.0.0.1:5672:5672"
       - "127.0.0.1:15672:15672"
+    networks:
+      - cinema_network
 
   db:
     image: postgres:15.0-alpine
     container_name: db
+    restart: always
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_HOST: "db"
     volumes:
       - postgres_volume:/var/lib/postgresql/data/
+      # table initialization
+      - ./rabbit_api/src/db/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
     env_file:
       - ./rabbit_api/src/.env
+    ports:
+      - "5432:5432"
+    networks:
+      - cinema_network
 
   render:
     container_name: render
@@ -29,6 +41,8 @@ services:
       - rabbitmq
     env_file:
       - ./rabbit_api/render/.env
+    networks:
+      - cinema_network
 
   rabbit_api:
     container_name: rabbit_api
@@ -42,27 +56,27 @@ services:
       - db
     ports:
       - "8000:8000"
-
-  notifications-db:
-    container_name: notifications-db
-    restart: always
-    image: postgres:15.0-alpine
-    env_file:
-      - ./rabbit_api/sender/.env
-    ports:
-      - "5432:5432"
-    volumes:
-      - notifications_db_volume:/var/lib/postgresql/data
-      # table initialization
-      - ./rabbit_api/src/db/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - cinema_network
 
   sender:
     container_name: sender
+#    restart: always
     build:
       context: .
       dockerfile: ./rabbit_api/sender/Dockerfile
     env_file:
       - ./rabbit_api/sender/.env
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_HOST: "db"
     depends_on:
       - rabbitmq
-      - notifications-db
+      - db
+    networks:
+      - cinema_network
+
+networks:
+  cinema_network:
+    driver: bridge

@@ -13,7 +13,7 @@ logging_config.dictConfig(LOGGING)
 
 class RabbitMQ(BaseSettings):
     username: str = Field("guest", env="RABBIT_USER")
-    password: str = Field("password", env="RABBIT_PASSWORD")
+    password: str = Field("guest", env="RABBIT_PASSWORD")
     host: str = Field("rabbitmq", env="RABBIT_HOST")
     port: str = Field("5672", env="RABBIT_PORT")
     exchange: str = Field("", env="RABBIT_EXCHANGE")

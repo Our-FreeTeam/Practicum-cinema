@@ -14,11 +14,11 @@ logging_config.dictConfig(LOGGING)
 
 class Postgres(BaseSettings):
     # Настройки Redis
-    dbname: str = Field("events_database", env="POSTGRES_DB")
-    user: str = Field(None, env="POSTGRES_USER")
-    password: str = Field(None, env="POSTGRES_PASSWORD")
-    host: str = Field(None, env="POSTGRES_HOST")
-    port: str = Field(None, env="POSTGRES_PORT")
+    dbname: str = Field("notifications", env="POSTGRES_DB")
+    user: str = Field("postgres", env="POSTGRES_USER")
+    password: str = Field("password", env="POSTGRES_PASSWORD")
+    host: str = Field("db", env="POSTGRES_HOST")
+    port: int = Field(5432, env="POSTGRES_PORT")
 
 
 class RabbitMQ(BaseSettings):
