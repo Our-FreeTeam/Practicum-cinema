@@ -2,12 +2,12 @@ from functools import lru_cache
 
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from models.models import Genre
+from src.models.models import Genre
 from services.cache_service import AsyncCacheStorage, RedisCacheService
 from services.common_service import CommonService
 
-from db.elastic import get_elastic
-from db.redis import get_redis
+from src.db import get_elastic
+from src.db import get_redis
 
 
 class GenreService(CommonService):

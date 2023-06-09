@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from core.config import settings
 from fastapi import APIRouter, Depends, HTTPException, Query
-from models.models import Genre, ResponseList
+from src.models.models import Genre, ResponseList
 from services import messages
 from services.genre import GenreService, get_genre_service
 

@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from core.config import settings
 from fastapi import APIRouter, Depends, HTTPException, Query
-from models.models import Person, PersonFilmsResponse, ResponseList
+from src.models.models import Person, PersonFilmsResponse, ResponseList
 from services import messages
 from services.person import PersonService, get_person_service
 

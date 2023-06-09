@@ -3,13 +3,13 @@ from functools import lru_cache
 from dotenv import load_dotenv
 from elasticsearch import AsyncElasticsearch, NotFoundError
 from fastapi import Depends
-from models.models import Person, PersonFilms, PersonFilmsResponse
+from src.models.models import Person, PersonFilms, PersonFilmsResponse
 from services.cache_service import AsyncCacheStorage, RedisCacheService
 from services.common_service import CommonService
 from services.elastic_query_collection import prep_film_person_query
 
-from db.elastic import get_elastic
-from db.redis import get_redis
+from src.db import get_elastic
+from src.db import get_redis
 
 load_dotenv()
 

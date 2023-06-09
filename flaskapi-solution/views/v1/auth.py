@@ -5,12 +5,12 @@ import messages
 from flask import jsonify, make_response, request
 from flask_pydantic_spec import Request, Response
 from keycloak_conn import keycloak_admin, keycloak_conn
-from main import api, app
-from models.models import (BoolResponse, ErrorStr, Login, OnlyLogin, RegInfo,
-                           SessionList, TokensResp)
+from src.main import api, app
+from src.models.models import (BoolResponse, ErrorStr, Login, OnlyLogin, RegInfo,
+                               SessionList, TokensResp)
 from redis_bucket_conn import rate_limiter
 from settings import settings
-from utils import check_session
+from sender.src.utils import check_session
 
 import keycloak
 from keycloak import KeycloakAuthenticationError, KeycloakPostError

@@ -1,0 +1,68 @@
+version: '3.9'
+
+volumes:
+  postgres_volume:
+  notifications_db_volume:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+
+  db:
+    image: postgres:15.0-alpine
+    container_name: db
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+    env_file:
+      - ./rabbit_api/src/.env
+
+  render:
+    container_name: render
+    build:
+      context: .
+      dockerfile: rabbit_api/render/Dockerfile
+    depends_on:
+      - rabbitmq
+    env_file:
+      - ./rabbit_api/render/.env
+
+  rabbit_api:
+    container_name: rabbit_api
+    restart: always
+    build:
+      context: .
+      dockerfile: rabbit_api/src/Dockerfile
+    env_file:
+      - ./rabbit_api/src/.env
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+
+  notifications-db:
+    container_name: notifications-db
+    restart: always
+    image: postgres:15.0-alpine
+    env_file:
+      - ./rabbit_api/sender/.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - notifications_db_volume:/var/lib/postgresql/data
+      # table initialization
+      - ./rabbit_api/src/db/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+
+  sender:
+    container_name: sender
+    build:
+      context: .
+      dockerfile: ./rabbit_api/sender/Dockerfile
+    env_file:
+      - ./rabbit_api/sender/.env
+    depends_on:
+      - rabbitmq
+      - notifications-db

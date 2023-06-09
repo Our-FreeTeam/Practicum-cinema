@@ -2,11 +2,11 @@ from datetime import datetime
 
 from auth_service import is_authorized
 from fastapi import APIRouter, Depends, Request
-from models.models import Event
+from src.models.models import Event
 from pydantic import StrictBool
 from settings import settings
 
-from db.kafka import get_producer
+from src.db import get_producer
 
 router = APIRouter()
 

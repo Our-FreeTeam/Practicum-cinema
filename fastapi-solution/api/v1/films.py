@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 from core.config import settings
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from models.models import Film, ResponseList
+from src.models.models import Film, ResponseList
 from services import messages
 from services.auth_service import check_role
 from services.film import FilmService, get_film_service
