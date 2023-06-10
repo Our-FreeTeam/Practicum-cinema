@@ -19,6 +19,11 @@ services:
       resources:
         limits:
           memory: 1024M
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "postgres_cinema"
     networks:
       - cinema_network
 
@@ -29,6 +34,11 @@ services:
       - "6379:6379"
     volumes:
       - ./_redis_data:/opt/redis/db
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "redis_ec_cache"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     networks:
@@ -49,14 +59,19 @@ services:
     hostname: elasticsearch
     volumes:
       - ./_es_data:/usr/share/elasticsearch/data
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "es_cinema"
     healthcheck:
       test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
       interval: 30s
       timeout: 10s
       retries: 50
+
     networks:
       - cinema_network
-
 
   etl_service_films:
     build: etl
@@ -72,6 +87,11 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "etl_movies"
     networks:
       - cinema_network
 
@@ -89,6 +109,11 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "etl_genres"
     networks:
       - cinema_network
 
@@ -106,6 +131,11 @@ services:
         condition: service_healthy
       elasticsearch:
         condition: service_healthy
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "etl_persons"
     networks:
       - cinema_network
 
@@ -128,9 +158,13 @@ services:
       interval: 30s
       timeout: 10s
       retries: 50
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "fastapi_cinema_api"
     networks:
       - cinema_network
-
 
   nginx_service:
     image: nginx:1.23
@@ -149,6 +183,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "nginx"
     networks:
       - cinema_network
 
@@ -173,6 +212,11 @@ services:
       resources:
         limits:
           memory: 256M
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "postgres_keycloak"
     networks:
       - cinema_network
 
@@ -198,6 +242,11 @@ services:
     depends_on:
       keycloak-postgres:
         condition: service_healthy
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "keycloak_service"
     networks:
       - cinema_network
 
@@ -213,6 +262,11 @@ services:
         condition: service_healthy
       redis_cache:
         condition: service_healthy
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "flaskapi_auth"
     networks:
       - cinema_network
 
@@ -234,55 +288,13 @@ services:
     networks:
       - cinema_network
 
-  logstash:
-    image: docker.elastic.co/logstash/logstash:7.10.2
-    depends_on:
-      - elasticsearch
-    environment:
-      XPACK_MONITORING_ENABLED: "false"
-      ES_HOST: "eslogs:9201"
-    ports:
-      - "5044:5044/udp"
-    volumes:
-      - ./logstash/logstash.conf:/config/logstash.conf:ro
-    command: logstash -f /config/logstash.conf
-    networks:
-      - cinema_network
-
-  elasticsearch_logs:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.9
-    hostname: eslogs
-    environment:
-      - discovery.type=single-node
-      - bootstrap.memory_lock=true
-      - http.port=9201 #different port
-      - "ES_JAVA_OPTS=-Xms900m -Xmx900m"
-    ports:
-      - "9201:9201"
-    volumes:
-      - /_es_data_logs:/tmp/elasticsearch/data
-    networks:
-      - cinema_network
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.2
-    ports:
-      - "5601:5601"
-    environment:
-      elasticsearch.hosts: "eslogs:9201"
-    depends_on:
-      - elasticsearch_logs
-    networks:
-      - cinema_network
-
 volumes:
   _postgres_data:
   _es_data:
   _redis_data:
   _postgres_data_cloak:
   tests_auth:
-  _es_data_logs:
-  logstash:
+
 
 networks:
   cinema_network:
