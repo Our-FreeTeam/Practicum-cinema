@@ -1,0 +1,5 @@
+pymongo==4.3.3
+faker==18.10.1
+clickhouse_driver==0.2.6
+backoff==2.2.1
+pydantic==1.10.6
