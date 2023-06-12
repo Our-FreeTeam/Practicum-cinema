@@ -1,12 +1,11 @@
 from datetime import datetime
 
 from auth_service import is_authorized
+from db.kafka import get_producer
 from fastapi import APIRouter, Depends, Request
 from models.models import Event
 from pydantic import StrictBool
 from settings import settings
-
-from db.kafka import get_producer
 
 router = APIRouter()
 
@@ -14,9 +13,9 @@ router = APIRouter()
 @router.post('/create', response_model=StrictBool)
 @is_authorized
 async def create_event(
-    request: Request,
-    event: Event,
-    kafka_producer=Depends(get_producer),
+        request: Request,
+        event: Event,
+        kafka_producer=Depends(get_producer),
 ) -> StrictBool:
     """
     Create event in Kafka.

@@ -2,22 +2,18 @@
 
 Задание с EKL
 
-Для разворачивания проекта использовать env.example и 
-docker-compose-prod.yml,
+Для разворачивания проекта использовать env.example и build_dev.bat,
+Либо разворачивать по очереди
+docker-compose-logs.yml,
+docker-compose.yml,
 docker-compose-kafka.yml,
 docker-compose-clickhouse.yml
 
-
-** Наша команда оказалась без одного человека, добавленный (третий) коллега, две недели обещал, 
-говорил что работает, в результате в день демо сказал что не смог ничего сделать. 
-В конце концов на демо, наставник сказал нам, что мы можем пропустить сравнение быстродействия 
-систем для этого спринта, и сделать подобное задание в следующем.**  
-
-Ссылка на репозиторий https://github.com/imkolias/Async_API_sprint_1
+Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
 
 # Структура проекта
 ```
-├── UML_schema/                         # Папка с архитектурой проекта в UML
+├── UML_schema/                         # Папка с архитектурой проекта в UML (спринт 8)
     ├── current/                        
         ├── current_uml_schema_C1.txt   #  текущая - уровень C1
         ├── current_uml_schema_C2.txt   #  текущая - уровень C2
@@ -172,6 +168,16 @@ docker-compose-clickhouse.yml
     ├── conf.d/                     # Папка с настройками сайтов
         ├── site.conf               # Настройка для проекта fastapi
     ├── nginx.conf                  # Файо с общими настройками nginx
+
+
+├── logstash/                       # Папка с настройками сервиса logstash
+    ├── logstash.conf               # файл настроек сервиса logstash 
+   
+ 
+├── fluentd/                        # Папка с настройками сервиса fluentd
+    ├── conf/                       # Папка с настройками сервиса
+        ├── fluent.conf             # Файл настроек сервиса fluentd
+    ├── Dockerfile                  # Dockerfile контейнера с установкой плагина GELF
     
     
 ├── redis_config/                   # Папка с Redis Cache
@@ -192,13 +198,16 @@ docker-compose-clickhouse.yml
 
 
 ├── .env.example                    # Пример файла с переменными окружения
+├── build_dev.bat                   # файл для сборки проекта под Windows
 ├── docker-compose.yml              # dev файл для сборки проекта в докере
+├── docker-compose-logs.yml         # файл для сборки системы логгирования в докере
 ├── docker-compose-prod.yml         # product файл для сборки проекта в докере
 ├── docker-compose-tests.yml        # product файл для сборки проекта в докере
 ├── docker-compose-kafka.yml        # компоуз для сборки системы аналитики на Kafka
 ├── docker-compose-clickhouse.yml   # компоуз для сборки системы аналитики на Kafka
 
-
+├── setup.cfg                       # настройки flake8 и mypy
+├── GITHUB_ACTION.md                # workflow github action
 ├── README.md
 ```
 

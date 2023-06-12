@@ -1,10 +1,9 @@
 from uuid import UUID
 
 from auth_service import is_authorized
+from db.redis import get_redis
 from fastapi import APIRouter, Depends, Request
 from models.models import UserView
-
-from db.redis import get_redis
 
 router = APIRouter()
 
@@ -12,10 +11,10 @@ router = APIRouter()
 @router.get('/get_last_view', response_model=UserView)
 @is_authorized
 async def get_views(
-    user_id: UUID,
-    movie_id: UUID,
-    request: Request,
-    cache=Depends(get_redis),
+        user_id: UUID,
+        movie_id: UUID,
+        request: Request,
+        cache=Depends(get_redis),
 ) -> UserView:
     """
     Get last moment of the watched film by user in Redis.
