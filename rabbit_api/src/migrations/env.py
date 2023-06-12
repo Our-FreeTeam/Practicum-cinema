@@ -1,39 +1,23 @@
+import os
 from logging.config import fileConfig
 
+from dotenv import load_dotenv
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
-from config.settings import settings
 from db.postgres import metadata as metadata_event
 
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
 config = context.config
-p = settings.postgres_settings
 
-section = config.config_ini_section
-config.set_section_option(section, "POSTGRES_DB", p.dbname)
-config.set_section_option(section, "POSTGRES_USER", p.user)
-config.set_section_option(section, "POSTGRES_PASSWORD", p.password)
-config.set_section_option(section, "DB_HOST", p.host)
-config.set_section_option(section, "DB_PORT", str(p.port))
-
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
 fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
 target_metadata = [metadata_event, ]
-
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
 
 
 def run_migrations_offline():
