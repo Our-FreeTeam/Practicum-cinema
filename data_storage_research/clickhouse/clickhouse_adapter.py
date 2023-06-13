@@ -131,3 +131,44 @@ class ClickhouseAdapter:
             table_name = self._distributed_table_name(table_name=table_name)
 
         return self.execute(f"SELECT {fields_str} FROM {table_name}")
+
+
+adapter = ClickhouseAdapter(host=settings.CLICKHOUSE_HOST, user=settings.USER_CH, password=settings.PASSWORD_CH)
+
+
+def init_clickhouse(
+        fields: dict[str, str], table: str,
+) -> None:
+    """Инициализация таблицы в ClickHouse."""
+    adapter.create_db(settings.SHARD_DB, cluster=settings.CLICKHOUSE_CLUSTER)
+    adapter.create_db(settings.REPLICA_DB, cluster=settings.CLICKHOUSE_CLUSTER)
+    adapter.create_table_distributed(
+        table_name=table,
+        fields=fields,
+        partition_by=None,
+        order_by="user_id",
+    )
+
+
+def full_init_clickhouse():
+    # лайки
+    init_clickhouse(fields={
+        "user_id": "String",
+        "film_id": "String",
+        "type": "UInt32",
+        "datetime": "DateTime",
+    }, table=settings.COLLECTION_LIKE)
+    # отзывы
+    init_clickhouse(fields={
+        "user_id": "String",
+        "film_id": "String",
+        "text": "String",
+        "rating": "UInt32",
+        "datetime": "DateTime",
+    }, table=settings.COLLECTION_REVIEW)
+    # закладки
+    init_clickhouse(fields={
+        "user_id": "String",
+        "film_id": "String",
+        "datetime": "DateTime",
+    }, table=settings.COLLECTION_BOOKMARK)
