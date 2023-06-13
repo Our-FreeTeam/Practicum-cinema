@@ -31,7 +31,7 @@ async def create_event(
     key = f'{event.event_type}+{str(event.user_id)}+{str(event.movie_id)}'
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    if key == 20:
+    if event.event_type == 20:
         event.message = 1
 
     kafka_value = f'{key},{event.message},{now_date}'.encode()

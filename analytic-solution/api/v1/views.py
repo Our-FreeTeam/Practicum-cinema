@@ -66,7 +66,7 @@ async def get_likes(
     key = f'{event_type}+{str(user_id)}+{str(movie_id)}'  # noqa: WPS237
     cache_data = await cache.get(key)
 
-    movie_status = UserLike(id=key, film_like=0)
+    movie_status = UserLike(id=key, movie_like=0)
     if cache_data:
-        movie_status.film_like = int(cache_data.decode('utf-8').split(',')[1])
+        movie_status.movie_like = int(cache_data.decode('utf-8').split(',')[1])
     return movie_status
