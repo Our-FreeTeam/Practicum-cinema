@@ -32,7 +32,7 @@ async def create_event(
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if event.event_type == 20:
-        event.message = 1
+        event.message = "1"
 
     kafka_value = f'{key},{event.message},{now_date}'.encode()
     await kafka_producer.send_and_wait(
