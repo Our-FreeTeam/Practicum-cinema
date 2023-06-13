@@ -158,7 +158,7 @@ docker-compose-clickhouse.yml
 ├── tests_analytic/                         # Папка с комплектов тестов для UTG-1
     ├── functional/                         # Функциональные тесты
         ├── src                             # Папка с тестами
-            ├── test_add_timestamp.py       # тесты добавления таймштампа на фильм
+            ├── test_add_ugc.py             # тесты добавления таймштампа на фильм
         ├── requirements.txt                # Зависимости для тестов
         ├── settings.py                     # Файл настроек
         ├── wait_for_fastapi.py             # Вейтер запуска FastAPI
