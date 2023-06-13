@@ -2,6 +2,7 @@ from typing import Callable
 from matplotlib import pyplot as plt
 import numpy as np
 
+from data_storage_research.clickhouse.clickhouse_adapter import full_init_clickhouse
 from data_storage_research.clickhouse.clickhouse_data_storage import clickhouse_insert_step, clickhouse_read_data
 from data_storage_research.fake_data import fake_bookmark_event, fake_like_event, fake_review_event
 from data_storage_research.mongo.mongo_data_storage import mongo_insert_step, mongo_read_data
@@ -51,6 +52,8 @@ def test_read(read_params: list[Callable, str]) -> None:
 
 
 if __name__ == "__main__":
+    full_init_clickhouse()
+
     test_insert(fake_like_event, settings.COLLECTION_LIKE)
     test_insert(fake_review_event, settings.COLLECTION_REVIEW)
     test_insert(fake_bookmark_event, settings.COLLECTION_BOOKMARK)
