@@ -3,9 +3,10 @@ from http import HTTPStatus
 
 import aiohttp
 import backoff
-import messages
 import requests
 from fastapi import HTTPException
+
+import messages
 from settings import settings
 
 

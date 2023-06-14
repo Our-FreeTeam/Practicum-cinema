@@ -2,8 +2,7 @@
 
 from datetime import datetime
 
-from fastapi import APIRouter, Depends
-from fastapi import Request
+from fastapi import APIRouter, Depends, Request
 from pydantic import StrictBool
 
 from auth_service import is_authorized
