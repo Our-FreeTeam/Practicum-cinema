@@ -2,7 +2,7 @@ from uuid import UUID
 
 from auth_service import is_authorized
 from fastapi import APIRouter, Depends, Request
-from models.models import UserView
+from models.models import UserView, UserLike
 
 from db.redis import get_redis
 
