@@ -1,14 +1,15 @@
 from contextlib import asynccontextmanager
 
+import uvicorn
+from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from api.v1 import events, views
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
-from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from redis.asyncio import Redis
-import uvicorn
-
-from api.v1 import events, views
-from db import kafka, redis
 from settings import settings
+
+from db import kafka, redis
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
