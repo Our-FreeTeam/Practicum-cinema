@@ -32,7 +32,7 @@ async def create_event(
     Returns:
         result (StrictBool): True if there were no errors
     """
-    key = f"{event.event_type}{PLUS_SIGN}{event.user_id}{PLUS_SIGN}{event.movie_id}"
+    key = f"{event.event_type}{PLUS_SIGN}{event.user_id}{PLUS_SIGN}{event.movie_id}"  # noqa: WPS221
 
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
