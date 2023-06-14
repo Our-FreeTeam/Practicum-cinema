@@ -8,6 +8,8 @@ from db.redis import get_redis
 
 router = APIRouter()
 
+BOOKMARK_MARK = 10
+LIKE_MARK = 20
 
 @router.get('/get_last_view', response_model=UserView)
 @is_authorized
@@ -32,9 +34,8 @@ async def get_views(
     user_id -- ID of user. Used as a part of key
     movie_id ID of movie. Used as a part of key
     """
-    event_type = 10  # event bookmark
-    key = str(event_type) + "+" + str(user_id)  # noqa: WPS237
-    key += "+" + str(movie_id)
+    event_type = BOOKMARK_MARK  # event bookmark
+    key = f"{event_type}+{user_id}+{movie_id}"
     cache_data = await cache.get(key)
     film_frame = UserView(id=key, film_frame=0)
     if cache_data:
@@ -65,9 +66,8 @@ async def get_likes(
     user_id -- ID of user. Used as a part of key
     movie_id ID of movie. Used as a part of key
     """
-    event_type = 20  # event like
-    key = str(event_type) + "+" + str(user_id)  # noqa: WPS237
-    key += "+" + str(movie_id)
+    event_type = LIKE_MARK  # event like
+    key = f"{event_type}+{user_id}+{movie_id}"
 
     cache_data = await cache.get(key)
 

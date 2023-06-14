@@ -10,6 +10,7 @@ from db.kafka import get_producer
 
 router = APIRouter()
 
+LIKE_MARK = 20
 
 @router.post('/create', response_model=StrictBool)
 @is_authorized
@@ -29,12 +30,11 @@ async def create_event(
     Returns:
         result (StrictBool): True if there were no errors
     """
-    key = str(event.event_type) + "+" + str(event.user_id)
-    key += "+" + str(event.movie_id)
+    key = f"{event.event_type}+{event.user_id}+{event.movie_id}"
 
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    if event.event_type == 20:
+    if event.event_type == LIKE_MARK:
         event.message = "1"
 
     kafka_value = f'{key},{event.message},{now_date}'.encode()
