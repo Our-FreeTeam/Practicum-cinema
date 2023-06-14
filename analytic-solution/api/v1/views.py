@@ -10,6 +10,7 @@ router = APIRouter()
 
 BOOKMARK_MARK = 10
 LIKE_MARK = 20
+PLUS_SIGN = '+'
 
 
 @router.get('/get_last_view', response_model=UserView)
@@ -36,7 +37,6 @@ async def get_views(
     movie_id ID of movie. Used as a part of key
     """
     event_type = BOOKMARK_MARK  # event bookmark
-    PLUS_SIGN = '+'
     key = f"{event_type}{PLUS_SIGN}{user_id}{PLUS_SIGN}{movie_id}"
     cache_data = await cache.get(key)
     film_frame = UserView(id=key, film_frame=0)
@@ -69,7 +69,6 @@ async def get_likes(
     movie_id ID of movie. Used as a part of key
     """
     event_type = LIKE_MARK  # event like
-    PLUS_SIGN = '+'
     key = f"{event_type}{PLUS_SIGN}{user_id}{PLUS_SIGN}{movie_id}"
 
     cache_data = await cache.get(key)
