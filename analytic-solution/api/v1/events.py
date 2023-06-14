@@ -10,6 +10,9 @@ from db.kafka import get_producer
 
 router = APIRouter()
 
+LIKE_MARK = 20
+PLUS_SIGN = '+'
+
 
 @router.post('/create', response_model=StrictBool)
 @is_authorized
@@ -29,8 +32,13 @@ async def create_event(
     Returns:
         result (StrictBool): True if there were no errors
     """
-    key = f'{str(event.user_id)}+{str(event.movie_id)}'
+    key = f"{event.event_type}{PLUS_SIGN}{event.user_id}{PLUS_SIGN}{event.movie_id}"  # noqa: WPS221
+
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    if event.event_type == LIKE_MARK:
+        event.message = "1"
+
     kafka_value = f'{key},{event.message},{now_date}'.encode()
     await kafka_producer.send_and_wait(
         topic=settings.topic_name,
