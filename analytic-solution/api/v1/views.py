@@ -1,9 +1,8 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Request
-
 from auth_service import is_authorized
 from db.redis import get_redis
+from fastapi import APIRouter, Depends, Request
 from models.models import UserLike, UserView
 
 router = APIRouter()
@@ -12,10 +11,10 @@ router = APIRouter()
 @router.get('/get_last_view', response_model=UserView)
 @is_authorized
 async def get_views(
-    user_id: UUID,
-    movie_id: UUID,
-    request: Request,
-    cache=Depends(get_redis),
+        user_id: UUID,
+        movie_id: UUID,
+        request: Request,
+        cache=Depends(get_redis),
 ) -> UserView:
     """
     Get last moment of the watched film by user in Redis.
@@ -33,7 +32,8 @@ async def get_views(
     movie_id ID of movie. Used as a part of key
     """
     event_type = 10  # event bookmark
-    key = f'{event_type}+{str(user_id)}+{str(movie_id)}'  # noqa: WPS237
+    key = str(event_type) + "+" + str(user_id)  # noqa: WPS237
+    key += "+" + str(movie_id)
     cache_data = await cache.get(key)
     film_frame = UserView(id=key, film_frame=0)
     if cache_data:
@@ -44,10 +44,10 @@ async def get_views(
 @router.get('/get_like', response_model=UserLike)
 @is_authorized
 async def get_likes(
-    user_id: UUID,
-    movie_id: UUID,
-    request: Request,
-    cache=Depends(get_redis),
+        user_id: UUID,
+        movie_id: UUID,
+        request: Request,
+        cache=Depends(get_redis),
 ) -> UserLike:
     """
     Get like status film by user in Redis.
@@ -65,7 +65,9 @@ async def get_likes(
     movie_id ID of movie. Used as a part of key
     """
     event_type = 20  # event like
-    key = f'{event_type}+{str(user_id)}+{str(movie_id)}'  # noqa: WPS237
+    key = str(event_type) + "+" + str(user_id)  # noqa: WPS237
+    key += "+" + str(movie_id)
+
     cache_data = await cache.get(key)
 
     movie_status = UserLike(id=key, movie_like=0)
