@@ -3,9 +3,9 @@ import logging
 import time
 
 from aiokafka import AIOKafkaConsumer
-from settings import settings
 
 from db import kafka
+from settings import settings
 
 
 async def check_kafka():
