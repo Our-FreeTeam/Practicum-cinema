@@ -1,3 +1,4 @@
+from __future__ import annotations
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 
 producer: AIOKafkaProducer | None = None
