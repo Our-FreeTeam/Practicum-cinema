@@ -1,9 +1,10 @@
 from uuid import UUID
 
 from auth_service import is_authorized
-from db.redis import get_redis
 from fastapi import APIRouter, Depends, Request
-from models.models import UserLike, UserView
+from models.models import UserView
+
+from db.redis import get_redis
 
 router = APIRouter()
 
