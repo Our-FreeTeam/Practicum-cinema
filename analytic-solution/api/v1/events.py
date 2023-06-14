@@ -15,9 +15,9 @@ router = APIRouter()
 @router.post('/create', response_model=StrictBool)
 @is_authorized
 async def create_event(
-        request: Request,
-        event: Event,
-        kafka_producer=Depends(get_producer),
+    request: Request,
+    event: Event,
+    kafka_producer=Depends(get_producer),
 ) -> StrictBool:
     """
     Create event in Kafka.

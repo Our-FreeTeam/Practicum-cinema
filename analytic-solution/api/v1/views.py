@@ -11,10 +11,10 @@ router = APIRouter()
 @router.get('/get_last_view', response_model=UserView)
 @is_authorized
 async def get_views(
-        user_id: UUID,
-        movie_id: UUID,
-        request: Request,
-        cache=Depends(get_redis),
+    user_id: UUID,
+    movie_id: UUID,
+    request: Request,
+    cache=Depends(get_redis),
 ) -> UserView:
     """
     Get last moment of the watched film by user in Redis.
@@ -44,10 +44,10 @@ async def get_views(
 @router.get('/get_like', response_model=UserLike)
 @is_authorized
 async def get_likes(
-        user_id: UUID,
-        movie_id: UUID,
-        request: Request,
-        cache=Depends(get_redis),
+    user_id: UUID,
+    movie_id: UUID,
+    request: Request,
+    cache=Depends(get_redis),
 ) -> UserLike:
     """
     Get like status film by user in Redis.
