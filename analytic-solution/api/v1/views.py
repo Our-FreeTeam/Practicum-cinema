@@ -36,7 +36,8 @@ async def get_views(
     movie_id ID of movie. Used as a part of key
     """
     event_type = BOOKMARK_MARK  # event bookmark
-    key = f"{event_type}+{user_id}+{movie_id}"
+    PLUS_SIGN = '+'
+    key = f"{event_type}{PLUS_SIGN}{user_id}{PLUS_SIGN}{movie_id}"
     cache_data = await cache.get(key)
     film_frame = UserView(id=key, film_frame=0)
     if cache_data:
@@ -68,7 +69,8 @@ async def get_likes(
     movie_id ID of movie. Used as a part of key
     """
     event_type = LIKE_MARK  # event like
-    key = f"{event_type}+{user_id}+{movie_id}"
+    PLUS_SIGN = '+'
+    key = f"{event_type}{PLUS_SIGN}{user_id}{PLUS_SIGN}{movie_id}"
 
     cache_data = await cache.get(key)
 
