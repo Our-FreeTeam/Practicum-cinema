@@ -1,11 +1,12 @@
 import logging
 import smtplib
-from email.message import EmailMessage
 import uuid
+from email.message import EmailMessage
 
 from config.settings import email_server_settings
 from models.models import EmailTemplate, Notification
-from services.abstract_database_service import AbstractNotificationDatabaseService
+from services.abstract_database_service import \
+    AbstractNotificationDatabaseService
 from services.abstract_sender import AbstractSender
 
 logger = logging.getLogger(__name__)

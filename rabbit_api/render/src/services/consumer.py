@@ -3,9 +3,9 @@ import logging
 
 import pika
 import pika.exceptions
+from utils.backoff import backoff
 
 from config.settings import settings
-from utils.backoff import backoff
 from services.message_handler import MessageHandler
 
 logger = logging.getLogger(__name__)

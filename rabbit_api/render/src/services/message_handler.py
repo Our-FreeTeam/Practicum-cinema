@@ -4,12 +4,10 @@ from typing import Generator
 
 from pydantic import ValidationError
 
-
-from services.schemas import Notification, EmailNotification
-from services.url_shortener import URLShortener
 from services.extraction import UserDataExtractor
-
 from services.rendering import TemplateRender
+from services.schemas import EmailNotification, Notification
+from services.url_shortener import URLShortener
 
 logger = logging.getLogger()
 

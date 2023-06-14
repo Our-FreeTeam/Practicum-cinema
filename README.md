@@ -204,6 +204,12 @@ docker-compose-clickhouse.yml
 Ссылка на библиотеку работы OAuth с российскими провайдерами
 https://mvnrepository.com/artifact/ru.playa.keycloak/keycloak-russian-providers/1.0.49
 
+**Сервисы и используемые порты**
+
+|                  Docker-compose                  |       Контейнеры        |            Порт             |
+|:------------------------------------------------:|:-----------------------:|:---------------------------:|
+|            docker-compose-rabbit.yml             | db<br/>rabbit_api       | "5435:5432"<br/>"8001:8000" |
+| docker-compose.yml<br/>docker-compose-tests.yml  |  fastapi_service<br/>   | "8000:8000"<br/>"5432:5432" |
  
 
 **FlaskAPI**

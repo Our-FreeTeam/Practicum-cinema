@@ -1,4 +1,5 @@
 from typing import Optional
+
 import pika
 
 rq: Optional[pika.BlockingConnection] = None

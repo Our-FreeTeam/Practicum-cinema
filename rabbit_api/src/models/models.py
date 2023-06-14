@@ -1,5 +1,5 @@
 import sqlalchemy
-from sqlalchemy import Column, Integer, String, Boolean, Table, Text
+from sqlalchemy import Boolean, Column, Integer, String, Table, Text
 
 from db.postgres import Base, metadata
 

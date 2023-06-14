@@ -1,9 +1,8 @@
 import logging
+from logging import config as logging_config
 
 from dotenv import find_dotenv
 from pydantic import BaseSettings, Field
-from logging import config as logging_config
-
 
 # Применяем настройки логирования
 from config.logger import LOGGING

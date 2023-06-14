@@ -1,11 +1,12 @@
-import uuid
 import datetime as dt
+import uuid
 
-from psycopg2.extensions import connection
 import psycopg2.extras
+from psycopg2.extensions import connection
 
 from models.models import Notification
-from services.abstract_database_service import AbstractNotificationDatabaseService
+from services.abstract_database_service import \
+    AbstractNotificationDatabaseService
 
 
 class NotificationPostgresService(AbstractNotificationDatabaseService):

@@ -4,9 +4,9 @@ from abc import ABC, abstractmethod
 
 import pika
 import pika.exceptions
+from utils.backoff import backoff, backoff_reconnect
 
 from config.settings import settings
-from utils.backoff import backoff, backoff_reconnect
 
 logger = logging.getLogger(__name__)
 

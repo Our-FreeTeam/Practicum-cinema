@@ -1,7 +1,7 @@
 import logging
 
-from services.consumer import RabbitConsumer
 from config.settings import settings
+from services.consumer import RabbitConsumer
 from services.extraction import UserDataExtractor
 from services.message_handler import EmailMessageHandler
 from services.publisher import RabbitPublisher

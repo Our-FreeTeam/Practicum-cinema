@@ -3,11 +3,10 @@ import logging
 
 import pika
 import pika.exceptions
-
-from services.abstract_sender import AbstractSender
+from utils.backoff import backoff
 
 from config.settings import rabbit_settings
-from utils.backoff import backoff
+from services.abstract_sender import AbstractSender
 
 logger = logging.getLogger(__name__)
 

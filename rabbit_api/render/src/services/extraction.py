@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 import requests
-
 from utils.backoff import backoff
 
 

@@ -4,7 +4,7 @@ import logging
 import pika
 import pika.exceptions
 
-from config.settings import settings, Queue
+from config.settings import Queue, settings
 
 logger = logging.getLogger(__name__)
 r = settings.rabbit_settings

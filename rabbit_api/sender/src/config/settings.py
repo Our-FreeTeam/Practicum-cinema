@@ -1,5 +1,6 @@
-from pydantic import BaseSettings, Field
 from logging import config as logging_config
+
+from pydantic import BaseSettings, Field
 
 
 class Postgres(BaseSettings):
@@ -8,7 +9,7 @@ class Postgres(BaseSettings):
     user: str = Field("postgres", env="POSTGRES_USER")
     password: str = Field("password", env="POSTGRES_PASSWORD")
     host: str = Field("localhost", env="POSTGRES_HOST")
-    port: int = Field(5432, env="POSTGRES_PORT")
+    port: int = Field(5435, env="POSTGRES_PORT")
 
 
 class RabbitMQ(BaseSettings):
