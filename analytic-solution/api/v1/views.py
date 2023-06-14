@@ -11,6 +11,7 @@ router = APIRouter()
 BOOKMARK_MARK = 10
 LIKE_MARK = 20
 
+
 @router.get('/get_last_view', response_model=UserView)
 @is_authorized
 async def get_views(

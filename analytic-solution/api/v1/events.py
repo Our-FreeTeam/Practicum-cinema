@@ -12,6 +12,7 @@ router = APIRouter()
 
 LIKE_MARK = 20
 
+
 @router.post('/create', response_model=StrictBool)
 @is_authorized
 async def create_event(
