@@ -2,13 +2,13 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
+from api.v1 import events, views
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from redis.asyncio import Redis
-
-from api.v1 import events, views
-from db import kafka, redis
 from settings import settings
+
+from db import kafka, redis
 
 
 @asynccontextmanager
