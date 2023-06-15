@@ -16,7 +16,6 @@ EMAIL_SERVER_ADDRESS EMAIL_SERVER_PORT EMAIL_ACCOUNT_LOGIN EMAIL_ACCOUNT_PASSWOR
 make run_rabbit
 ```
 
-
 ### Миграции данных
 Для миграции данных используется библиотека alembic.
 Для перехода в папку api выполните команду
@@ -43,11 +42,11 @@ alembic revision --autogenerate -m "Database creation"
 Для лучшего отслеживания рекомендуется переимновывать созданные файлы миграции, добавляя в начало дату создания.
 Чтобы запустить миграцию, пропишите команду (revision берется из файла миграции)
 ```
-alembic upgrate <revision>
+alembic upgrade <revision>
 ```
 или
 ```
-alembic upgrate head
+alembic upgrade head
 ```
 
 ### Документация API

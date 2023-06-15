@@ -16,8 +16,8 @@ class Postgres(BaseSettings):
     dbname: str = Field("notifications", env="POSTGRES_DB")
     user: str = Field("postgres", env="POSTGRES_USER")
     password: str = Field("password", env="POSTGRES_PASSWORD")
-    host: str = Field("localhost", env="POSTGRES_HOST")
-    port: int = Field(5432, env="POSTGRES_PORT")
+    host: str = Field("127.0.0.1", env="POSTGRES_HOST")
+    port: int = Field(5435, env="POSTGRES_PORT")
 
 
 class RabbitMQ(BaseSettings):
