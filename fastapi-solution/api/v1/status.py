@@ -15,7 +15,7 @@ async def status_func(status_service: FilmService = Depends(get_film_service)) -
        Get service status by find one element
     """
     items = await status_service.get_list_from_elastic(query="The", page_size=1)
-    if not items.result_list:
+    if not items:
         raise HTTPException(status_code=HTTPStatus.SERVICE_UNAVAILABLE,
                             detail=messages.STATUS_ERROR)
     current_status = "OK"

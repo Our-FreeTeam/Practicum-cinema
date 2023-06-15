@@ -8,7 +8,7 @@ FA_STATUS_OK="FA_OK.STATUS"
 
 
 if [ -e /$FA_STATUS_OK ]; then
-  pytest /tests_analytic/functional/src --hs_access_token="$HELIOS_API_TOKEN" --hs_enabled=true
+  pytest /tests_analytic/functional/src --hs_access_token="$HELIOS_API_TOKEN" --hs_enabled=false
 else
   echo "================== !!! ===================="
   echo "WARNING THERE IS ERRORS WITH FASTAPI check"
