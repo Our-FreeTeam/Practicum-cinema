@@ -5,8 +5,7 @@ import psycopg2
 from etl_models import (Genre, Movie, Person, PersonEtl, PersonMovieList,
                         PreparedMovie, PreparedPersonForMovie)
 from sql import sql_genres, sql_movies, sql_persons
-from sender.src.utils import log
-from sender.src.utils import backoff
+from utils import backoff, log
 
 
 class AbstractPostgresExtractor(ABC):

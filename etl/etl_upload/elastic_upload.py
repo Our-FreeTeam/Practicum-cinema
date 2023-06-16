@@ -4,8 +4,7 @@ import logging
 import elastic_transport
 import elasticsearch
 from elasticsearch import Elasticsearch
-from sender.src.utils import log
-from sender.src.utils import backoff
+from utils import backoff, log
 
 
 class ElasticUpload:

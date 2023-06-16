@@ -2,12 +2,12 @@ from functools import lru_cache
 
 from elasticsearch import AsyncElasticsearch
 from fastapi import Depends
-from src.models.models import Film
+from models.models import Film
 from services.cache_service import AsyncCacheStorage, RedisCacheService
 from services.common_service import CommonService
 
-from src.db import get_elastic
-from src.db import get_redis
+from db.elastic import get_elastic
+from db.redis import get_redis
 
 
 class FilmService(CommonService):
