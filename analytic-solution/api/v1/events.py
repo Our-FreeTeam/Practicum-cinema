@@ -34,6 +34,7 @@ async def create_event(
     """
     key = f"{event.event_type}{PLUS_SIGN}{event.user_id}{PLUS_SIGN}{event.movie_id}"
 
+
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     if event.event_type == LIKE_MARK:
