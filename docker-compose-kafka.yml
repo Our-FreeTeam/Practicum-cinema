@@ -2,7 +2,7 @@
 version: '3.9'
 services:
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.3.0
+    image: confluentinc/cp-zookeeper:latest
     hostname: zookeeper
     container_name: zookeeper
     ports:
@@ -22,7 +22,7 @@ services:
       - cinema_network
 
   broker:
-    image: confluentinc/cp-server:7.3.0
+    image: confluentinc/cp-server:latest
     hostname: broker
     container_name: broker
     depends_on:
@@ -57,7 +57,7 @@ services:
       - cinema_network
 
   schema-registry:
-    image: confluentinc/cp-schema-registry:7.3.0
+    image: confluentinc/cp-schema-registry:latest
     hostname: schema-registry
     container_name: schema-registry
     depends_on:
@@ -72,7 +72,7 @@ services:
       - cinema_network
 
   connect:
-    image: cnfldemos/cp-server-connect-datagen:0.6.0-7.3.0
+    image: confluentinc/cp-server-connect:latest
     hostname: connect
     container_name: connect
     depends_on:
@@ -95,7 +95,7 @@ services:
       CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       # CLASSPATH required due to CC-2422
-      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.3.0.jar
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-latest.jar
       CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
       CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
       CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components,
@@ -104,13 +104,13 @@ services:
     volumes:
       - ./_kafka_data/connect:/var/lib/kafka/data:rw
       - ./kafka-config/connectors:/usr/share/kafka-plugins
-      - ./kafka-config/redis_sink_conf:/etc/kafka-connect/jars
+      - ./kafka-config/sink_conf:/etc/kafka-connect/jars
     networks:
       - cinema_network
 
 
   control-center:
-    image: confluentinc/cp-enterprise-control-center:7.3.0
+    image: confluentinc/cp-enterprise-control-center:latest
     hostname: control-center
     container_name: control-center
     depends_on:
@@ -135,7 +135,7 @@ services:
       - cinema_network
 
   ksqldb-server:
-    image: confluentinc/cp-ksqldb-server:7.3.0
+    image: confluentinc/cp-ksqldb-server:latest
     hostname: ksqldb-server
     container_name: ksqldb-server
     depends_on:
@@ -159,44 +159,9 @@ services:
     networks:
       - cinema_network
 
-#  ksqldb-cli:
-#    image: confluentinc/cp-ksqldb-cli:7.3.0
-#    container_name: ksqldb-cli
-#    depends_on:
-#      - broker
-#      - connect
-#      - ksqldb-server
-#    entrypoint: /bin/sh
-#    tty: true
-#    networks:
-#      - cinema_network
-
-#  ksql-datagen:
-#    image: confluentinc/ksqldb-examples:7.3.0
-#    hostname: ksql-datagen
-#    container_name: ksql-datagen
-#    depends_on:
-#      - ksqldb-server
-#      - broker
-#      - schema-registry
-#      - connect
-#    command: "bash -c 'echo Waiting for Kafka to be ready... && \
-#                       cub kafka-ready -b broker:29092 1 40 && \
-#                       echo Waiting for Confluent Schema Registry to be ready... && \
-#                       cub sr-ready schema-registry 8081 40 && \
-#                       echo Waiting a few seconds for topic creation to finish... && \
-#                       sleep 11 && \
-#                       tail -f /dev/null'"
-#    environment:
-#      KSQL_CONFIG_DIR: "/etc/ksql"
-#      STREAMS_BOOTSTRAP_SERVERS: broker:29092
-#      STREAMS_SCHEMA_REGISTRY_HOST: schema-registry
-#      STREAMS_SCHEMA_REGISTRY_PORT: 8081
-#    networks:
-#      - cinema_network
 
   rest-proxy:
-    image: confluentinc/cp-kafka-rest:7.3.0
+    image: confluentinc/cp-kafka-rest:latest
     depends_on:
       - broker
       - schema-registry

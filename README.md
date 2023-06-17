@@ -3,9 +3,9 @@
 Задание с EKL
 
 Для разворачивания проекта использовать env.example и 
-docker-compose-prod.yml,
+docker-compose.yml,
 docker-compose-kafka.yml,
-docker-compose-clickhouse.yml
+docker-compose-mongo-solo.yml
 
 
 ** Наша команда оказалась без одного человека, добавленный (третий) коллега, две недели обещал, 

@@ -8,12 +8,16 @@ from db.redis import get_redis
 
 router = APIRouter()
 
+BOOKMARK_MARK = 10
+PLUS_SIGN = '+'
 
-@router.get('/get_last_view', response_model=UserView)
+
+@router.get('/get_last_event', response_model=UserView)
 @is_authorized
 async def get_views(
     user_id: UUID,
     movie_id: UUID,
+    event_type: int,
     request: Request,
     cache=Depends(get_redis),
 ) -> UserView:
@@ -32,7 +36,7 @@ async def get_views(
     user_id -- ID of user. Used as a part of key
     movie_id ID of movie. Used as a part of key
     """
-    key = f'{str(user_id)}+{str(movie_id)}'  # noqa: WPS237
+    key = f"{event_type}{PLUS_SIGN}{user_id}{PLUS_SIGN}{movie_id}"
     cache_data = await cache.get(key)
     film_frame = UserView(id=key, film_frame=0)
     if cache_data:
