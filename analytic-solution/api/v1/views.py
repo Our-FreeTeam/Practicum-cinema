@@ -25,6 +25,7 @@ async def get_views(
     Get last moment of the watched film by user in Redis.
 
     Parameters:
+        event_type: type of event to take (int)
         user_id: ID of user
         movie_id: ID of movie
         request: FastAPI request
