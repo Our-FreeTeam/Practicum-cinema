@@ -57,7 +57,7 @@ user_id = get_user_id("cinema_admin")
                                                             "message": 1234}),
 
      (200, 'GET',
-      analytic_url + f'/api/v1/views/get_last_view?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+      analytic_url + f'/api/v1/views/get_last_event?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {}),
 
      (200, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,
@@ -68,7 +68,6 @@ user_id = get_user_id("cinema_admin")
      (200, 'GET',
       analytic_url + f'/api/v1/views/get_like?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {}),
-
 
      (202, 'POST', site_url + 'v1/auth/logout', {"user": "cinema_admin", "password": "password"}),
      (401, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,

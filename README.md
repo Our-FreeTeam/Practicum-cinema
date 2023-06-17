@@ -5,11 +5,13 @@
 Для разворачивания проекта использовать env.example и build_dev.bat,
 Либо разворачивать по очереди
 docker-compose-logs.yml,
+docker-compose-mongo-solo.yml
+docker-compose-kafka.yml
 docker-compose.yml,
-docker-compose-kafka.yml,
-docker-compose-clickhouse.yml
+
 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
+
 
 # Структура проекта
 ```
@@ -191,11 +193,12 @@ docker-compose-clickhouse.yml
 
 
 ├── kafka-config/                   # Папка с настройками Apache Kafka - UGC
-    ├── redis_sink_conf             # Файл с настройками для
-        ├── sink.properis           # настройки для коннектора redis sink         
+    ├── sink_conf                   # Файл с настройками для
+        ├── Mongosink.properis      # настройки для коннектора Mongo sink     
+        ├── RedisSink.properis      # настройки для коннектора redis sink                
     ├── connectors                  # папка с дополнительными коннекторами
-        ├── jcustenborder-kafka-connect-redis-0.0.4      # Redis Sink connector
-
+        ├── jcustenborder-kafka-connect-redis-0.0.4     # Redis Sink connector
+        ├── mongodb-kafka-connect-mongodb-1.10.1        # MongoDB connector
 
 ├── .env.example                    # Пример файла с переменными окружения
 ├── build_dev.bat                   # файл для сборки проекта под Windows
@@ -204,7 +207,8 @@ docker-compose-clickhouse.yml
 ├── docker-compose-prod.yml         # product файл для сборки проекта в докере
 ├── docker-compose-tests.yml        # product файл для сборки проекта в докере
 ├── docker-compose-kafka.yml        # компоуз для сборки системы аналитики на Kafka
-├── docker-compose-clickhouse.yml   # компоуз для сборки системы аналитики на Kafka
+├── docker-compose-mongo-solo.yml   # компоуз для сборки системы mongo
+
 
 ├── setup.cfg                       # настройки flake8 и mypy
 ├── GITHUB_ACTION.md                # workflow github action

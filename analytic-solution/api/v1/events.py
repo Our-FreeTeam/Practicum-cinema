@@ -11,7 +11,6 @@ from db.kafka import get_producer
 router = APIRouter()
 
 LIKE_MARK = 20
-PLUS_SIGN = '+'
 
 
 @router.post('/create', response_model=StrictBool)
@@ -32,7 +31,7 @@ async def create_event(
     Returns:
         result (StrictBool): True if there were no errors
     """
-    key = f"{event.event_type}{PLUS_SIGN}{event.user_id}{PLUS_SIGN}{event.movie_id}"  # noqa: WPS221
+    key = f"{event.event_type}+{event.user_id}+{event.movie_id}"
 
     now_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
