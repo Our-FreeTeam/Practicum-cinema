@@ -2,7 +2,7 @@ from uuid import UUID
 
 from auth_service import is_authorized
 from fastapi import APIRouter, Depends, Request
-from models.models import UserLike, UserView
+from models.models import UserView
 
 from db.redis import get_redis
 
@@ -10,7 +10,6 @@ router = APIRouter()
 
 BOOKMARK_MARK = 10
 PLUS_SIGN = '+'
-
 
 
 @router.get('/get_last_event', response_model=UserView)
@@ -39,11 +38,9 @@ async def get_views(
     movie_id ID of movie. Used as a part of key
     """
 
-    event_type = BOOKMARK_MARK  # event bookmark
     key = f"{event_type}{PLUS_SIGN}{user_id}{PLUS_SIGN}{movie_id}"
     cache_data = await cache.get(key)
     film_frame = UserView(id=key, film_frame=0)
     if cache_data:
         film_frame.film_frame = int(cache_data.decode('utf-8').split(',')[1])
     return film_frame
-

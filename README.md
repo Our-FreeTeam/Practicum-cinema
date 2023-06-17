@@ -5,6 +5,8 @@
 Для разворачивания проекта использовать env.example и build_dev.bat,
 Либо разворачивать по очереди
 docker-compose-logs.yml,
+docker-compose-mongo-solo.yml
+docker-compose-kafka.yml
 docker-compose.yml,
 
 
