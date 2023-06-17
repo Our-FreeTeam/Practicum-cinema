@@ -4,16 +4,11 @@
 
 Для разворачивания проекта использовать env.example и 
 docker-compose.yml,
+docker-compose-logs.yml,
 docker-compose-kafka.yml,
 docker-compose-mongo-solo.yml
 
-
-** Наша команда оказалась без одного человека, добавленный (третий) коллега, две недели обещал, 
-говорил что работает, в результате в день демо сказал что не смог ничего сделать. 
-В конце концов на демо, наставник сказал нам, что мы можем пропустить сравнение быстродействия 
-систем для этого спринта, и сделать подобное задание в следующем.**  
-
-Ссылка на репозиторий https://github.com/imkolias/Async_API_sprint_1
+Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema/
 
 # Структура проекта
 ```
@@ -162,7 +157,7 @@ docker-compose-mongo-solo.yml
 ├── tests_analytic/                         # Папка с комплектов тестов для UTG-1
     ├── functional/                         # Функциональные тесты
         ├── src                             # Папка с тестами
-            ├── test_add_timestamp.py       # тесты добавления таймштампа на фильм
+            ├── test_add_ugc.py             # тесты добавления таймштампа на фильм
         ├── requirements.txt                # Зависимости для тестов
         ├── settings.py                     # Файл настроек
         ├── wait_for_fastapi.py             # Вейтер запуска FastAPI
@@ -172,6 +167,16 @@ docker-compose-mongo-solo.yml
     ├── conf.d/                     # Папка с настройками сайтов
         ├── site.conf               # Настройка для проекта fastapi
     ├── nginx.conf                  # Файо с общими настройками nginx
+
+
+├── logstash/                       # Папка с настройками сервиса logstash
+    ├── logstash.conf               # файл настроек сервиса logstash 
+   
+ 
+├── fluentd/                        # Папка с настройками сервиса fluentd
+    ├── conf/                       # Папка с настройками сервиса
+        ├── fluent.conf             # Файл настроек сервиса fluentd
+    ├── Dockerfile                  # Dockerfile контейнера с установкой плагина GELF
     
     
 ├── redis_config/                   # Папка с Redis Cache
@@ -185,20 +190,24 @@ docker-compose-mongo-solo.yml
 
 
 ├── kafka-config/                   # Папка с настройками Apache Kafka - UGC
-    ├── redis_sink_conf             # Файл с настройками для
-        ├── sink.properis           # настройки для коннектора redis sink         
+    ├── sink_conf                   # Файл с настройками для
+        ├── Mongosink.properis      # настройки для коннектора Mongo sink     
+        ├── RedisSink.properis      # настройки для коннектора redis sink                
     ├── connectors                  # папка с дополнительными коннекторами
-        ├── jcustenborder-kafka-connect-redis-0.0.4      # Redis Sink connector
-
+        ├── jcustenborder-kafka-connect-redis-0.0.4     # Redis Sink connector
+        ├── mongodb-kafka-connect-mongodb-1.10.1        # MongoDB connector
 
 ├── .env.example                    # Пример файла с переменными окружения
+├── build_dev.bat                   # файл для сборки проекта под Windows
 ├── docker-compose.yml              # dev файл для сборки проекта в докере
+├── docker-compose-logs.yml         # файл для сборки системы логгирования в докере
 ├── docker-compose-prod.yml         # product файл для сборки проекта в докере
 ├── docker-compose-tests.yml        # product файл для сборки проекта в докере
 ├── docker-compose-kafka.yml        # компоуз для сборки системы аналитики на Kafka
-├── docker-compose-clickhouse.yml   # компоуз для сборки системы аналитики на Kafka
+├── docker-compose-mongo-solo.yml   # компоуз для сборки системы mongo
 
-
+├── setup.cfg                       # настройки flake8 и mypy
+├── GITHUB_ACTION.md                # workflow github action
 ├── README.md
 ```
 
