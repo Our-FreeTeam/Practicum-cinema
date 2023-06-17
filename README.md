@@ -2,17 +2,18 @@
 
 Задание с EKL
 
-Для разворачивания проекта использовать env.example и 
-docker-compose.yml,
+Для разворачивания проекта использовать env.example и build_dev.bat,
+Либо разворачивать по очереди
 docker-compose-logs.yml,
-docker-compose-kafka.yml,
-docker-compose-mongo-solo.yml
+docker-compose.yml,
 
-Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema/
+
+Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
+
 
 # Структура проекта
 ```
-├── UML_schema/                         # Папка с архитектурой проекта в UML
+├── UML_schema/                         # Папка с архитектурой проекта в UML (спринт 8)
     ├── current/                        
         ├── current_uml_schema_C1.txt   #  текущая - уровень C1
         ├── current_uml_schema_C2.txt   #  текущая - уровень C2
@@ -205,6 +206,7 @@ docker-compose-mongo-solo.yml
 ├── docker-compose-tests.yml        # product файл для сборки проекта в докере
 ├── docker-compose-kafka.yml        # компоуз для сборки системы аналитики на Kafka
 ├── docker-compose-mongo-solo.yml   # компоуз для сборки системы mongo
+
 
 ├── setup.cfg                       # настройки flake8 и mypy
 ├── GITHUB_ACTION.md                # workflow github action

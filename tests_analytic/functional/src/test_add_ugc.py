@@ -47,15 +47,26 @@ user_id = get_user_id("cinema_admin")
       {"user": "cinema_admin", "password": "wrong_pass",
        "user_id": user_id,
        "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
+       "event_type": 10,
        "message": 1234}),
 
      (200, 'POST', site_url + 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
      (200, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,
                                                             "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
+                                                            "event_type": 10,
                                                             "message": 1234}),
 
      (200, 'GET',
-      analytic_url + f'/api/v1/views/get_last_event?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+      analytic_url + f'/api/v1/views/get_last_enent?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+      {}),
+
+     (200, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,
+                                                            "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
+                                                            "event_type": 20,
+                                                            "message": 1234}),
+
+     (200, 'GET',
+      analytic_url + f'/api/v1/views/get_like?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {}),
 
      (202, 'POST', site_url + 'v1/auth/logout', {"user": "cinema_admin", "password": "password"}),
@@ -68,6 +79,8 @@ user_id = get_user_id("cinema_admin")
          "Login into service",
          "Save user frame for movie",
          "Get frame in movie for user",
+         "Save user like for movie",
+         "Get user like for movie",
          "Logout from service",
          "Can't save user event in Kafka"
          ]
