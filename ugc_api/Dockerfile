@@ -12,4 +12,6 @@ RUN  pip install --upgrade pip \
 
 COPY . .
 
+RUN chmod +x /opt/fastapi/entrypoint.sh
+
 ENTRYPOINT ["/opt/fastapi/entrypoint.sh"]

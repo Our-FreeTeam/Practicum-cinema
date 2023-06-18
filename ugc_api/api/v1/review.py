@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.models import Review
 from uuid import UUID
 from db.mongo import database
@@ -11,8 +11,8 @@ reviews = database['reviews']
 
 
 @router.post('/create', response_model=Review)
-#@is_authorized
-async def create_review(user_id: UUID, movie_id: UUID, review: Review):
+@is_authorized
+async def create_review(request: Request, user_id: UUID, movie_id: UUID, review: Review):
     """
     Create a new review record for the specified user and movie.
 
@@ -33,8 +33,8 @@ async def create_review(user_id: UUID, movie_id: UUID, review: Review):
 
 
 @router.get('/', response_model=Review)
-#@is_authorized
-async def get_review(user_id: UUID, movie_id: UUID):
+@is_authorized
+async def get_review(request: Request, user_id: UUID, movie_id: UUID):
     """
     Retrieve a review record for the specified user and movie.
 
@@ -62,8 +62,8 @@ async def get_review(user_id: UUID, movie_id: UUID):
 
 
 @router.put('/update', response_model=Review)
-#@is_authorized
-async def update_review(user_id: UUID, movie_id: UUID, review: Review):
+@is_authorized
+async def update_review(request: Request, user_id: UUID, movie_id: UUID, review: Review):
     """
     Update an existing review record for the specified user and movie.
 
@@ -95,8 +95,8 @@ async def update_review(user_id: UUID, movie_id: UUID, review: Review):
 
 
 @router.delete('/')
-#@is_authorized
-async def delete_review(user_id: UUID, movie_id: UUID):
+@is_authorized
+async def delete_review(request: Request, user_id: UUID, movie_id: UUID):
     """
     Delete a review record for the specified user and movie.
 

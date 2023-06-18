@@ -12,4 +12,6 @@ RUN  pip install --upgrade pip \
 
 COPY . .
 
+RUN chmod +x /tests_auth/functional/entrypoint.sh
+
 ENTRYPOINT ["/tests_auth/functional/entrypoint.sh"]

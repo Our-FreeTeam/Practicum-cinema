@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.models import FrameNumber
 from uuid import UUID
 from db.mongo import database
@@ -7,12 +7,12 @@ from pymongo import ReturnDocument, DESCENDING
 from bson import Binary
 
 router = APIRouter()
-framenumbers = database['framenumbers']
+framenumbers = database['framenumber']
 
 
 @router.post('/create', response_model=FrameNumber)
-# @is_authorized
-async def create_frame_number(user_id: UUID, movie_id: UUID, frame_number: FrameNumber):
+@is_authorized
+async def create_frame_number(request: Request, user_id: UUID, movie_id: UUID, frame_number: FrameNumber):
     """
     Create a new frame number record for the specified user and movie.
 
@@ -33,8 +33,8 @@ async def create_frame_number(user_id: UUID, movie_id: UUID, frame_number: Frame
 
 
 @router.get('/', response_model=FrameNumber)
-#@is_authorized
-async def get_frame_number(user_id: UUID, movie_id: UUID):
+@is_authorized
+async def get_frame_number(request: Request, user_id: UUID, movie_id: UUID):
     """
     Retrieve a frame number record for the specified user and movie.
 
@@ -51,7 +51,6 @@ async def get_frame_number(user_id: UUID, movie_id: UUID):
         sort=[("_id", DESCENDING)],
     )
 
-
     if frame_number is None:
         raise HTTPException(status_code=404, detail='Frame number not found')
 
@@ -63,8 +62,8 @@ async def get_frame_number(user_id: UUID, movie_id: UUID):
 
 
 @router.put('/update', response_model=FrameNumber)
-# @is_authorized
-async def update_frame_number(user_id: UUID, movie_id: UUID, frame_number: FrameNumber):
+@is_authorized
+async def update_frame_number(request: Request, user_id: UUID, movie_id: UUID, frame_number: FrameNumber):
     """
     Update an existing frame number record for the specified user and movie.
 
@@ -96,8 +95,8 @@ async def update_frame_number(user_id: UUID, movie_id: UUID, frame_number: Frame
 
 
 @router.delete('/')
-# @is_authorized
-async def delete_frame_number(user_id: UUID, movie_id: UUID):
+@is_authorized
+async def delete_frame_number(request: Request, user_id: UUID, movie_id: UUID):
     """
     Delete a frame number record for the specified user and movie.
 

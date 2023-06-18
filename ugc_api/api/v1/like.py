@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from models.models import Like
 from uuid import UUID
 from db.mongo import database
@@ -11,8 +11,8 @@ likes = database['likes']
 
 
 @router.post('/create', response_model=Like)
-#@is_authorized
-async def create_like(user_id: UUID, movie_id: UUID, like: Like):
+@is_authorized
+async def create_like(request: Request, user_id: UUID, movie_id: UUID, like: Like):
     """
     Create a new like record for the specified user and movie.
 
@@ -33,8 +33,8 @@ async def create_like(user_id: UUID, movie_id: UUID, like: Like):
 
 
 @router.get('/', response_model=Like)
-#@is_authorized
-async def get_like(user_id: UUID, movie_id: UUID):
+@is_authorized
+async def get_like(request: Request, user_id: UUID, movie_id: UUID):
     """
     Retrieve a like record for the specified user and movie.
 
@@ -62,8 +62,8 @@ async def get_like(user_id: UUID, movie_id: UUID):
 
 
 @router.put('/update', response_model=Like)
-#@is_authorized
-async def update_like(user_id: UUID, movie_id: UUID, like: Like):
+@is_authorized
+async def update_like(request: Request, user_id: UUID, movie_id: UUID, like: Like):
     """
     Update an existing like record for the specified user and movie.
 
@@ -95,8 +95,8 @@ async def update_like(user_id: UUID, movie_id: UUID, like: Like):
 
 
 @router.delete('/')
-#@is_authorized
-async def delete_like(user_id: UUID, movie_id: UUID):
+@is_authorized
+async def delete_like(request: Request, user_id: UUID, movie_id: UUID):
     """
     Delete a like record for the specified user and movie.
 

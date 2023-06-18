@@ -202,9 +202,9 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
       PGUSER: postgres
-      PGPORT: 5433
+      PGPORT: 5432
     healthcheck:
-      test: [ "CMD", "pg_isready", "-p", "5433" ]
+      test: [ "CMD", "pg_isready", "-p", "5432" ]
       interval: 3s
       timeout: 5s
       retries: 30
@@ -299,7 +299,19 @@ services:
       driver: "fluentd"
       options:
         fluentd-address: "host.docker.internal:24224"
-        tag: "flaskapi_auth"
+        tag: "ugc_service"
+    networks:
+      - cinema_network
+
+  tests_ugc:
+    build: tests_analytic/functional
+    volumes:
+      - ./tests_analytic:/tests_analytic
+    env_file:
+      - .env
+    depends_on:
+      ugc_service:
+        condition: service_started
     networks:
       - cinema_network
 
