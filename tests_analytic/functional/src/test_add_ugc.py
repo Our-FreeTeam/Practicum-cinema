@@ -104,9 +104,6 @@ async def test_user_auth(answer_code: str, req_type: str, api_url: str, body: di
     else:
         result = requests.get(url=api_url, headers=headers)
 
-
-    print("####>>>> ",req_type,"-->", api_url, "UID:", user_id)
-
     if result.headers.get("access_token") is not None and result.headers.get(
             "refresh_token") is not None:
         headers['access_token'] = result.headers.get("access_token")
