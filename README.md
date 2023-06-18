@@ -11,6 +11,7 @@ docker-compose.yml,
 
 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
+Ссылка на Sentry https://our-freeteam.sentry.io/issues/
 
 
 # Структура проекта

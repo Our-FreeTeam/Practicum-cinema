@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 
+import sentry_sdk
 import uvicorn
 from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from api.v1 import events, views
@@ -30,6 +31,12 @@ async def lifespan(app: FastAPI):
     await redis.redis.close()
 
 
+sentry_sdk.init(
+    dsn="https://d36a31b3f1c44c2c95df8254d8726b86@o4505379921592320.ingest.sentry.io/4505380179673088",
+    traces_sample_rate=1.0,
+)
+
+
 app = FastAPI(
     title="API Для записи событий в Kafka",
     description="Информация о пользовательских событиях",
@@ -42,6 +49,12 @@ app = FastAPI(
 
 app.include_router(events.router, prefix='/api/v1/events', tags=['events'])
 app.include_router(views.router, prefix='/api/v1/views', tags=['views'])
+
+
+@app.get("/sentry-debug")
+async def trigger_error():
+    division_by_zero = 1 / 0
+
 
 if __name__ == '__main__':
     uvicorn.run(
