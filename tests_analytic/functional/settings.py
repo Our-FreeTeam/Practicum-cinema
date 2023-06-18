@@ -11,11 +11,8 @@ class Settings(BaseSettings):
     log_format: str = Field(..., env='LOG_FORMAT')
     log_level: int = Field(..., env='LOG_LEVEL')
 
-    helios_api_token: str = Field(..., env='HELIOS_API_TOKEN')
-    helios_enabled: bool = Field(..., env='HELIOS_ENABLED')
-
     analytic_url: str = Field(..., env='ANALYTIC_URL')
-
+    ugc_api_service: str = Field(..., env='UGC_API_URL')
 
 class Config:
     env_file = '.env'

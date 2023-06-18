@@ -10,9 +10,8 @@ load_dotenv()
 
 headers = {'Content-Type': "application/json", 'Accept': "application/json", "access_token": "",
            "refresh_token": ""}
-
+ugc_api_url = os.environ.get('UGC_API_URL')
 site_url = os.environ.get('AUTH_URL')
-analytic_url = os.environ.get('ANALYTIC_URL')
 keycloak_url = os.environ.get('KEYCLOAK_URL')
 keycloak_realm = os.environ.get('KEYCLOAK_REALM_ID')
 keycloak_client_id = os.environ.get('KEYCLOAK_CLIENT_ID')
@@ -43,46 +42,32 @@ user_id = get_user_id("cinema_admin")
 @pytest.mark.parametrize(
     'answer_code, req_type, api_url, body',
     [(401, 'POST', site_url + 'v1/auth/login', {"user": "test_user", "password": "wrong_pass"}),
-     (401, 'POST', analytic_url + '/api/v1/events/create',
-      {"user": "cinema_admin", "password": "wrong_pass",
-       "user_id": user_id,
-       "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
-       "event_type": 10,
-       "message": 1234}),
-
      (200, 'POST', site_url + 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
-     (200, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,
-                                                            "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
-                                                            "event_type": 10,
-                                                            "message": 1234}),
-
+     (200, 'POST', ugc_api_url + f'/api/v1/framenumber/create?user_id={user_id}'
+                                 f'&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+      {"user_id": f"{user_id}", "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
+       "frame_number": 12345688}),
      (200, 'GET',
-      analytic_url + f'/api/v1/views/get_last_event?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+      ugc_api_url + f'/api/v1/framenumber/?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {}),
 
-     (200, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,
-                                                            "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
-                                                            "event_type": 20,
-                                                            "message": 1234}),
+     (200, 'DELETE',
+      ugc_api_url + f'/api/v1/framenumber/?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+      {}),
 
-     (200, 'GET',
-      analytic_url + f'/api/v1/views/get_like?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
+     (404, 'GET',
+      ugc_api_url + f'/api/v1/framenumber/?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {}),
 
      (202, 'POST', site_url + 'v1/auth/logout', {"user": "cinema_admin", "password": "password"}),
-     (401, 'POST', analytic_url + '/api/v1/events/create', {"user_id": user_id,
-                                                            "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
-                                                            "message": 1234}),
      ],
     ids=["Can't login with incorrect pass",
-         "Can't save user event in Kafka without login",
          "Login into service",
          "Save user frame for movie",
-         "Get frame in movie for user",
-         "Save user like for movie",
-         "Get user like for movie",
+         "Get user frame for movie",
+         "Delete user frame for movie",
+         "There is no user frame for movie",
          "Logout from service",
-         "Can't save user event in Kafka"
          ]
 )
 async def test_user_auth(answer_code: str, req_type: str, api_url: str, body: dict):
@@ -90,6 +75,8 @@ async def test_user_auth(answer_code: str, req_type: str, api_url: str, body: di
 
     if req_type == "POST":
         result = requests.post(url=api_url, json=body, headers=headers)
+    elif req_type == "DELETE":
+        result = requests.delete(url=api_url, headers=headers)
     else:
         result = requests.get(url=api_url, headers=headers)
 
