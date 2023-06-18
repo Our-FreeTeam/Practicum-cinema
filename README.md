@@ -202,6 +202,23 @@ docker-compose.yml,
         ├── jcustenborder-kafka-connect-redis-0.0.4     # Redis Sink connector
         ├── mongodb-kafka-connect-mongodb-1.10.1        # MongoDB connector
 
+├── ugc_api/                        # Папка с FastAPI для API сервиса записи контента от 
+                                      пользователей (лайки, обзоры, таймстампы, лайки обзорам)
+    ├── api/                        
+        ├── v1/                     # Папка с api версии 1
+            ├── frame.py            # сохранение пользователем места просмотра фильма
+            ├── like.py             # управление лайками
+            ├── review.py           # управление обзорами
+            ├── like_review.py      # управление лайками для обзоров
+    ├── db/                         # папка с функциями для работы с mongo
+        ├── mongo.py                # mongo consumer/producer 
+    ├── models/                     # папка с файлами моделей
+        ├── models.py               # файл со всеми моделями проекта   
+    ├── main.py                     # основной файл запуска проекта
+    ├── requirements.txt            # файл с зависимостями для FastAPI
+    ├── Dockerfile                  # Dockerfile контейнера FastApi-solution
+    ├── wait_for_mongo.py           # Вейтер для MongoDB
+
 ├── .env.example                    # Пример файла с переменными окружения
 ├── build_dev.bat                   # файл для сборки проекта под Windows
 ├── docker-compose.yml              # dev файл для сборки проекта в докере
