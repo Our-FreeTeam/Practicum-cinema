@@ -10,7 +10,7 @@ load_dotenv()
 
 headers = {'Content-Type': "application/json", 'Accept': "application/json", "access_token": "",
            "refresh_token": ""}
-ugc_api_url = "http://ugc_service:8005"
+ugc_api_url = os.environ.get('UGC_API_URL')
 site_url = os.environ.get('AUTH_URL')
 analytic_url = os.environ.get('ANALYTIC_URL')
 keycloak_url = os.environ.get('KEYCLOAK_URL')
