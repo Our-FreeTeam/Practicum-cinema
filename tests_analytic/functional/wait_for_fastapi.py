@@ -12,7 +12,7 @@ from settings import settings
                       jitter=None)
 def connect_check():
     logging.info("[Trying check health status of FastAPI analytic api]")
-    result = requests.get(settings.analytic_url + "/api/v1/views/get_last_view")
+    result = requests.get(settings.analytic_url + "/api/v1/views/get_last_event")
     if result.status_code == 422:
         with open("/FA_OK.STATUS", "w") as fp:
             fp.write("ok")

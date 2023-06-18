@@ -288,9 +288,9 @@ services:
     networks:
       - cinema_network
 
-  ugc_api_service:
+  ugc_service:
     build: ugc_api
-    hostname: ugc_api_service
+    hostname: ugc_service
     env_file:
       - .env
     ports:

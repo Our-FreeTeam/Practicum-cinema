@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     helios_enabled: bool = Field(..., env='HELIOS_ENABLED')
 
     analytic_url: str = Field(..., env='ANALYTIC_URL')
-
+    ugc_api_service: str = Field(..., env='UGC_API_URL')
 
 class Config:
     env_file = '.env'
