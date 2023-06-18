@@ -288,6 +288,21 @@ services:
     networks:
       - cinema_network
 
+  ugc_api_service:
+    build: ugc_api
+    hostname: ugc_api_service
+    env_file:
+      - .env
+    ports:
+      - "8005:8005"
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "flaskapi_auth"
+    networks:
+      - cinema_network
+
 volumes:
   _postgres_data:
   _es_data:
