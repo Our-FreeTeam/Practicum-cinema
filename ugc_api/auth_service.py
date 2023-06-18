@@ -11,8 +11,7 @@ from settings import settings
 
 def is_authorized(func):
     @wraps(func)
-    async def inner(*args, **kwargs):
-        tokens = {}  # Initialize the tokens variable with an empty dictionary
+    async def inner(*args, **kwargs):  # noqa: WPS430
         request = kwargs.get('request')
         if request:
             headers = request.headers
@@ -22,8 +21,8 @@ def is_authorized(func):
             }
             user = kwargs.get('user_id')
             get_user_id = user if user else kwargs.get('event').user_id
-        if tokens.get('access_token'):
-            return await request_auth(*args, exec_func=func, tokens=tokens, get_user_id=get_user_id, **kwargs)
+            if tokens['access_token']:
+                return await request_auth(*args, exec_func=func, tokens=tokens, get_user_id=get_user_id, **kwargs)
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
             detail=messages.INCORRECT_TOKEN,
@@ -31,7 +30,12 @@ def is_authorized(func):
     return inner
 
 
-@backoff.on_exception(backoff.expo, (requests.exceptions.Timeout, requests.exceptions.ConnectionError), max_tries=8, jitter=None)
+@backoff.on_exception(  # noqa: WPS317
+    backoff.expo,
+    (requests.exceptions.Timeout, requests.exceptions.ConnectionError),
+    max_tries=8,
+    jitter=None,
+)
 async def request_auth(*args, **kwargs):
     async with aiohttp.ClientSession() as session:
         async with session.get(
