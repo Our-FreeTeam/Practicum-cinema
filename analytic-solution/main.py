@@ -51,11 +51,6 @@ app.include_router(events.router, prefix='/api/v1/events', tags=['events'])
 app.include_router(views.router, prefix='/api/v1/views', tags=['views'])
 
 
-@app.get("/sentry-debug")
-async def trigger_error():
-    division_by_zero = 1 / 0
-
-
 if __name__ == '__main__':
     uvicorn.run(
         'main:app',
