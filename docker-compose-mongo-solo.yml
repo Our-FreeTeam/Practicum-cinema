@@ -1,0 +1,19 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    hostname: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./_mongodb_data:/data/db
+    ports:
+      - 27017:27017
+    networks:
+      - cinema_network
+
+networks:
+  cinema_network:
+    driver: bridge

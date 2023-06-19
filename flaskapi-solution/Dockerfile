@@ -15,4 +15,6 @@ RUN  pip install --upgrade pip \
 
 COPY . .
 
+RUN chmod +x /opt/flaskapi/entrypoint.sh
+
 ENTRYPOINT ["/opt/flaskapi/entrypoint.sh"]

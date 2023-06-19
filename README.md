@@ -5,11 +5,15 @@
 Для разворачивания проекта использовать env.example и build_dev.bat,
 Либо разворачивать по очереди
 docker-compose-logs.yml,
+docker-compose-mongo-solo.yml
+docker-compose-kafka.yml
 docker-compose.yml,
-docker-compose-kafka.yml,
-docker-compose-clickhouse.yml
 
+Инвайт для https://github.com/orgs/Our-FreeTeam/people/BigDeepBlue - отправили 10 июня (он не 
+приянят), еще раз отправили 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
+Ссылка на Sentry https://our-freeteam.sentry.io/issues/
+
 
 # Структура проекта
 ```
@@ -191,11 +195,29 @@ docker-compose-clickhouse.yml
 
 
 ├── kafka-config/                   # Папка с настройками Apache Kafka - UGC
-    ├── redis_sink_conf             # Файл с настройками для
-        ├── sink.properis           # настройки для коннектора redis sink         
+    ├── sink_conf                   # Файл с настройками для
+        ├── Mongosink.properis      # настройки для коннектора Mongo sink     
+        ├── RedisSink.properis      # настройки для коннектора redis sink                
     ├── connectors                  # папка с дополнительными коннекторами
-        ├── jcustenborder-kafka-connect-redis-0.0.4      # Redis Sink connector
+        ├── jcustenborder-kafka-connect-redis-0.0.4     # Redis Sink connector
+        ├── mongodb-kafka-connect-mongodb-1.10.1        # MongoDB connector
 
+├── ugc_api/                        # Папка с FastAPI для API сервиса записи контента от 
+                                      пользователей (лайки, обзоры, таймстампы, лайки обзорам)
+    ├── api/                        
+        ├── v1/                     # Папка с api версии 1
+            ├── frame.py            # сохранение пользователем места просмотра фильма
+            ├── like.py             # управление лайками
+            ├── review.py           # управление обзорами
+            ├── like_review.py      # управление лайками для обзоров
+    ├── db/                         # папка с функциями для работы с mongo
+        ├── mongo.py                # mongo consumer/producer 
+    ├── models/                     # папка с файлами моделей
+        ├── models.py               # файл со всеми моделями проекта   
+    ├── main.py                     # основной файл запуска проекта
+    ├── requirements.txt            # файл с зависимостями для FastAPI
+    ├── Dockerfile                  # Dockerfile контейнера FastApi-solution
+    ├── wait_for_mongo.py           # Вейтер для MongoDB
 
 ├── .env.example                    # Пример файла с переменными окружения
 ├── build_dev.bat                   # файл для сборки проекта под Windows
@@ -204,7 +226,8 @@ docker-compose-clickhouse.yml
 ├── docker-compose-prod.yml         # product файл для сборки проекта в докере
 ├── docker-compose-tests.yml        # product файл для сборки проекта в докере
 ├── docker-compose-kafka.yml        # компоуз для сборки системы аналитики на Kafka
-├── docker-compose-clickhouse.yml   # компоуз для сборки системы аналитики на Kafka
+├── docker-compose-mongo-solo.yml   # компоуз для сборки системы mongo
+
 
 ├── setup.cfg                       # настройки flake8 и mypy
 ├── GITHUB_ACTION.md                # workflow github action
