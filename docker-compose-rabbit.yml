@@ -1,0 +1,64 @@
+version: '3.9'
+
+volumes:
+  postgres_volume:
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - cinema_network
+
+  db:
+    image: postgres:15.0-alpine
+    container_name: db_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data/
+      # table initialization
+      - ./rabbit_api/sender/src/database/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    env_file:
+      - .env
+    ports:
+      - "5435:5432"
+    networks:
+      - cinema_network
+
+  render:
+    container_name: render
+    build:
+      context: .
+      dockerfile: rabbit_api/render/Dockerfile
+    depends_on:
+      - rabbitmq
+    env_file:
+      - .env
+    networks:
+      - cinema_network
+
+  rabbit_api:
+    container_name: rabbit_api
+    restart: always
+    build:
+      context: .
+      dockerfile: rabbit_api/src/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db_postgres
+    ports:
+      - "8001:8000"
+    networks:
+      - cinema_network
+
+networks:
+  cinema_network:
+    driver: bridge

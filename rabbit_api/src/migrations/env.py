@@ -2,25 +2,30 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
-from storage_config import pgdb, settings
 
-from db.models import *
-
-target_metadata = Base.metadata
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+from config.settings import settings
+from db.postgres import metadata as metadata_event
 
 config = context.config
+p = settings.postgres_settings
 
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+section = config.config_ini_section
+config.set_section_option(section, "NOTIFICATION_POSTGRES_DB", p.dbname)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_USER", p.user)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_PASSWORD", p.password)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_HOST", p.host)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_PORT", str(p.port))
 
-target_metadata = Base.metadata
+# Interpret the config file for Python logging.
+# This line sets up loggers basically.
+fileConfig(config.config_file_name)
 
-config.set_main_option(
-    'sqlalchemy.url',
-    f"{settings.dbservice}://{pgdb.user}:{pgdb.password}@{pgdb.host}/{pgdb.dbname}")
+target_metadata = [metadata_event, ]
 
 
-def run_migrations_offline() -> None:
+def run_migrations_offline():
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -44,7 +49,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def run_migrations_online() -> None:
+def run_migrations_online():
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -52,7 +57,7 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        config.get_section(config.config_ini_section),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
