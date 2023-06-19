@@ -5,7 +5,7 @@ from pydantic import BaseSettings, Field
 
 class Postgres(BaseSettings):
     # Настройки Redis
-    dbname: str = Field("notifications", env="NOTIFICATION_POSTGRES_DB")
+    dbname: str = Field("postgres", env="NOTIFICATION_POSTGRES_USER")
     user: str = Field("postgres", env="NOTIFICATION_POSTGRES_USER")
     password: str = Field("password", env="NOTIFICATION_POSTGRES_PASSWORD")
     host: str = Field("localhost", env="NOTIFICATION_POSTGRES_HOST")

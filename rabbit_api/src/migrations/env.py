@@ -12,7 +12,7 @@ config = context.config
 p = settings.postgres_settings
 
 section = config.config_ini_section
-config.set_section_option(section, "NOTIFICATION_POSTGRES_DB", p.dbname)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_USER", p.dbname)
 config.set_section_option(section, "NOTIFICATION_POSTGRES_USER", p.user)
 config.set_section_option(section, "NOTIFICATION_POSTGRES_PASSWORD", p.password)
 config.set_section_option(section, "NOTIFICATION_POSTGRES_HOST", p.host)

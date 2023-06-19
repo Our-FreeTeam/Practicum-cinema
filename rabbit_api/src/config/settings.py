@@ -13,7 +13,7 @@ logging_config.dictConfig(LOGGING)
 
 class Postgres(BaseSettings):
     # Настройки Redis
-    dbname: str = Field("notifications", env="NOTIFICATION_POSTGRES_DB")
+    dbname: str = Field("postgres", env="NOTIFICATION_POSTGRES_USER")
     user: str = Field("postgres", env="NOTIFICATION_POSTGRES_USER")
     password: str = Field("password", env="NOTIFICATION_POSTGRES_PASSWORD")
     host: str = Field("127.0.0.1", env="NOTIFICATION_POSTGRES_HOST")
