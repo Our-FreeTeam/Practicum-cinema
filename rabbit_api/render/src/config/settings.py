@@ -16,7 +16,7 @@ class RabbitMQ(BaseSettings):
     host: str = Field("rabbitmq", env="RABBIT_HOST")
     port: int = Field(5672, env="RABBIT_PORT")
     exchange: str = Field("", env="RABBIT_EXCHANGE")
-    queue: str = Field("", env="QUEUE")
+    queue: str = Field("", env="RABBIT_QUEUE")
 
 
 class Auth(BaseSettings):

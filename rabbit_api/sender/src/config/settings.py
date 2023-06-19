@@ -5,11 +5,11 @@ from pydantic import BaseSettings, Field
 
 class Postgres(BaseSettings):
     # Настройки Redis
-    dbname: str = Field("notifications", env="POSTGRES_DB")
-    user: str = Field("postgres", env="POSTGRES_USER")
-    password: str = Field("password", env="POSTGRES_PASSWORD")
-    host: str = Field("localhost", env="POSTGRES_HOST")
-    port: int = Field(5435, env="POSTGRES_PORT")
+    dbname: str = Field("notifications", env="NOTIFICATION_POSTGRES_DB")
+    user: str = Field("postgres", env="NOTIFICATION_POSTGRES_USER")
+    password: str = Field("password", env="NOTIFICATION_POSTGRES_PASSWORD")
+    host: str = Field("localhost", env="NOTIFICATION_POSTGRES_HOST")
+    port: int = Field(5435, env="NOTIFICATION_POSTGRES_PORT")
 
 
 class RabbitMQ(BaseSettings):
@@ -18,7 +18,7 @@ class RabbitMQ(BaseSettings):
     host: str = Field("rabbitmq", env="RABBIT_HOST")
     port: int = Field(5672, env="RABBIT_PORT")
     exchange: str = Field("", env="RABBIT_EXCHANGE")
-    queue: str = Field("sender", env="QUEUE")
+    queue: str = Field("sender", env="RABBIT_QUEUE")
 
 
 class Sender(BaseSettings):

@@ -12,11 +12,11 @@ config = context.config
 p = settings.postgres_settings
 
 section = config.config_ini_section
-config.set_section_option(section, "POSTGRES_DB", p.dbname)
-config.set_section_option(section, "POSTGRES_USER", p.user)
-config.set_section_option(section, "POSTGRES_PASSWORD", p.password)
-config.set_section_option(section, "POSTGRES_HOST", p.host)
-config.set_section_option(section, "POSTGRES_PORT", str(p.port))
+config.set_section_option(section, "NOTIFICATION_POSTGRES_DB", p.dbname)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_USER", p.user)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_PASSWORD", p.password)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_HOST", p.host)
+config.set_section_option(section, "NOTIFICATION_POSTGRES_PORT", str(p.port))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

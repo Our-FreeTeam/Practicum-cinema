@@ -13,11 +13,11 @@ logging_config.dictConfig(LOGGING)
 
 class Postgres(BaseSettings):
     # Настройки Redis
-    dbname: str = Field("notifications", env="POSTGRES_DB")
-    user: str = Field("postgres", env="POSTGRES_USER")
-    password: str = Field("password", env="POSTGRES_PASSWORD")
-    host: str = Field("127.0.0.1", env="POSTGRES_HOST")
-    port: int = Field(5435, env="POSTGRES_PORT")
+    dbname: str = Field("notifications", env="NOTIFICATION_POSTGRES_DB")
+    user: str = Field("postgres", env="NOTIFICATION_POSTGRES_USER")
+    password: str = Field("password", env="NOTIFICATION_POSTGRES_PASSWORD")
+    host: str = Field("127.0.0.1", env="NOTIFICATION_POSTGRES_HOST")
+    port: int = Field(5435, env="NOTIFICATION_POSTGRES_PORT")
 
 
 class RabbitMQ(BaseSettings):
@@ -26,12 +26,12 @@ class RabbitMQ(BaseSettings):
     host: str = Field("rabbitmq", env="RABBIT_HOST")
     port: int = Field(5672, env="RABBIT_PORT")
     exchange: str = Field("", env="RABBIT_EXCHANGE")
-    queue: str = Field("", env="QUEUE")
+    queue: str = Field("", env="RABBIT_QUEUE")
 
 
 class Gunicorn(BaseSettings):
-    gunicorn_bind_host: str = Field("0.0.0.0", env="GUNICORN_HOST")
-    gunicorn_bind_port: str = Field("8000", env="GUNICORN_PORT")
+    gunicorn_bind_host: str = Field("0.0.0.0", env="NOTIFICATION_GUNICORN_HOST")
+    gunicorn_bind_port: int = Field(8000, env="NOTIFICATION_GUNICORN_PORT")
 
 
 class Settings(BaseSettings):
