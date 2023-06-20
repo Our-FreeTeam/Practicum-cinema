@@ -3,29 +3,26 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 from config.settings import settings
-from db.postgres import metadata as metadata_event
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
 
 config = context.config
 p = settings.postgres_settings
 
-section = config.config_ini_section
-config.set_section_option(section, "NOTIFICATION_POSTGRES_USER", p.dbname)
-config.set_section_option(section, "NOTIFICATION_POSTGRES_USER", p.user)
-config.set_section_option(section, "NOTIFICATION_POSTGRES_PASSWORD", p.password)
-config.set_section_option(section, "NOTIFICATION_POSTGRES_HOST", p.host)
-config.set_section_option(section, "NOTIFICATION_POSTGRES_PORT", str(p.port))
+if config.config_file_name is not None:
+    fileConfig(config.config_file_name)
 
-# Interpret the config file for Python logging.
-# This line sets up loggers basically.
-fileConfig(config.config_file_name)
+target_metadata = Base.metadata
 
-target_metadata = [metadata_event, ]
+config.set_main_option(
+    'sqlalchemy.url',
+    f"{settings.dbservice}://{p.user}:{p.password}@{p.host}:{p.port}/{p.dbname}")
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
     This configures the context with just a URL
@@ -49,7 +46,7 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-def run_migrations_online():
+def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
     In this scenario we need to create an Engine
@@ -57,7 +54,7 @@ def run_migrations_online():
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

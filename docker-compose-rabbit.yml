@@ -57,7 +57,7 @@ services:
     depends_on:
       - notification_db
     ports:
-      - "8001:8000"
+      - "8011:8000"
     networks:
       - cinema_network
 

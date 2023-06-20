@@ -35,6 +35,7 @@ class Gunicorn(BaseSettings):
 
 
 class Settings(BaseSettings):
+    dbservice: str = Field("postgresql", env="DB_SERVICE")
 
     log_level: int = logging.DEBUG
     logging_config: dict = LOGGING

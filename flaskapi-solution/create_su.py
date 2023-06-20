@@ -29,6 +29,7 @@ def create_superuser_requests(new_admin_username: str, new_admin_password: str, 
         "username": new_admin_username,
         "enabled": True,
         "emailVerified": True,
+        "email": settings.keycloak_service_email,
         "credentials": [{"type": "password", "value": new_admin_password, "temporary": False}],
     }
     new_user_url = f"{keycloak_url}/admin/realms/{target_realm}/users"

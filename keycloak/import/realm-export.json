@@ -30,7 +30,7 @@
   "registrationAllowed": false,
   "registrationEmailAsUsername": false,
   "rememberMe": false,
-  "verifyEmail": false,
+  "verifyEmail": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": false,
@@ -1462,7 +1462,20 @@
     "xXSSProtection": "1; mode=block",
     "strictTransportSecurity": "max-age=31536000; includeSubDomains"
   },
-  "smtpServer": {},
+  "smtpServer": {
+    "replyToDisplayName": "",
+    "starttls": "false",
+    "auth": "true",
+    "envelopeFrom": "",
+    "ssl": "false",
+    "password": "***********",
+    "port": "2525",
+    "host": "smtp.elasticemail.com",
+    "replyTo": "${KEYCLOAK_SERVICE_EMAIL}",
+    "from": "${KEYCLOAK_SERVICE_EMAIL}",
+    "fromDisplayName": "",
+    "user": "${KEYCLOAK_SERVICE_EMAIL}"
+  },
   "eventsEnabled": true,
   "eventsExpiration": 1296000,
   "eventsListeners": [
