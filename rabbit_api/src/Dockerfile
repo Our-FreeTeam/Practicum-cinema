@@ -14,4 +14,6 @@ COPY ./rabbit_api/src .
 
 EXPOSE 8000
 
-ENTRYPOINT ["gunicorn", "main:app", "--workers", "4", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+RUN chmod +x /app/run.sh
+
+ENTRYPOINT ["/app/run.sh"]

@@ -20,6 +20,8 @@ SET row_security = off;
 -- Name: content; Type: SCHEMA; Schema: -; Owner: postgres
 --
 
+\c postgres
+
 CREATE SCHEMA content;
 
 

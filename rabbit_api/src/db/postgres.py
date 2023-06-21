@@ -9,10 +9,11 @@ from sqlalchemy.pool import NullPool
 from config.settings import settings
 
 p = settings.postgres_settings
-DATABASE_URL = f"postgresql+asyncpg://{p.user}:{p.password}@{p.host}{p.port}/{p.dbname}"
+DATABASE_URL = f"postgresql+asyncpg://{p.user}:{p.password}@{p.host}:{p.port}/{p.dbname}"
 
 Base = declarative_base()
 metadata = MetaData()
+
 engine = create_async_engine(DATABASE_URL, poolclass=NullPool)
 async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
