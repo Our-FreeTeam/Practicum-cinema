@@ -61,6 +61,32 @@ async def get_review(request: Request, user_id: UUID, movie_id: UUID):
     return Review(**review)
 
 
+@router.get('/by_id', response_model=Review)
+@is_authorized
+async def get_review_by_id(request: Request, review_id: UUID):
+    """
+    Retrieve a review record using review_id
+
+    Parameters:
+        review_id: The review ID.
+    """
+    # Convert UUID to binary for MongoDB query
+    review_id = Binary.from_uuid(review_id)
+
+    review = await reviews.find_one(
+        {"_id": review_id}
+    )
+
+    if review is None:
+        raise HTTPException(status_code=404, detail='Review not found')
+
+    # Convert binary back to UUID
+    review['user_id'] = UUID(bytes=review['user_id'])
+    review['movie_id'] = UUID(bytes=review['movie_id'])
+
+    return Review(**review)
+
+
 @router.put('/update', response_model=Review)
 @is_authorized
 async def update_review(request: Request, user_id: UUID, movie_id: UUID, review: Review):

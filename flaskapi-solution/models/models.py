@@ -72,6 +72,10 @@ class BoolResponse(BaseModel):
     result: bool
 
 
+class StrResponse(BaseModel):
+    result: str
+
+
 class SimpleList(BaseModel):
     roles_list: list
 

@@ -13,6 +13,9 @@ class Settings(BaseSettings):
 
     request_timeout: int = Field(..., env='REQUEST_TIMEOUT')
 
+    notification_host: str = Field("0.0.0.0", env="NOTIFICATION_GUNICORN_HOST")
+    notification_port: int = Field(8000, env="NOTIFICATION_GUNICORN_PORT")
+
 
 class Config:
     env_file = '.env'
