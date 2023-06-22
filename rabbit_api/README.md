@@ -51,5 +51,5 @@ alembic upgrade head
 
 ### Документация API
 
-[Схема API](http://localhost:8000/api/openapi)
+[Схема API](http://localhost:8011/api/openapi)
 

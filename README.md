@@ -10,7 +10,7 @@ docker-compose-kafka.yml
 docker-compose.yml,
 
 Инвайт для https://github.com/orgs/Our-FreeTeam/people/BigDeepBlue - отправили 10 июня (он не 
-приянят), еще раз отправили 
+принят), еще раз отправили 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
 Ссылка на Sentry https://our-freeteam.sentry.io/issues/
 

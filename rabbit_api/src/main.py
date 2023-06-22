@@ -27,15 +27,17 @@ async def startup():
         credentials=credentials
     )
     # Отправка сообщений в очередь
-    rabbit.rq = pika.BlockingConnection(connection_parameters)
+    rabbit.rc = pika.BlockingConnection(connection_parameters)
+    rabbit.rq = rabbit.rc.channel()
     # Создание 2х очередей
-    rabbit.rq.channel().queue_declare("fast")
-    rabbit.rq.channel().queue_declare("slow")
+    rabbit.rq.queue_declare("fast")
+    rabbit.rq.queue_declare("slow")
 
 
 @app.on_event("shutdown")
 async def shutdown():
     rabbit.rq.close()
+    rabbit.rc.close()
 
 
 app.include_router(

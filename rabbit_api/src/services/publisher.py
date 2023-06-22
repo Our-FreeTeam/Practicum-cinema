@@ -12,9 +12,8 @@ r = settings.rabbit_settings
 
 def publish(message, connection, queue):
     try:
-        channel = connection.channel()
         # Отправка сообщения через точку обмена exchange
-        channel.basic_publish(
+        connection.basic_publish(
             exchange=r.exchange,
             routing_key=queue,
             body=json.dumps(message),
