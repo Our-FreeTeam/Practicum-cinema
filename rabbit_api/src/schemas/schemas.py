@@ -11,7 +11,7 @@ class TemplateIn(BaseModel):
 
 
 class TemplateSchema(TemplateIn):
-    id: int
+    id: UUID
 
     class Config:
         orm_mode = True
