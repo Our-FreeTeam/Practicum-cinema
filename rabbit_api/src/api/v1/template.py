@@ -1,17 +1,23 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_db
 from schemas import schemas
 from services import crud
+from services.check_role import check_role
 
 router = APIRouter()
 
 
 @router.post("/", response_model=schemas.TemplateSchema, summary="Create a template")
-async def create_template(template: schemas.TemplateIn, session: AsyncSession = Depends(get_db)):
+@check_role(["Manager"])
+async def create_template(
+        request: Request,
+        template: schemas.TemplateIn, 
+        session: AsyncSession = Depends(get_db)
+):
     """
     Create a template for the event:
 
@@ -27,7 +33,13 @@ async def create_template(template: schemas.TemplateIn, session: AsyncSession = 
 
 
 @router.put("/{event}", response_model=schemas.TemplateSchema, summary="Change a template")
-async def change_template(event: str, template: schemas.TemplateIn, session: AsyncSession = Depends(get_db)):
+@check_role(["Manager"])
+async def change_template(
+        request: Request,
+        event: str,
+        template: schemas.TemplateIn,
+        session: AsyncSession = Depends(get_db)
+):
     """
     Change a template for the event:
 

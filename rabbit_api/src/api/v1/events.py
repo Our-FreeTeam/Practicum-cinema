@@ -1,20 +1,23 @@
 from http import HTTPStatus
 
 import pika
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres import get_db
 from db.rabbit import get_rabbit
 from schemas import schemas
 from services import crud, publisher
+from services.check_role import check_role
 from services.publisher import get_queue
 
 router = APIRouter()
 
 
 @router.post("/", summary="Create a notification")
+@check_role(["Manager"])
 async def create_notification(
+        request: Request,
         event: schemas.Event,
         session: AsyncSession = Depends(get_db),
         connection: pika.BlockingConnection = Depends(get_rabbit)

@@ -15,3 +15,5 @@ psycopg2-binary==2.9.6
 psycopg2==2.9.6
 email-validator==2.0.0.post2
 greenlet==2.0.2
+backoff==2.2.1
+aiohttp==3.8.4

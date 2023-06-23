@@ -35,6 +35,7 @@ class Gunicorn(BaseSettings):
 
 
 class Settings(BaseSettings):
+    auth_url: str = Field(..., env='AUTH_URL')
     dbservice: str = Field("postgresql", env="DB_SERVICE")
 
     log_level: int = logging.DEBUG
