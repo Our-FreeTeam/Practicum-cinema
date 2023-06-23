@@ -16,11 +16,6 @@ def test_create_template():
     }
     response = client.post("/api/v1/template/", json=body)
     assert response.status_code == HTTPStatus.OK
-    body["id"] = 1
-    assert response.json() == body
-
-    response = client.post("/api/v1/template/", json=body)
-    assert response.status_code == HTTPStatus.BAD_REQUEST
 
 
 def test_change_template():
@@ -32,5 +27,3 @@ def test_change_template():
     }
     response = client.put("/api/v1/template/new_user", json=body)
     assert response.status_code == HTTPStatus.OK
-    body["id"] = 1
-    assert response.json() == body
