@@ -5,8 +5,7 @@ volumes:
 
 services:
   rabbitmq:
-    build:
-      dockerfile: rabbit_api/mq/Dockerfile
+    build: rabbit_api/mq
     hostname: rabbitmq
     ports:
       - "5672:5672"

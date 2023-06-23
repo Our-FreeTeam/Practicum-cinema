@@ -12,4 +12,6 @@ RUN pip install --upgrade pip && \
 
 COPY ./rabbit_api/sender/src .
 
+RUN python3 /app/utils/create_delayed_exchange.py
+
 CMD ["python3", "sender.py"]
