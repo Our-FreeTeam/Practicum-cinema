@@ -11,5 +11,8 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir --upgrade -r requirements.txt
 
 COPY ./rabbit_api/sender/src .
+RUN chmod +x /app/entrypoint.sh
 
-CMD ["python3", "sender.py"]
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+CMD ["/app/entrypoint.sh"]

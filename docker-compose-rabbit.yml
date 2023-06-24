@@ -5,16 +5,21 @@ volumes:
 
 services:
   rabbitmq:
-    image: rabbitmq:3.10-management
-    container_name: rabbitmq
+    build: rabbit_api/mq
+    hostname: rabbitmq
     ports:
       - "5672:5672"
       - "15672:15672"
+    environment:
+      - RABBITMQ_CONFIG_FILE=/etc/rabbitmq/conf.d/10-default-guest-user.conf
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     networks:
       - cinema_network
 
   notification_db:
     image: postgres:15.0-alpine
+    hostname: notification_db
     container_name: notification_db
     restart: always
     environment:

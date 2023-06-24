@@ -1,16 +1,15 @@
-# Проектная работа 9 спринта (UGC-2) v1
+# Проектная работа 10 спринта Notification
 
-Задание с EKL
+Задание Notification (RabbitMQ)
 
 Для разворачивания проекта использовать env.example и build_dev.bat,
 Либо разворачивать по очереди
 docker-compose-logs.yml,
 docker-compose-mongo-solo.yml
-docker-compose-kafka.yml
+docker-compose-rabbit.yml
+docker-compose-sender.yml
 docker-compose.yml,
 
-Инвайт для https://github.com/orgs/Our-FreeTeam/people/BigDeepBlue - отправили 10 июня (он не 
-принят), еще раз отправили 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
 Ссылка на Sentry https://our-freeteam.sentry.io/issues/
 
@@ -25,20 +24,6 @@ docker-compose.yml,
         ├── next_uml_schema_C1.txt      #  новая - уровень C1
         ├── next_uml_schema_C2.txt      #  новая - уровень C2 
         ├── next_uml_schema_C3.txt      #  новая - уровень C3                
-
-
-├── analytic-solution/              # Папка с FastAPI для RestAPI записи аналитики
-    ├── api/                        
-        ├── v1/                     # Папка с api версии 1
-            ├── events.py           # поиск по фильмам
-    ├── db/                         # папка с функциями для работы с redis и elastic
-        ├── kafka.py                # kafka consumer/producer 
-    ├── models/                     # папка с файлами моделей
-        ├── models.py               # файл со всеми моделями проекта   
-    ├── main.py                     # основной файл запуска проекта
-    ├── requirements.txt            # файл с зависимостями для FastAPI
-    ├── Dockerfile                  # Dockerfile контейнера FastApi-solution
-    ├── wait_for_kafka.py           # Вейтер для Kafka
 
 
 ├── flaskapi-solution/              # Основная папка приложения Flask
@@ -194,14 +179,6 @@ docker-compose.yml,
     ├── Dockerfile                  # Dockerfile контейнера ETL
 
 
-├── kafka-config/                   # Папка с настройками Apache Kafka - UGC
-    ├── sink_conf                   # Файл с настройками для
-        ├── Mongosink.properis      # настройки для коннектора Mongo sink     
-        ├── RedisSink.properis      # настройки для коннектора redis sink                
-    ├── connectors                  # папка с дополнительными коннекторами
-        ├── jcustenborder-kafka-connect-redis-0.0.4     # Redis Sink connector
-        ├── mongodb-kafka-connect-mongodb-1.10.1        # MongoDB connector
-
 ├── ugc_api/                        # Папка с FastAPI для API сервиса записи контента от 
                                       пользователей (лайки, обзоры, таймстампы, лайки обзорам)
     ├── api/                        
@@ -225,7 +202,6 @@ docker-compose.yml,
 ├── docker-compose-logs.yml         # файл для сборки системы логгирования в докере
 ├── docker-compose-prod.yml         # product файл для сборки проекта в докере
 ├── docker-compose-tests.yml        # product файл для сборки проекта в докере
-├── docker-compose-kafka.yml        # компоуз для сборки системы аналитики на Kafka
 ├── docker-compose-mongo-solo.yml   # компоуз для сборки системы mongo
 
 
