@@ -7,7 +7,7 @@ from flask_pydantic_spec import Request, Response
 from keycloak_conn import keycloak_admin
 from main import api, app
 from models.models import (BoolResponse, ErrorStr, Role, RoleCheck, RoleIds,
-                           RoleList, UserRole)
+                           RoleList, UserRole, StrResponse)
 from redis_bucket_conn import rate_limiter
 from settings import settings
 from utils import check_session
@@ -122,6 +122,20 @@ def get_user_roles(user_id: str):
     if roles:
         result_roles = [{'id': role['id'], 'role_name': role['name']} for role in roles]
     return jsonify({'result': result_roles})
+
+
+@app.route('/v1/admin/user/<user_id>/name', methods=['GET'])
+@rate_limiter(settings.rate_limit, settings.time_period)
+@api.validate(resp=Response(HTTP_200=StrResponse,
+                            HTTP_429=ErrorStr), tags=['admin'])
+@check_role_wrap(['theatre_admin'])
+def get_user_name(user_id: str):
+    """ Получить имя пользователя """
+    user_data = keycloak_admin.get_user(user_id)
+    user_name = ''
+    if user_data:
+        user_name = user_data['username']
+    return jsonify({'result': user_name})
 
 
 @app.route('/v1/admin/roles/<role_name>/delete', methods=['POST'])

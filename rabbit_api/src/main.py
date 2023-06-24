@@ -54,7 +54,7 @@ app.include_router(
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        host=settings.gunicorn_settings.gunicorn_bind_host,
+        host='0.0.0.0',
         port=settings.gunicorn_settings.gunicorn_bind_port,
         log_config=settings.logging_config,
         log_level=settings.log_level,

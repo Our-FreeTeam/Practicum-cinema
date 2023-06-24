@@ -5,6 +5,7 @@ from db.mongo import database
 from auth_service import is_authorized
 from pymongo import ReturnDocument, DESCENDING
 from bson import Binary
+from bson.objectid import ObjectId
 
 router = APIRouter()
 reviews = database['reviews']
@@ -49,6 +50,31 @@ async def get_review(request: Request, user_id: UUID, movie_id: UUID):
     review = await reviews.find_one(
         {"user_id": user_id, "movie_id": movie_id},
         sort=[("_id", DESCENDING)],
+    )
+
+    if review is None:
+        raise HTTPException(status_code=404, detail='Review not found')
+
+    # Convert binary back to UUID
+    review['user_id'] = UUID(bytes=review['user_id'])
+    review['movie_id'] = UUID(bytes=review['movie_id'])
+    review['review_id'] = str(review['_id'])
+
+    return Review(**review)
+
+
+async def get_review_by_id(review_id: ObjectId):
+    """
+    Retrieve a review record using review_id
+
+    Parameters:
+        review_id: The review ID.
+    """
+    # Convert UUID to binary for MongoDB query
+    review_id = ObjectId(review_id)
+
+    review = await reviews.find_one(
+        {"_id": review_id}
     )
 
     if review is None:
