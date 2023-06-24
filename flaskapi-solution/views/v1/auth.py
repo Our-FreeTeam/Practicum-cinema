@@ -128,6 +128,7 @@ def reg_user():
         try:
             keycloak_admin.create_user({"email": body['email'],
                                         "username": body['user'],
+                                        "attributes": {"timezone": body.get('timezone', 'UTC')},
                                         "enabled": True,
                                         "credentials": [
                                             {"value": body['password'], "type": "password", }]})
@@ -160,6 +161,7 @@ def update_user(token_info=None):
             user_id,
             {"email": body['email'],
              "enabled": True,
+             "attributes": {"timezone": body.get('timezone', 'UTC')},
              "credentials": [
                  {"value": body['password'], "type": "password", }]})
 

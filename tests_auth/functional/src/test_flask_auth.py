@@ -18,6 +18,7 @@ headers = {'Content-Type': "application/json", 'Accept': "application/json", "ac
      (422, 'POST', 'v1/auth/user_create', {"user": "test_user", "password": "",
                                            "email": "test@mail.com"}),
      (201, 'POST', 'v1/auth/user_create', {"user": "test_user", "password": "123qwer",
+                                           "timezone": "GMT+3",
                                            "email": "test@mail.com"}),
      (401, 'POST', 'v1/auth/login', {"user": "test_user", "password": "wrong_pass"}),
      (401, 'POST', 'v1/auth/login', {"user": "wrong_user", "password": "wrong_pass"}),

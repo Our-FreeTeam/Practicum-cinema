@@ -22,6 +22,7 @@ class Login(BaseModel):
 
 class RegInfo(Login):
     email: EmailStr
+    timezone: str
 
 
 class Token(BaseModel):
