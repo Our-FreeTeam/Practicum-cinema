@@ -29,6 +29,7 @@ def create_superuser_requests(new_admin_username: str, new_admin_password: str, 
         "username": new_admin_username,
         "enabled": True,
         "emailVerified": True,
+        "attributes": {"timezone": "GMT+0"},
         "email": settings.keycloak_service_email,
         "credentials": [{"type": "password", "value": new_admin_password, "temporary": False}],
     }
