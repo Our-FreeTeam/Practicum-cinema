@@ -19,8 +19,8 @@ services:
 
   notification_db:
     image: postgres:15.0-alpine
-    container_name: db_postgres
     hostname: notification_db
+    container_name: notification_db
     restart: always
     environment:
       POSTGRES_USER: ${NOTIFICATION_POSTGRES_USER}
