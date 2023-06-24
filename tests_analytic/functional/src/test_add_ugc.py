@@ -10,8 +10,9 @@ load_dotenv()
 
 headers = {'Content-Type': "application/json", 'Accept': "application/json", "access_token": "",
            "refresh_token": ""}
+
 ugc_api_url = os.environ.get('UGC_API_URL')
-site_url = os.environ.get('AUTH_URL')
+auth_url = os.environ.get('AUTH_URL')
 keycloak_url = os.environ.get('KEYCLOAK_URL')
 keycloak_realm = os.environ.get('KEYCLOAK_REALM_ID')
 keycloak_client_id = os.environ.get('KEYCLOAK_CLIENT_ID')
@@ -41,8 +42,10 @@ user_id = get_user_id("cinema_admin")
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     'answer_code, req_type, api_url, body',
-    [(401, 'POST', site_url + 'v1/auth/login', {"user": "test_user", "password": "wrong_pass"}),
-     (200, 'POST', site_url + 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
+    [(401, 'POST', auth_url + 'v1/auth/login', {"user": "test_user", "password": "wrong_pass"}),
+
+     (200, 'POST', auth_url + 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
+
      (200, 'POST', ugc_api_url + f'/api/v1/framenumber/create?user_id={user_id}'
                                  f'&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {"user_id": f"{user_id}", "movie_id": "3fa85f64-5717-4562-b3fc-2c963f66afa2",
@@ -59,7 +62,8 @@ user_id = get_user_id("cinema_admin")
       ugc_api_url + f'/api/v1/framenumber/?user_id={user_id}&movie_id=3fa85f64-5717-4562-b3fc-2c963f66afa2',
       {}),
 
-     (202, 'POST', site_url + 'v1/auth/logout', {"user": "cinema_admin", "password": "password"}),
+     (202, 'POST', auth_url + 'v1/auth/logout', {"user": "cinema_admin", "password": "password"})
+
      ],
     ids=["Can't login with incorrect pass",
          "Login into service",
