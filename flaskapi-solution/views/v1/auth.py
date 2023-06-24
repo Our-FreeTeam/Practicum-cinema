@@ -129,6 +129,7 @@ def reg_user():
             keycloak_admin.create_user({"email": body['email'],
                                         "username": body['user'],
                                         "attributes": {"timezone": body.get('timezone', 'UTC')},
+                                        "emailVerified": True,  # Set email as verified
                                         "enabled": True,
                                         "credentials": [
                                             {"value": body['password'], "type": "password", }]})
