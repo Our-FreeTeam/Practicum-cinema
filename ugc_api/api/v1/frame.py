@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from models.models import FrameNumber
 from uuid import UUID
@@ -12,7 +14,7 @@ framenumbers = database['framenumber']
 
 @router.post('/create', response_model=FrameNumber)
 @is_authorized
-async def create_frame_number(request: Request, user_id: UUID, movie_id: UUID, frame_number: FrameNumber):
+async def create_frame_number(request: Request, frame_number: FrameNumber):
     """
     Create a new frame number record for the specified user and movie.
 
@@ -21,12 +23,9 @@ async def create_frame_number(request: Request, user_id: UUID, movie_id: UUID, f
         movie_id: The movie ID.
         frame_number: The frame number data.
     """
-    frame_number.user_id = user_id
-    frame_number.movie_id = movie_id
-
-    # Convert UUID to binary for MongoDB storage
     frame_number.user_id = Binary.from_uuid(frame_number.user_id)
     frame_number.movie_id = Binary.from_uuid(frame_number.movie_id)
+    frame_number.date_create = datetime.now()
 
     await framenumbers.insert_one(frame_number.dict())
     return frame_number
