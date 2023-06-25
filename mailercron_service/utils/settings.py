@@ -17,7 +17,11 @@ class Settings(BaseSettings):
     keycloak_realm_su: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
     keycloak_realm_su_psw: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU_PSW')
 
-
+    # RabbitMQ connection parameters
+    rabbitmq_host: str = Field(..., env='RABBIT_HOST')
+    rabbitmq_port: int = Field(..., env='RABBIT_PORT')
+    rabbitmq_exchange = 'delayed_exchange'
+    rabbitmq_queue: str = Field(..., env='RABBIT_QUEUE')
 
 class Config:
     env_file = '.env'

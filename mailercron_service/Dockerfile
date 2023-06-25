@@ -1,6 +1,6 @@
 FROM python:3.10
 
-WORKDIR /opt
+WORKDIR /opt/app
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
@@ -16,8 +16,6 @@ RUN  pip install --upgrade pip \
 
 COPY . .
 
-ENTRYPOINT ["python","/opt/utils/email_to_queue.py"]
+RUN crontab /etc/cron.d/crontab
 
-#RUN crontab /etc/cron.d/crontab
-
-#ENTRYPOINT ["/opt/app/run.sh"]
+ENTRYPOINT ["/opt/app/run.sh"]
