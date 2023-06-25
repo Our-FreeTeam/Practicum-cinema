@@ -18,12 +18,15 @@ headers = {'Content-Type': "application/json", 'Accept': "application/json", "ac
      (422, 'POST', 'v1/auth/user_create', {"user": "test_user", "password": "",
                                            "email": "test@mail.com"}),
      (201, 'POST', 'v1/auth/user_create', {"user": "test_user", "password": "123qwer",
+                                           "timezone": "GMT+3",
                                            "email": "test@mail.com"}),
      (401, 'POST', 'v1/auth/login', {"user": "test_user", "password": "wrong_pass"}),
      (401, 'POST', 'v1/auth/login', {"user": "wrong_user", "password": "wrong_pass"}),
      (200, 'POST', 'v1/auth/login', {"user": "test_user", "password": "123qwer"}),
      (200, 'POST', 'v1/auth/session_history', {}),
-     (202, 'POST', 'v1/auth/user_update', {"user": "test_user", "password": "1234qwer", "email": "test@mail.org"}),
+     (202, 'POST', 'v1/auth/user_update', {"user": "test_user", "password": "1234qwer",
+                                           "timezone": "GMT+3",
+                                           "email": "test@mail.org"}),
      (200, 'POST', 'v1/auth/user_sessions', {}),
      (200, 'POST', 'v1/auth/refresh_token', {}),
      (202, 'POST', 'v1/auth/logout', {"user": "test_user"}),
@@ -60,10 +63,10 @@ async def test_user_auth(answer_code: str, req_type: str, api_url: str, body: di
     global headers
 
     site_url = os.environ.get('AUTH_URL')
-
     result = requests.post(url=site_url + api_url, json=body, headers=headers)
 
-    if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
+    if result.headers.get("access_token") is not None and result.headers.get(
+            "refresh_token") is not None:
         headers['access_token'] = result.headers.get("access_token")
         headers['refresh_token'] = result.headers.get("refresh_token")
 
