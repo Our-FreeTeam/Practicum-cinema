@@ -109,7 +109,6 @@ if __name__ == '__main__':
 
         if settings.debug_mode == 1:
             logging.warning("Debug mode enabled")
-            print("[Debug mode enabled]")
 
         emails_list = get_user_list()
 
