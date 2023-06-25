@@ -25,5 +25,7 @@ if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     locale -a
 fi
 
+sh /opt/app/run_em.sh
+
 #cron -f
 busybox syslogd -C; cron -L 2 -f

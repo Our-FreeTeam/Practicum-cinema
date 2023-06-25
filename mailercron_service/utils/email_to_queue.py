@@ -8,7 +8,6 @@ from settings import settings
 
 
 def rabbit_send(mail_list, time_shift):
-
     # Connect to RabbitMQ
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=settings.rabbitmq_host, port=settings.rabbitmq_port,
@@ -34,7 +33,7 @@ def rabbit_send(mail_list, time_shift):
     processed_count = 0
     for user_email in mail_list:
         if user_email:
-            prep_data = f"\'{user_email}\':\'watched_film3\'"
+            prep_data = f"\'{user_email}\':\'watched_film\'"
             channel.basic_publish(
                 exchange=settings.rabbitmq_exchange,
                 routing_key=settings.rabbitmq_queue,
@@ -101,14 +100,14 @@ def process_list(user_list):
 
 if __name__ == '__main__':
     logging.basicConfig(format=settings.log_format, level="INFO")
+
     # Get the current day of the week
     current_day = datetime.datetime.now().strftime('%A')
 
     # Check if the current day is Thursday
-    if current_day == 'Thursday':
+    if current_day == 'Thursday' or settings.debug_mode == 1:
         emails_list = get_user_list()
 
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
             process_list(emails_list)
-
