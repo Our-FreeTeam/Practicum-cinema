@@ -50,7 +50,6 @@ def get_user_list():
     user_list = {}
 
     for user in users:
-        print(user)
         attrs = user.get('attributes')
         if attrs:
             timezone = attrs.get('timezone')[0]  # Extract timezone attribute

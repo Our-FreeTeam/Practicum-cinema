@@ -2,6 +2,7 @@ import json
 import logging
 import datetime
 
+import pika
 import requests
 from keycloak_conn import keycloak_admin
 from rabbit_connection import rabbit_conn
@@ -30,9 +31,23 @@ def get_message(channel):
 def send_message(email: str, message: str, event_type: str, channel):
     prep_data = f"{email}:{message}"
 
+    channel.exchange_declare(
+        exchange=settings.rabbitmq_full_exchange,
+        exchange_type='x-delayed-message',
+        arguments={'x-delayed-type': 'direct'}
+    )
+
+    time_shift = 0
+    # Publish the serialized user list to the delayed exchange
+    properties = pika.BasicProperties(headers={'x-delay': time_shift})
+
     channel.queue_declare(queue=settings.rabbitmq_full_queue)
+
+    # Bind the queue to the exchange
+    channel.queue_bind(exchange=settings.rabbitmq_full_exchange, queue=settings.rabbitmq_full_queue)
+
     channel.basic_publish(
-        exchange=settings.rabbitmq_exchange,
+        exchange=settings.rabbitmq_full_exchange,
         routing_key=settings.rabbitmq_full_queue,
         body=json.dumps(prep_data).encode()
     )
