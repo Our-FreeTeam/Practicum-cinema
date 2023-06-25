@@ -1,5 +1,5 @@
 # Use the official RabbitMQ image as the base image
-FROM rabbitmq:3.12-management-alpine
+FROM rabbitmq:3.12-management
 
 COPY ./plugins /opt/rabbitmq/plugins
 COPY ./conf/rabbitmq.conf /etc/rabbitmq/conf.d/10-default-guest-user.conf

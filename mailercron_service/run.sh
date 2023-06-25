@@ -25,7 +25,11 @@ if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     locale -a
 fi
 
+python3 /opt/app/utils/queue_enrichment.py &
+
 sh /opt/app/run_em.sh
 
 #cron -f
 busybox syslogd -C; cron -L 2 -f
+
+wait

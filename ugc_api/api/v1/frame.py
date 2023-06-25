@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from models.models import FrameNumber
 from uuid import UUID
@@ -12,7 +14,7 @@ framenumbers = database['framenumber']
 
 @router.post('/create', response_model=FrameNumber)
 @is_authorized
-async def create_frame_number(request: Request, user_id: UUID, movie_id: UUID, frame_number: FrameNumber):
+async def create_frame_number(request: Request, frame_number: FrameNumber):
     """
     Create a new frame number record for the specified user and movie.
 
@@ -21,20 +23,17 @@ async def create_frame_number(request: Request, user_id: UUID, movie_id: UUID, f
         movie_id: The movie ID.
         frame_number: The frame number data.
     """
-    frame_number.user_id = user_id
-    frame_number.movie_id = movie_id
-
-    # Convert UUID to binary for MongoDB storage
     frame_number.user_id = Binary.from_uuid(frame_number.user_id)
     frame_number.movie_id = Binary.from_uuid(frame_number.movie_id)
+    frame_number.date_create = datetime.now()
 
     await framenumbers.insert_one(frame_number.dict())
     return frame_number
 
 
-@router.get('/', response_model=FrameNumber)
+@router.get('/', response_model=list[FrameNumber])
 @is_authorized
-async def get_frame_number(request: Request, user_id: UUID, movie_id: UUID):
+async def get_frame_number(request: Request, user_id: UUID | None = None, movie_id: UUID | None = None):
     """
     Retrieve a frame number record for the specified user and movie.
 
@@ -43,22 +42,32 @@ async def get_frame_number(request: Request, user_id: UUID, movie_id: UUID):
         movie_id: The movie ID.
     """
     # Convert UUID to binary for MongoDB query
-    user_id = Binary.from_uuid(user_id)
-    movie_id = Binary.from_uuid(movie_id)
 
-    frame_number = await framenumbers.find_one(
-        {"user_id": user_id, "movie_id": movie_id},
+    query = {}
+    if user_id:
+        user_id = Binary.from_uuid(user_id)
+        query |= {"user_id": user_id}
+    if movie_id:
+        movie_id = Binary.from_uuid(movie_id)
+        query |= {"movie_id": movie_id}
+
+    frame_numbers = framenumbers.find(
+        query,
         sort=[("_id", DESCENDING)],
     )
 
-    if frame_number is None:
+    if not frame_numbers:
         raise HTTPException(status_code=404, detail='Frame number not found')
 
-    # Convert binary back to UUID
-    frame_number['user_id'] = UUID(bytes=frame_number['user_id'])
-    frame_number['movie_id'] = UUID(bytes=frame_number['movie_id'])
+    response_raw = []
+    for frame_number in await frame_numbers.to_list(length=100):
+        response_raw.append({'user_id': UUID(bytes=frame_number['user_id']),
+                             'movie_id': UUID(bytes=frame_number['movie_id']),
+                             'frame_number': frame_number['frame_number']})
 
-    return FrameNumber(**frame_number)
+    response = [FrameNumber(**i) for i in response_raw]
+
+    return response
 
 
 @router.put('/update', response_model=FrameNumber)

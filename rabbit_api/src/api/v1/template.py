@@ -52,3 +52,28 @@ async def change_template(
     if not db_template:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Event not found")
     return await crud.change_template(session=session, template=template, event=event)
+
+
+@router.get("/{event}", response_model=schemas.TemplateIn, summary="Get a template")
+@check_role(["Manager"])
+async def get_template(
+        request: Request,
+        event: str,
+        session: AsyncSession = Depends(get_db)
+):
+    """
+    Get a template for the event:
+
+    - **event**: event to notification
+    - **instant_event**: instant notification or not
+    - **title**: subject for notification
+    - **text**: template for notification
+    """
+    db_template = await crud.get_template_by_event(session, event=event)
+    if not db_template:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Event not found")
+
+    return schemas.TemplateIn(event=db_template.event,
+                              instant_event=db_template.instant_event,
+                              title=db_template.title,
+                              text=db_template.text)

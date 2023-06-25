@@ -21,7 +21,16 @@ class Settings(BaseSettings):
     rabbitmq_host: str = Field(..., env='RABBIT_HOST')
     rabbitmq_port: int = Field(..., env='RABBIT_PORT')
     rabbitmq_exchange = 'delayed_exchange'
-    rabbitmq_queue: str = Field(..., env='RABBIT_QUEUE')
+    rabbitmq_raw_queue: str = Field(..., env='RABBIT_QUEUE')
+
+    rabbitmq_full_exchange = 'full_exchange'
+    rabbitmq_full_queue: str = Field(..., env='RABBIT_FULL_QUEUE')
+
+    rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
+    rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
+
+    ugc_api_service: str = Field(..., env='UGC_API_URL')
+    auth_url: str = Field(..., env='AUTH_URL')
 
     debug_mode: int = Field(0, env='MAILCRON_DEBUG')
 

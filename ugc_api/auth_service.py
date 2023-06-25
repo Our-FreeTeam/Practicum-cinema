@@ -19,8 +19,11 @@ def is_authorized(func):
                 'access_token': headers.get('access_token'),
                 'refresh_token': headers.get('refresh_token'),
             }
+            dict_keys = list(kwargs.keys())
+            dict_keys.remove('request')
+
             user = kwargs.get('user_id')
-            get_user_id = user if user else kwargs.get('event').user_id
+            get_user_id = user if user else kwargs[dict_keys[0]].user_id
             if tokens['access_token']:
                 return await request_auth(*args, exec_func=func, tokens=tokens, get_user_id=get_user_id, **kwargs)
         raise HTTPException(

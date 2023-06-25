@@ -4,15 +4,13 @@ import pika
 import logging
 from keycloak_conn import keycloak_admin
 from dateutil.tz import tzoffset
+
+from rabbit_connection import rabbit_conn
 from settings import settings
 
 
-def rabbit_send(mail_list, time_shift):
-    # Connect to RabbitMQ
-    connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=settings.rabbitmq_host, port=settings.rabbitmq_port,
-                                  ssl_options=None))
-    channel = connection.channel()
+@rabbit_conn
+def rabbit_send(mail_list, time_shift, channel):
 
     # Declare the delayed exchange
     channel.exchange_declare(
@@ -21,31 +19,29 @@ def rabbit_send(mail_list, time_shift):
         arguments={'x-delayed-type': 'direct'}
     )
 
+    time_shift = 0
     # Publish the serialized user list to the delayed exchange
     properties = pika.BasicProperties(headers={'x-delay': time_shift})
 
     # Declare the queue
-    channel.queue_declare(queue=settings.rabbitmq_queue, durable=True)
+    channel.queue_declare(queue=settings.rabbitmq_raw_queue, durable=True)
 
     # Bind the queue to the exchange
-    channel.queue_bind(exchange=settings.rabbitmq_exchange, queue=settings.rabbitmq_queue)
+    channel.queue_bind(exchange=settings.rabbitmq_exchange, queue=settings.rabbitmq_raw_queue)
 
     processed_count = 0
     for user_email in mail_list:
         if user_email:
-            prep_data = f"\'{user_email}\':\'watched_film\'"
+            prep_data = f"{user_email}:watched_film"
             channel.basic_publish(
                 exchange=settings.rabbitmq_exchange,
-                routing_key=settings.rabbitmq_queue,
+                routing_key=settings.rabbitmq_raw_queue,
                 body=json.dumps(prep_data).encode(),
                 properties=properties
             )
-            print(prep_data)
             processed_count += 1
 
     logging.info("Emails send to delayed q: {:d}".format(processed_count))
-    # Close the RabbitMQ connection
-    connection.close()
 
 
 def get_user_list():
@@ -54,13 +50,15 @@ def get_user_list():
     user_list = {}
 
     for user in users:
-        timezone = user.get('attributes').get('timezone')[0]  # Extract timezone attribute
-        email = user.get('email')  # Extract user email
-        if email != "None":
-            if timezone not in user_list:
-                user_list[timezone] = [email]
-            else:
-                user_list[timezone].append(email)
+        attrs = user.get('attributes')
+        if attrs:
+            timezone = attrs.get('timezone')[0]  # Extract timezone attribute
+            email = user.get('email')  # Extract user email
+            if email != "None":
+                if timezone not in user_list:
+                    user_list[timezone] = [email]
+                else:
+                    user_list[timezone].append(email)
     return user_list
 
 
@@ -115,3 +113,4 @@ if __name__ == '__main__':
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
             process_list(emails_list)
+

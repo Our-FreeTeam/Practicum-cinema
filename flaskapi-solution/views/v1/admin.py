@@ -71,8 +71,14 @@ def check_role():
 @api.validate(resp=Response(HTTP_200=BoolResponse, HTTP_403=None, HTTP_429=ErrorStr), tags=['admin'])
 def check_authorization(user_id: str, token_info: dict):
     """ Проверка корректности токена пользователя (если роли не нужны) """
+
     if user_id == token_info['sub']:
         return jsonify({'result': True})
+    user_roles = token_info['resource_access'].get('theatre')
+    if user_roles:
+        user_roles = user_roles.get('roles')
+        if set(user_roles) & set(['theatre_admin']):
+            return jsonify({'result': True})
     return messages.INSUFFICIENT_PRIVILEGES
 
 
@@ -136,6 +142,20 @@ def get_user_name(user_id: str):
     if user_data:
         user_name = user_data['username']
     return jsonify({'result': user_name})
+
+
+@app.route('/v1/admin/user/<email>', methods=['GET'])
+@rate_limiter(settings.rate_limit, settings.time_period)
+@api.validate(resp=Response(HTTP_200=StrResponse,
+                            HTTP_429=ErrorStr), tags=['admin'])
+@check_role_wrap(['theatre_admin'])
+def get_user_id_by_email(email: str):
+    """ Получить имя пользователя """
+    user_data = keycloak_admin.get_users(query={'email': email})
+    user_id = -1
+    if user_data:
+        user_id = user_data[0]['id']
+    return jsonify({'result': user_id})
 
 
 @app.route('/v1/admin/roles/<role_name>/delete', methods=['POST'])

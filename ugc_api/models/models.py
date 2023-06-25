@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from uuid import UUID
 
@@ -19,6 +20,7 @@ class FrameNumber(BaseModel):
     user_id: UUID
     movie_id: UUID
     frame_number: int
+    date_create: datetime | None = datetime.now()
 
 
 class ReviewLike(BaseModel):
