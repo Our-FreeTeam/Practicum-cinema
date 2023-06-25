@@ -100,12 +100,16 @@ def process_list(user_list):
 
 
 if __name__ == '__main__':
-    print("RUN")
     logging.basicConfig(format=settings.log_format, level="INFO")
 
-    emails_list = get_user_list()
+    # Get the current day of the week
+    current_day = datetime.datetime.now().strftime('%A')
 
-    if emails_list:
-        logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
-        process_list(emails_list)
+    # Check if the current day is Thursday
+    if current_day == 'Thursday':
+        emails_list = get_user_list()
+
+        if emails_list:
+            logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
+            process_list(emails_list)
 

@@ -21,7 +21,6 @@ CONTAINER_FIRST_STARTUP="CONTAINER_FIRST_STARTUP"
 if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     touch /$CONTAINER_FIRST_STARTUP
     # first startup.
-    rm -rf /opt/app/requirements.txt
     touch /var/log/cron.log
     locale -a
 fi

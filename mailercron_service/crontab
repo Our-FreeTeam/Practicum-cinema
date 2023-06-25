@@ -4,4 +4,4 @@ LANG=en_US.UTF-8
 LC_ALL=en_US.UTF-8
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/sifi/bin:/opt/app:/usr/local/lib/python3.10/site-packages
 # START CRON JOB
-02 19 * * 0 . $HOME/.profile; python3 /opt/app/utils/email_to_queue.py >> /var/log/cron.log 2>&1
+12 19 * * 0 . $HOME/.profile; python3 /opt/app/utils/email_to_queue.py >> /var/log/cron.log 2>&1

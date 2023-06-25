@@ -6,6 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 COPY crontab /etc/cron.d/crontab
+COPY run_em.sh /etc/cron.daily/run_em.sh
 
 COPY requirements.txt requirements.txt
 
