@@ -106,6 +106,10 @@ if __name__ == '__main__':
 
     # Check if the current day is Thursday
     if current_day == 'Thursday' or settings.debug_mode == 1:
+
+        if settings.debug_mode == 1:
+            logging.warning("Debug mode enabled")
+
         emails_list = get_user_list()
 
         if emails_list:
