@@ -23,7 +23,7 @@ def rabbit_send(mail_list, time_shift):
     )
 
     # Publish the serialized user list to the delayed exchange
-    properties = pika.BasicProperties(headers={'x-delay': 30000})
+    properties = pika.BasicProperties(headers={'x-delay': time_shift})
 
     # Declare the queue
     channel.queue_declare(queue=settings.rabbitmq_queue, durable=True)
@@ -101,7 +101,6 @@ def process_list(user_list):
 
 if __name__ == '__main__':
     logging.basicConfig(format=settings.log_format, level="INFO")
-
     # Get the current day of the week
     current_day = datetime.datetime.now().strftime('%A')
 
