@@ -10,7 +10,7 @@ FL_STATUS_OK="FL_OK.STATUS"
 
 
 if [ -e /$KC_STATUS_OK ] && [ -e /$FL_STATUS_OK ]; then
-  pytest /tests_auth/functional/src --hs_access_token="$HELIOS_API_TOKEN" --hs_enabled=true
+  pytest /tests_auth/functional/src --hs_access_token="$HELIOS_API_TOKEN" --hs_enabled=false
 else
   echo "================== !!! ===================="
   echo "WARNING THERE IS ERRORS WITH KEYCLOAK or FLASKAUTH check"
