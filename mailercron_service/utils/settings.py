@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     debug_mode: int = Field(0, env='MAILCRON_DEBUG')
 
 
+
 class Config:
     env_file = '.env'
     env_file_encoding = 'utf-8'
