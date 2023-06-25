@@ -2,16 +2,33 @@
 
 Задание Notification (RabbitMQ)
 
+1. Сервис mailercron_service собирает раз в неделю почтовые адреса пользователей из сервиса
+   авторизации и отправляет в точку обмена с задержкой отправки равной времени в секундах
+   до ближайшей пятницы 15:00 по местному времени получателя (планируем отправить пользователю
+   еженедельную рассылку с информацией о том сколько фильмов он посмотрел)
+
+2. Сервис render забирает адреса пользователей из очереди (при достижении правильного времени)
+   и создает текст письма обращаясь к API ugc (получая оттуда данные по просмотрам фильмов для)
+   пользователей и отправляет обратно в новую очередь
+
+3. Сервис sender получает из очереди письма и отправляет их конечным пользователям
+   (попытка интегрировать подключение к sendgrid не увенчалась успехом, при попытке обращения
+   к API сервиса с правильным ключом возвращается ошибка 404)
+
+
 Для разворачивания проекта использовать env.example и build_dev.bat,
 Либо разворачивать по очереди
 docker-compose-logs.yml,
-docker-compose-mongo-solo.yml
-docker-compose-rabbit.yml
-docker-compose-sender.yml
+docker-compose-mongo-solo.yml,
+docker-compose-authsubsys.yml,
+docker-compose-rabbit.yml,
+docker-compose-sender.yml,
 docker-compose.yml,
 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
 Ссылка на Sentry https://our-freeteam.sentry.io/issues/
+
+
 
 
 # Структура проекта
@@ -137,6 +154,7 @@ docker-compose.yml,
         ├── src                             # Папка с тестами
             ├── test_flask_admin.py         # тесты административных API
             ├── test_flask_auth.py          # тесты пользовательских API
+            ├── test_flask_ddos.py          # тесты ddos ручек API 
         ├── requirements.txt                # Зависимости для тестов
         ├── settings.py                     # Файл настроек
         ├── wait_for_flask.py               # Вейтер запуска flask
@@ -167,7 +185,26 @@ docker-compose.yml,
     ├── conf/                       # Папка с настройками сервиса
         ├── fluent.conf             # Файл настроек сервиса fluentd
     ├── Dockerfile                  # Dockerfile контейнера с установкой плагина GELF
-    
+
+
+├── rabbit_api/                     # Папка с FastAPI для API сервиса записи контента от 
+                                      пользователей (лайки, обзоры, таймстампы, лайки обзорам)
+    ├── mq/                        
+        ├── conf/                   # Папка с настройками для rabbitmq
+            ├── rabbitmq.conf       # сохранение пользователем места просмотра фильма
+        ├── plugins/                # папка с плагинами
+            ├── rabbitmq_delayed_message_exchange-3.12.0.ez    # плагин для корзины delay
+        ├── requirements.txt        # файл с зависимостями для FastAPI
+        ├── Dockerfile              # Dockerfile контейнера FastApi-solution
+    ├── render/                        
+        ├── src/                    # Папка с системой render 
+        ├── requirements.txt        # файл с зависимостями для render
+        ├── Dockerfile              # Dockerfile контейнера rabbit-render
+    ├── sender/                        
+        ├── src/                    # Папка с системой sender 
+        ├── requirements.txt        # файл с зависимостями для render
+        ├── Dockerfile              # Dockerfile контейнера rabbit-render
+
     
 ├── redis_config/                   # Папка с Redis Cache
     ├── redis.conf                  # Файл с настройками для Redis
@@ -195,6 +232,8 @@ docker-compose.yml,
     ├── requirements.txt            # файл с зависимостями для FastAPI
     ├── Dockerfile                  # Dockerfile контейнера FastApi-solution
     ├── wait_for_mongo.py           # Вейтер для MongoDB
+    ├── settings.py                 # Файл настроек
+
 
 ├── .env.example                    # Пример файла с переменными окружения
 ├── build_dev.bat                   # файл для сборки проекта под Windows

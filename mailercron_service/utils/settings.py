@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     rabbitmq_exchange = 'delayed_exchange'
     rabbitmq_queue: str = Field(..., env='RABBIT_QUEUE')
 
+    debug_mode: int = Field(..., env='MAILCRON_DEBUG')
+
+
 class Config:
     env_file = '.env'
     env_file_encoding = 'utf-8'

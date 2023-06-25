@@ -8,7 +8,6 @@ from settings import settings
 
 
 def rabbit_send(mail_list, time_shift):
-
     # Connect to RabbitMQ
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(host=settings.rabbitmq_host, port=settings.rabbitmq_port,
@@ -23,7 +22,7 @@ def rabbit_send(mail_list, time_shift):
     )
 
     # Publish the serialized user list to the delayed exchange
-    properties = pika.BasicProperties(headers={'x-delay': 30000})
+    properties = pika.BasicProperties(headers={'x-delay': time_shift})
 
     # Declare the queue
     channel.queue_declare(queue=settings.rabbitmq_queue, durable=True)
@@ -34,7 +33,7 @@ def rabbit_send(mail_list, time_shift):
     processed_count = 0
     for user_email in mail_list:
         if user_email:
-            prep_data = f"\'{user_email}\':\'watched_film3\'"
+            prep_data = f"\'{user_email}\':\'watched_film\'"
             channel.basic_publish(
                 exchange=settings.rabbitmq_exchange,
                 routing_key=settings.rabbitmq_queue,
@@ -106,10 +105,14 @@ if __name__ == '__main__':
     current_day = datetime.datetime.now().strftime('%A')
 
     # Check if the current day is Thursday
-    if current_day == 'Thursday':
+    if current_day == 'Thursday' or settings.debug_mode == 1:
+
+        if settings.debug_mode == 1:
+            logging.warning("Debug mode enabled")
+            print("[Debug mode enabled]")
+
         emails_list = get_user_list()
 
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
             process_list(emails_list)
-
