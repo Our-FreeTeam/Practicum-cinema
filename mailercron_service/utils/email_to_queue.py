@@ -21,7 +21,7 @@ def rabbit_send(mail_list, time_shift, channel):
 
     time_shift = 0
     # Publish the serialized user list to the delayed exchange
-    properties = pika.BasicProperties(headers={'x-delay': 1 * 1000})
+    properties = pika.BasicProperties(headers={'x-delay': time_shift * 1000})
 
     # Declare the queue
     channel.queue_declare(queue=settings.rabbitmq_raw_queue, durable=True)
