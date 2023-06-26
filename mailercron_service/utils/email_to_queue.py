@@ -21,7 +21,7 @@ def rabbit_send(mail_list, time_shift, channel):
 
     time_shift = 0
     # Publish the serialized user list to the delayed exchange
-    properties = pika.BasicProperties(headers={'x-delay': time_shift})
+    properties = pika.BasicProperties(headers={'x-delay': time_shift * 1000})
 
     # Declare the queue
     channel.queue_declare(queue=settings.rabbitmq_raw_queue, durable=True)
@@ -64,8 +64,6 @@ def get_user_list():
 
 def process_list(user_list):
     for offset_str, email_list in user_list.items():
-
-        # local_time = datetime.datetime.now(datetime.timezone.utc).astimezone()
 
         offset_hours = int(offset_str[3:])  # Take the substring after 'GMT'
         if offset_str[3] == '-':

@@ -23,7 +23,10 @@ if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     # first startup.
     touch /var/log/cron.log
     locale -a
+    python3 /opt/app/utils/create_delayed_exchange.py
+    echo "================ FIRST RUN ================"
 fi
+
 
 python3 /opt/app/utils/queue_enrichment.py &
 
