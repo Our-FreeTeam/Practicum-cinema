@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 import pika
 import uvicorn
 from fastapi import FastAPI
@@ -7,16 +9,10 @@ from api.v1 import events, template
 from config.settings import settings
 from db import rabbit
 
-app = FastAPI(
-    title=settings.project_name,
-    docs_url="/api/openapi",
-    openapi_url="/api/openapi.json",
-    default_response_class=ORJSONResponse,
-)
 
-
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup rabbit connection
     credentials = pika.PlainCredentials(
         username=settings.rabbit_settings.username,
         password=settings.rabbit_settings.password
@@ -32,12 +28,19 @@ async def startup():
     # Создание 2х очередей
     rabbit.rq.queue_declare("fast")
     rabbit.rq.queue_declare("slow")
-
-
-@app.on_event("shutdown")
-async def shutdown():
+    yield
+    # shutdown rabbit connection
     rabbit.rq.close()
     rabbit.rc.close()
+
+
+app = FastAPI(
+    title=settings.project_name,
+    docs_url="/api/openapi",
+    openapi_url="/api/openapi.json",
+    default_response_class=ORJSONResponse,
+    lifespan=lifespan
+)
 
 
 app.include_router(
