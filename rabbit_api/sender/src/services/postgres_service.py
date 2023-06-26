@@ -1,5 +1,6 @@
 import datetime as dt
 import uuid
+from contextlib import contextmanager
 
 import psycopg2.extras
 from psycopg2.extensions import connection
@@ -7,6 +8,14 @@ from psycopg2.extensions import connection
 from models.models import Notification
 from services.abstract_database_service import \
     AbstractNotificationDatabaseService
+
+
+@contextmanager
+def closing(connection: connection):
+    try:
+        yield connection
+    finally:
+        connection.close()
 
 
 class NotificationPostgresService(AbstractNotificationDatabaseService):
@@ -37,12 +46,14 @@ class NotificationPostgresService(AbstractNotificationDatabaseService):
                 notification.type,
                 str(dt.datetime.now()).split('.')[0]
                 )
-        self._execute_query(query, values)
+        with closing(self.connection):
+            self._execute_query(query, values)
 
     def get_notifications(self):
         """Возвращает все уведомления из БД"""
         query = f"SELECT * FROM notifications;"
-        result = self._execute_query(query)
+        with closing(self.connection):
+            result = self._execute_query(query)
 
         return result
 
@@ -51,5 +62,6 @@ class NotificationPostgresService(AbstractNotificationDatabaseService):
         query = f"""SELECT * FROM notifications
                   WHERE notification_id='{notification_id}' AND user_id='{user_id}';"""
 
-        result = self._execute_query(query)
+        with closing(self.connection):
+            result = self._execute_query(query)
         return result[0] if result else None

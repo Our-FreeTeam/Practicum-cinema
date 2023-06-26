@@ -1,8 +1,8 @@
 from database.connections import create_pg_conn
 from psycopg2.extras import DictCursor
-from utils.email_sender import EmailSender
-from utils.postgres_service import NotificationPostgresService
-from utils.worker import Worker
+from services.email_sender import EmailSender
+from services.postgres_service import NotificationPostgresService
+from services.worker import Worker
 
 from config.settings import (email_server_settings, postgres_settings,
                              rabbit_settings)
