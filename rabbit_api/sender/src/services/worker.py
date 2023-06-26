@@ -30,8 +30,8 @@ class Worker:
     def on_channel_open(self, new_channel):
         """Этот метод создаст очередь после открытия канала"""
         self.channel = new_channel
-        self.channel.queue_declare(
-            queue=self.rabbit_params.queue,
+        await self.channel.declare_queue(
+            name=self.rabbit_params.queue,
             durable=True,
             exclusive=False,
             auto_delete=False,

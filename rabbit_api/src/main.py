@@ -26,12 +26,11 @@ async def lifespan(app: FastAPI):
     rabbit.rc = pika.BlockingConnection(connection_parameters)
     rabbit.rq = rabbit.rc.channel()
     # Создание 2х очередей
-    rabbit.rq.queue_declare("fast")
-    rabbit.rq.queue_declare("slow")
+    await rabbit.rq.declare_queue("fast")
+    await rabbit.rq.declare_queue("slow")
     yield
     # shutdown rabbit connection
-    rabbit.rq.close()
-    rabbit.rc.close()
+    await rabbit.rc.close()
 
 
 app = FastAPI(

@@ -1,7 +1,9 @@
+import asyncio
 import datetime
-import json
-import pika
 import logging
+
+from aio_pika import Message
+
 from keycloak_conn import keycloak_admin
 from dateutil.tz import tzoffset
 
@@ -10,34 +12,32 @@ from settings import settings
 
 
 @rabbit_conn
-def rabbit_send(mail_list, time_shift, channel):
+async def rabbit_send(mail_list, time_shift, channel):
 
     # Declare the delayed exchange
-    channel.exchange_declare(
-        exchange=settings.rabbitmq_exchange,
-        exchange_type='x-delayed-message',
+    exchange = await channel.declare_exchange(
+        name=settings.rabbitmq_exchange,
+        type='x-delayed-message',
         arguments={'x-delayed-type': 'direct'}
     )
 
-    time_shift = 0
     # Publish the serialized user list to the delayed exchange
-    properties = pika.BasicProperties(headers={'x-delay': time_shift * 1000})
 
     # Declare the queue
-    channel.queue_declare(queue=settings.rabbitmq_raw_queue, durable=True)
+    queue = await channel.declare_queue(name=settings.rabbitmq_raw_queue, durable=True)
 
     # Bind the queue to the exchange
-    channel.queue_bind(exchange=settings.rabbitmq_exchange, queue=settings.rabbitmq_raw_queue)
+    await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_raw_queue)
 
     processed_count = 0
     for user_email in mail_list:
         if user_email:
             prep_data = f"{user_email}:watched_film"
-            channel.basic_publish(
-                exchange=settings.rabbitmq_exchange,
+            await exchange.publish(
                 routing_key=settings.rabbitmq_raw_queue,
-                body=json.dumps(prep_data).encode(),
-                properties=properties
+                message=Message(bytes(prep_data, "utf-8"),
+                                content_type="text/plain",
+                                headers={'x-delay': time_shift * 1000}),
             )
             processed_count += 1
 
@@ -62,7 +62,7 @@ def get_user_list():
     return user_list
 
 
-def process_list(user_list):
+async def process_list(user_list):
     for offset_str, email_list in user_list.items():
 
         offset_hours = int(offset_str[3:])  # Take the substring after 'GMT'
@@ -91,10 +91,10 @@ def process_list(user_list):
         # Calculate the difference
         time_difference = next_friday - current_time
 
-        rabbit_send(email_list, int(time_difference.total_seconds()))
+        await rabbit_send(email_list, int(time_difference.total_seconds()))
 
 
-if __name__ == '__main__':
+async def main():
     logging.basicConfig(format=settings.log_format, level="INFO")
 
     # Get the current day of the week
@@ -110,5 +110,8 @@ if __name__ == '__main__':
 
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
-            process_list(emails_list)
+            await process_list(emails_list)
 
+
+if __name__ == "__main__":
+    asyncio.run(main())

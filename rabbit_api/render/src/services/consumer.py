@@ -30,8 +30,8 @@ class RabbitConsumer():
 
     def on_channel_open(self, new_channel):
         self.channel = new_channel
-        self.channel.queue_declare(
-            queue=self.params.queue,
+        self.channel.declare_queue(
+            name=self.params.queue,
             durable=True,
             exclusive=False,
             auto_delete=False,

@@ -1,8 +1,8 @@
-import json
 import logging
 
 import pika
 import pika.exceptions
+from aio_pika import Message
 
 from config.settings import Queue, settings
 
@@ -10,14 +10,14 @@ logger = logging.getLogger(__name__)
 r = settings.rabbit_settings
 
 
-def publish(message, connection, queue):
+async def publish(message, queue):
     try:
         # Отправка сообщения через точку обмена exchange
-        connection.basic_publish(
-            exchange=r.exchange,
+        await r.exchange.publish(
             routing_key=queue,
-            body=json.dumps(message),
+            message=Message(bytes(message, "utf-8"), content_type="text/plain"),
         )
+
         logger.info("Message was published")
     except pika.exceptions.UnroutableError:
         logger.error("Message was returned")
