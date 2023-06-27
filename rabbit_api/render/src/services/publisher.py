@@ -10,6 +10,7 @@ from config.settings import settings
 
 logger = logging.getLogger(__name__)
 
+
 class Publisher(ABC):
     @abstractmethod
     async def publish(self, message: dict, headers: dict) -> None:

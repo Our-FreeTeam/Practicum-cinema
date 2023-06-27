@@ -7,6 +7,7 @@ from services.message_handler import MessageHandler
 
 logger = logging.getLogger(__name__)
 
+
 class RabbitConsumer():
     def __init__(self, rabbit_params: settings.rabbit_settings, publisher: settings.rabbit_settings, render: MessageHandler) -> None:
         self.params = rabbit_params

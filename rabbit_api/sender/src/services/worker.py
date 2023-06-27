@@ -1,9 +1,9 @@
+import asyncio
 import json
 import logging
 
-import aio_pika
-import pika
-import pika.exceptions
+from aio_pika import connect
+
 from utils.backoff import backoff
 
 from config.settings import rabbit_settings
@@ -15,32 +15,29 @@ logger = logging.getLogger(__name__)
 class Worker:
     """Занимается получением сообщений из очереди RabbitMQ """
     def __init__(self, rabbit_params: rabbit_settings, sender: AbstractSender, template) -> None:
-        self.rabbit_params = rabbit_params
+        self.params = rabbit_params
         self.sender = sender
         self.template_to_send = template
         # Подключаемся к Rabbit
-        self.connection = aio_pika.connect_robust(
-            f"amqp://{self.rabbit_params.username}:{self.rabbit_params.password}@{self.rabbit_params.host}:{self.rabbit_params.port}/",
+        self.loop = asyncio.get_event_loop()
+
+    @backoff()
+    async def start(self) -> None:
+        self.connection = await connect(
+            f"amqp://{self.params.username}:{self.params.password}@{self.params.host}:{self.params.port}/",
+            loop=self.loop
         )
-        self.start()
 
-    def on_connected(self, connection):
-        """Этот метод создаст канал, когда мы полностью подключимся к очереди"""
-        connection.channel(on_open_callback=self.on_channel_open)
+        # Creating a channel
+        self.channel = await self.connection.channel()
 
-    def on_channel_open(self, new_channel):
-        """Этот метод создаст очередь после открытия канала"""
-        self.channel = new_channel
-        self.channel.declare_queue(
-            name=self.rabbit_params.queue,
-            durable=True,
-            exclusive=False,
-            auto_delete=False,
-            callback=self.on_queue_declared)
+        # Declaring queue
+        queue = await self.channel.declare_queue(self.params.queue, durable=True)
 
-    def on_queue_declared(self, frame):
-        # Получение сообщений из очереди
-        self.channel.basic_consume(self.rabbit_params.queue, self.handle_delivery)
+        await queue.consume(self.handle_delivery)
+
+    async def stop(self):
+        await self.connection.close()
 
     def handle_delivery(self, channel, method, parameters, body):
         """Срабатывает при получении сообщения из Rabbit"""
@@ -56,12 +53,3 @@ class Worker:
         # Сообщаем очереди, что сообщение обработано, что сообщение обработано
         logger.warning("Message was sent")
         channel.basic_ack(delivery_tag=method.delivery_tag)
-
-    @backoff()
-    def start(self):
-        """Запускает loop"""
-        try:
-            self.connection.ioloop.start()
-        except KeyboardInterrupt:
-            self.connection.close()
-            self.connection.ioloop.start()
