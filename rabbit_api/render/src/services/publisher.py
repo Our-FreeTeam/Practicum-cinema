@@ -2,6 +2,7 @@ import json
 import logging
 from abc import ABC, abstractmethod
 
+import aio_pika
 import pika
 import pika.exceptions
 from utils.backoff import backoff, backoff_reconnect
@@ -28,11 +29,13 @@ class RabbitPublisher(Publisher):
         self.connect()
 
     @backoff()
-    def connect(self) -> None:
-        self.connection = pika.BlockingConnection(self.parameters)
+    async def connect(self) -> None:
+        self.connection = await aio_pika.connect_robust(
+            f"amqp://{self.params.username}:{self.params.password}@{self.params.host}:{self.params.port}/",
+        )
         self.channel = self.connection.channel()
         # Получение сообщений из очереди; durable означает, что очередь не будет потеряна при перезапуске
-        await self.channel.declare_queue(name=self.params.queue, durable=True, exclusive=False, auto_delete=False)
+        self.channel.declare_queue(name=self.params.queue, durable=True, exclusive=False, auto_delete=False)
         self.channel.confirm_delivery()
 
     def __init__(self, rabbit_params: settings.rabbit_settings) -> None:

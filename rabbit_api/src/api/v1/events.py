@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-import pika
+import aio_pika
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,6 +11,8 @@ from services import crud, publisher
 from services.check_role import check_role
 from services.publisher import get_queue
 
+from config.settings import settings
+
 router = APIRouter()
 
 
@@ -20,7 +22,7 @@ async def create_notification(
         request: Request,
         event: schemas.Event,
         session: AsyncSession = Depends(get_db),
-        connection: pika.BlockingConnection = Depends(get_rabbit)
+        connection=get_rabbit
 ):
     """
     Create a notification with all the information:

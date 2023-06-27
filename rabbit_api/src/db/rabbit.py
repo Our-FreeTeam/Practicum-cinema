@@ -1,10 +1,14 @@
+from functools import lru_cache
 from typing import Optional
 
-import pika
+from aio_pika import Connection
 
-rq: Optional[pika.adapters.blocking_connection.BlockingChannel] = None
-rc: Optional[pika.BlockingConnection] = None
+rabbitmq: Optional[Connection] = None
 
 
-async def get_rabbit():
-    return rq
+@lru_cache
+async def get_rabbit() -> Connection:
+    """Фабрика для получения подключения к Rabbitmq.
+    Возвращает экземпляр rabbitmq(Connection)
+    """
+    return rabbitmq

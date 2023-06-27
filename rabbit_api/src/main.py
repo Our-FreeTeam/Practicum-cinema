@@ -1,6 +1,7 @@
+import logging
 from contextlib import asynccontextmanager
 
-import pika
+import aio_pika
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
@@ -9,28 +10,26 @@ from api.v1 import events, template
 from config.settings import settings
 from db import rabbit
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # startup rabbit connection
-    credentials = pika.PlainCredentials(
-        username=settings.rabbit_settings.username,
-        password=settings.rabbit_settings.password
+    rabbit.rabbitmq = await aio_pika.connect_robust(
+        f"amqp://{settings.rabbitmq_user}:{settings.rabbitmq_password}@{settings.rabbitmq_host}"
+        f":{settings.rabbitmq_port}/",
     )
-    connection_parameters = pika.ConnectionParameters(
-        settings.rabbit_settings.host,
-        settings.rabbit_settings.port,
-        credentials=credentials
-    )
-    # Отправка сообщений в очередь
-    rabbit.rc = pika.BlockingConnection(connection_parameters)
-    rabbit.rq = rabbit.rc.channel()
     # Создание 2х очередей
-    await rabbit.rq.declare_queue("fast")
-    await rabbit.rq.declare_queue("slow")
+    # durable помогает очереди пережить перезапуск RabbitMq
+    async with rabbit.rabbitmq:
+        channel: aio_pika.abc.AbstractChannel = await rabbit.rabbitmq.channel()
+        queue_slow: aio_pika.abc.AbstractQueue = await channel.declare_queue("slow", durable=True)
+        queue_fast: aio_pika.abc.AbstractQueue = await channel.declare_queue("fast", durable=True)
+        logger.info("Starting consuming")
     yield
     # shutdown rabbit connection
-    await rabbit.rc.close()
+    rabbit.rabbitmq.close()
 
 
 app = FastAPI(

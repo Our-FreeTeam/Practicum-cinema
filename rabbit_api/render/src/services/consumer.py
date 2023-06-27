@@ -1,6 +1,7 @@
 import json
 import logging
 
+import aio_pika
 import pika
 import pika.exceptions
 from utils.backoff import backoff
@@ -19,9 +20,9 @@ class RabbitConsumer():
                  ) -> None:
         self.params = rabbit_params
         self.render = render
-        credentials = pika.PlainCredentials(rabbit_params.username, rabbit_params.password)
-        parameters = pika.ConnectionParameters(rabbit_params.host, rabbit_params.port, credentials=credentials)
-        self.connection = pika.SelectConnection(parameters, on_open_callback=self.on_connected)
+        self.connection = aio_pika.connect_robust(
+            f"amqp://{self.params.username}:{self.params.password}@{self.params.host}:{self.params.port}/",
+        )
         self.publisher = publisher
         self.start()
 

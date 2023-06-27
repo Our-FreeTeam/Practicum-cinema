@@ -1,6 +1,7 @@
 import json
 import logging
 
+import aio_pika
 import pika
 import pika.exceptions
 from utils.backoff import backoff
@@ -18,9 +19,9 @@ class Worker:
         self.sender = sender
         self.template_to_send = template
         # Подключаемся к Rabbit
-        credentials = pika.PlainCredentials(rabbit_params.username, rabbit_params.password)
-        parameters = pika.ConnectionParameters(rabbit_params.host, rabbit_params.port, credentials=credentials)
-        self.connection = pika.SelectConnection(parameters, on_open_callback=self.on_connected)
+        self.connection = aio_pika.connect_robust(
+            f"amqp://{self.rabbit_params.username}:{self.rabbit_params.password}@{self.rabbit_params.host}:{self.rabbit_params.port}/",
+        )
         self.start()
 
     def on_connected(self, connection):
@@ -30,7 +31,7 @@ class Worker:
     def on_channel_open(self, new_channel):
         """Этот метод создаст очередь после открытия канала"""
         self.channel = new_channel
-        await self.channel.declare_queue(
+        self.channel.declare_queue(
             name=self.rabbit_params.queue,
             durable=True,
             exclusive=False,
