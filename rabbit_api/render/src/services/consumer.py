@@ -1,68 +1,60 @@
 import json
 import logging
-
-import aio_pika
-import pika
-import pika.exceptions
-from utils.backoff import backoff
-
+import asyncio
+from aio_pika import connect, IncomingMessage
 from config.settings import settings
 from services.message_handler import MessageHandler
 
 logger = logging.getLogger(__name__)
 
-
 class RabbitConsumer():
-    def __init__(self,
-                 rabbit_params: settings.rabbit_settings,
-                 publisher: settings.rabbit_settings,
-                 render: MessageHandler,
-                 ) -> None:
+    def __init__(self, rabbit_params: settings.rabbit_settings, publisher: settings.rabbit_settings, render: MessageHandler) -> None:
         self.params = rabbit_params
         self.render = render
-        self.connection = aio_pika.connect_robust(
-            f"amqp://{self.params.username}:{self.params.password}@{self.params.host}:{self.params.port}/",
-        )
         self.publisher = publisher
-        self.start()
+        self.loop = asyncio.get_event_loop()
 
-    def on_connected(self, connection):
-        connection.channel(on_open_callback=self.on_channel_open)
+    async def on_message(self, message: IncomingMessage):
+        async with message.process():
+            body = message.body.decode()
+            logger.info("New message %s %s", body, message.headers)
 
-    def on_channel_open(self, new_channel):
-        self.channel = new_channel
-        self.channel.declare_queue(
-            name=self.params.queue,
-            durable=True,
-            exclusive=False,
-            auto_delete=False,
-            callback=self.on_queue_declared)
+            try:
+                message_dict = json.loads(body)
+            except json.JSONDecodeError:
+                logger.exception("JSON Decode error format: %s", body)
+                return
 
-    def on_queue_declared(self, frame):
-        self.channel.basic_consume(self.params.queue, self.handle_delivery)
+            logger.info("Message decoded %s", message_dict)
 
-    def handle_delivery(self, channel, method, properties, body):
-        logger.info("New message %s %s", body, properties.headers)
+            notifications = self.render.proccess_message(message_dict)
+            for notification in notifications:
+                await self.publisher.publish(notification.dict(), message.headers)
+            logger.info("Message was processed.")
 
+    async def start(self):
+        self.connection = await connect(
+            f"amqp://{self.params.username}:{self.params.password}@{self.params.host}:{self.params.port}/",
+            loop=self.loop
+        )
+
+        # Creating a channel
+        self.channel = await self.connection.channel()
+
+        # Declaring queue
+        queue = await self.channel.declare_queue(self.params.queue, durable=True)
+
+        # Start listening the queue with name 'test_queue'
+        await queue.consume(self.on_message)
+
+    async def stop(self):
+        await self.connection.close()
+
+    def run(self):
         try:
-            message = json.loads(body)
-        except json.JSONDecodeError:
-            logger.exception("JSON Decode error format: %s", body)
-            channel.basic_ack(delivery_tag=method.delivery_tag)
-            return
-
-        logger.info("Message decoded %s", message)
-
-        notifications = self.render.proccess_message(message)
-        for notification in notifications:
-            self.publisher.publish(notification.dict(), properties.headers)
-        channel.basic_ack(delivery_tag=method.delivery_tag)
-        logger.info("Message was processed.")
-
-    @backoff()
-    def start(self):
-        try:
-            self.connection.ioloop.start()
+            self.loop.run_until_complete(self.start())
+            self.loop.run_forever()
         except KeyboardInterrupt:
-            self.connection.close()
-            self.connection.ioloop.start()
+            self.loop.run_until_complete(self.stop())
+        finally:
+            self.loop.close()

@@ -1,4 +1,5 @@
 import logging
+import asyncio
 
 from config.settings import settings
 from services.consumer import RabbitConsumer
@@ -17,10 +18,11 @@ if __name__ == "__main__":
         JanjaTemplateRender(),
         BitlyURLShortener(settings.bitly_settings.endpoint, settings.bitly_settings.access_token),
     )
+
+    logging.info("Render starting")
     consumer = RabbitConsumer(
         settings.rabbit_settings,
         RabbitPublisher(settings.rabbit_settings),
         message_handler
     )
-
-    consumer.start()
+    consumer.run()
