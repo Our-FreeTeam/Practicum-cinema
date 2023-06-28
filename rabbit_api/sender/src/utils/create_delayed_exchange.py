@@ -29,5 +29,7 @@ connection = pika.BlockingConnection(connection_params)
 channel = connection.channel()
 
 # Declare a delayed exchange
-channel.exchange_declare(exchange='delayed_exchange', exchange_type='x-delayed-message', arguments={'x-delayed-type': 'direct'})
+channel.declare_exchange(name='delayed_exchange',
+                         type='x-delayed-message',
+                         arguments={'x-delayed-type': 'direct'})
 logging.info("Created")

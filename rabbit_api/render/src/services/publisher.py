@@ -32,7 +32,7 @@ class RabbitPublisher(Publisher):
         self.connection = pika.BlockingConnection(self.parameters)
         self.channel = self.connection.channel()
         # Получение сообщений из очереди; durable означает, что очередь не будет потеряна при перезапуске
-        self.channel.queue_declare(queue=self.params.queue, durable=True, exclusive=False, auto_delete=False)
+        await self.channel.declare_queue(name=self.params.queue, durable=True, exclusive=False, auto_delete=False)
         self.channel.confirm_delivery()
 
     def __init__(self, rabbit_params: settings.rabbit_settings) -> None:
