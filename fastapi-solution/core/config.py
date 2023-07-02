@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     recapcha_api_key: str = Field(..., env='RECAPCHA_API_KEY')
     recapcha_enabled: bool = Field(..., env='RECAPCHA_ENABLED')
 
+    kassa_account_id: str = Field(..., env='KASSA_ACCOUNT_ID')
+    kassa_secret_key: str = Field(..., env='KASSA_SECRET_KEY')
+
 
 class Config:
     env_file = '.env'
