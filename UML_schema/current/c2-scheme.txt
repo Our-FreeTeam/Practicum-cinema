@@ -1,0 +1,57 @@
+@startuml
+
+actor User as Client
+actor Admin as Admin
+
+package "Data Layer" {
+  [Postgres1] -down-> [ETL]
+  [ETL] --> [Elasticsearch]
+}
+
+package "ExtMailingGateway" {
+  [sendgrid]
+}
+
+package "Authorization Service" {
+  [FlaskAPI] <--> [Keycloak] : api for manage users
+  [Keycloak] <--> [Postgres2] : store user accounts
+}
+
+package "Main Service" {
+  [NGINX] <--> [FastAPI] : client requests
+  [NGINX] <--> [FlaskAPI] : client requests
+  [FastAPI] <--> [Redis Cache]
+  [FastAPI] <--> [Elasticsearch]
+  [FastAPI] <--> [FlaskAPI]: Authorization
+}
+
+package "UGC Service" {
+  [FastAPI_ugc] <--> [FlaskAPI]: access rights check
+  [FastAPI_ugc] <--> [MongoDB]
+}
+
+
+[Main Service] --> [Logging Service]
+
+package "Logging Service" {
+  [Logstash] <-- [fluentd]
+  [Kibana] <-- [Logstash]
+  [Kibana] <--> [Elasticsearch_logs]
+}
+
+package "Notification Service" {
+  [mailer_cron] --> [rabbit_mq]
+  [render] <--> [rabbit_mq]
+  [rabbit_mq] --> [sender]
+  [rabbit_api] <--> [Notification_db]
+  [rabbit_api] <--> [rabbit_mq]
+  [sender] --> [ExtMailingGateway]
+  [rabbit_api] <--> [FlaskAPI]: access rights check
+}
+
+
+[Client] <--> [NGINX]: API requests
+[Admin] <--> [NGINX]: Web interface
+
+
+@enduml
