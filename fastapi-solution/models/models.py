@@ -1,3 +1,5 @@
+from datetime import datetime
+from decimal import Decimal
 from typing import Generic, TypeVar
 from uuid import UUID
 
@@ -83,3 +85,26 @@ class PersonFilmsResponse(BaseOrjsonModel):
 class StatusModel(BaseModel):
     current_datetime: str
     current_status: str = ""
+
+
+class Subscriptions(BaseOrjsonModel):
+    user_id: UUID
+    start_date: datetime
+    end_date: datetime
+    subscription_type: str
+    is_active: bool
+
+
+class Payments(BaseOrjsonModel):
+    user_id: UUID
+    subscription_id: UUID
+    payment_amount: Decimal
+    payment_status: str
+    external_payment_id: str
+
+
+class Refunds(BaseOrjsonModel):
+    payment_id: UUID
+    refund_amount: Decimal
+    refund_status: str
+    external_refund_id: str
