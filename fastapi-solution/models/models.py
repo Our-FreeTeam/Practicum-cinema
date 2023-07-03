@@ -95,6 +95,13 @@ class Subscriptions(BaseOrjsonModel):
     is_active: bool
 
 
+class SubscriptionTypes(BaseOrjsonModel):
+    id: UUID
+    name: str
+    amount: Decimal
+    is_active: bool
+
+
 class Payments(BaseOrjsonModel):
     user_id: UUID
     subscription_id: UUID

@@ -14,7 +14,7 @@ async def main():
     logging_format = os.environ.get('LOG_FORMAT')
     logging_level = os.environ.get('LOG_LEVEL')
 
-    logging.basicConfig(format=logging_format)
+    logging.basicConfig(format=logging_format, level=logging_level)
     logging.info("Going to create Delayed Queue in Rabbit")
 
     # RabbitMQ setup

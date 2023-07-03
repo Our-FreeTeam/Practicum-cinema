@@ -9,11 +9,6 @@ from sqlalchemy.orm import declarative_base, declarative_mixin
 
 Base = declarative_base()
 
-DATE_DIR = {
-    'month': datetime.datetime.today() + relativedelta(months=1),
-    'year': datetime.datetime.today() + relativedelta(year=1),
-}
-
 
 @declarative_mixin
 class TimeStapleMixin:
@@ -83,9 +78,18 @@ class Subscriptions(Base, UUIDMixin):
 
     user_id = Column(UUID, ForeignKey('content.user.id', ondelete='CASCADE'))
     start_date = Column(TIMESTAMP, default=func.now())
-    end_date = Column(TIMESTAMP, default=DATE_DIR['year'])
+    end_date = Column(TIMESTAMP)
     subscription_type = Column(String, nullable=True)
     is_active = Column(BOOLEAN)
+
+
+class SubscriptionTypes(Base, UUIDMixin):
+    __tablename__ = 'subscription_types'
+    __table_args__ = {'schema': 'content'}
+
+    name = Column(String, nullable=True)
+    refund_amount = Column(DECIMAL(precision=None))
+    is_active = Column(BOOLEAN, default=True)
 
 
 class Payments(Base, UUIDMixin, TimeStapleMixin):
