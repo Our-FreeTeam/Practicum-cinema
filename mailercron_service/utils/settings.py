@@ -1,4 +1,14 @@
+from typing import Optional
+
 from pydantic import BaseSettings, Field
+
+
+class PGDB(BaseSettings):
+    dbname: str = Field(..., env="DB_NAME")
+    user: str = Field(..., env="DB_USER")
+    password: str = Field(..., env="DB_PASSWORD")
+    host: Optional[str] = Field(..., env="DB_HOST")
+    port: int = Field(..., env="DB_PORT")
 
 
 class Settings(BaseSettings):
@@ -24,6 +34,7 @@ class Settings(BaseSettings):
     rabbitmq_port: int = Field(..., env='RABBIT_PORT')
     rabbitmq_exchange = 'delayed_exchange'
     rabbitmq_raw_queue: str = Field(..., env='RABBIT_QUEUE')
+    rabbitmq_subscription_queue: str = Field(..., env='RABBIT_SUBSCRIPTION_QUEUE')
 
     rabbitmq_full_exchange = 'full_exchange'
     rabbitmq_full_queue: str = Field(..., env='RABBIT_FULL_QUEUE')
@@ -43,3 +54,4 @@ class Config:
 
 
 settings = Settings()
+pgdb = PGDB()

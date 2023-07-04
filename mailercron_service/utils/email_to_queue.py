@@ -1,18 +1,42 @@
 import asyncio
 import datetime
 import logging
+from contextlib import contextmanager
 
+import psycopg2
 from aio_pika import Message
+from psycopg2.extras import DictCursor
 
 from keycloak_conn import keycloak_admin
 from dateutil.tz import tzoffset
 
 from rabbit_connection import rabbit_conn
-from settings import settings
+from settings import settings, pgdb
+
+from backoff import backoff, log
+
+sql = """
+    SELECT user_id
+      FROM content.subscriptions sub
+     WHERE DATEDIFF(day, datetime.datetime.now(), end_date) < 4
+    ORDER BY start_date;
+"""
+
+@log
+@backoff(exception=psycopg2.OperationalError)
+def pg_conn(*args, **kwargs):
+    return psycopg2.connect(*args, **kwargs)
+
+
+@contextmanager
+def pg_conn_context(*args, **kwargs):
+    connection = pg_conn(*args, **kwargs)
+    yield connection
+    connection.close()
 
 
 @rabbit_conn
-async def rabbit_send(mail_list, time_shift, channel):
+async def rabbit_send(mail_list, time_shift, channel, queue_name):
 
     # Declare the delayed exchange
     exchange = await channel.declare_exchange(
@@ -24,7 +48,7 @@ async def rabbit_send(mail_list, time_shift, channel):
     # Publish the serialized user list to the delayed exchange
 
     # Declare the queue
-    queue = await channel.declare_queue(name=settings.rabbitmq_raw_queue, durable=True)
+    queue = await channel.declare_queue(name=queue_name, durable=True)
 
     # Bind the queue to the exchange
     await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_raw_queue)
@@ -62,6 +86,15 @@ def get_user_list():
     return user_list
 
 
+def get_subscribed_users():
+    with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
+        cur = pg_connect.cursor()
+        cur.execute(sql)
+        users = cur.fetchall()
+
+    return users
+
+
 async def process_list(user_list):
     for offset_str, email_list in user_list.items():
 
@@ -91,7 +124,11 @@ async def process_list(user_list):
         # Calculate the difference
         time_difference = next_friday - current_time
 
-        await rabbit_send(email_list, int(time_difference.total_seconds()))
+        await rabbit_send(
+            mail_list=email_list,
+            time_shift=int(time_difference.total_seconds()),
+            queue_name=settings.rabbitmq_raw_queue
+        )
 
 
 async def main():
@@ -111,6 +148,20 @@ async def main():
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
             await process_list(emails_list)
+
+    subscribed_users = get_subscribed_users()
+    # Check the subscription date
+    if len(subscribed_users) > 0 or settings.debug_mode == 1:
+
+        if settings.debug_mode == 1:
+            logging.warning("Debug mode enabled")
+
+        logging.info(f"Put {len(subscribed_users)} to queue")
+        await rabbit_send(
+            mail_list=subscribed_users,
+            time_shift=1,
+            queue_name=settings.rabbitmq_subscription_queue
+        )
 
 
 if __name__ == "__main__":
