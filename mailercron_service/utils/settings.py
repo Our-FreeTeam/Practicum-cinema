@@ -4,11 +4,11 @@ from pydantic import BaseSettings, Field
 
 
 class PGDB(BaseSettings):
-    dbname: str = Field(..., env="DB_NAME")
-    user: str = Field(..., env="DB_USER")
-    password: str = Field(..., env="DB_PASSWORD")
-    host: Optional[str] = Field(..., env="DB_HOST")
-    port: int = Field(..., env="DB_PORT")
+    dbname: str = Field(..., env="KC_DB_NAME")
+    user: str = Field(..., env="KC_DB_USERNAME")
+    password: str = Field(..., env="KC_DB_PASSWORD")
+    host: Optional[str] = Field(..., env="KC_DB_HOST")
+    port: int = Field(..., env="KC_DB_PORT")
 
 
 class Settings(BaseSettings):
