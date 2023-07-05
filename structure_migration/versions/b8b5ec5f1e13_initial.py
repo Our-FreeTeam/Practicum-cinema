@@ -79,44 +79,6 @@ def upgrade() -> None:
     schema='content'
     )
     op.create_index('idxu_person_filmwork', 'person_film_work', ['film_work_id', 'person_id', 'role'], unique=False, schema='content')
-    op.create_table('subscriptions',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('user_id', postgresql.UUID(), nullable=True),
-    sa.Column('start_date', sa.TIMESTAMP(), nullable=True),
-    sa.Column('end_date', sa.TIMESTAMP(), nullable=True),
-    sa.Column('subscription_type', sa.String(), nullable=True),
-    sa.Column('is_active', sa.BOOLEAN()),
-    sa.ForeignKeyConstraint(['user_id'], ['content.user.id'], ondelete='CASCADE'),
-    schema='content'
-    )
-    op.create_table('subscription_types',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('name', sa.String(), nullable=True),
-    sa.Column('refund_amount', sa.DECIMAL(precision=None)),
-    sa.Column('is_active', sa.BOOLEAN(), default=True),
-    schema='content'
-    )
-    op.create_table('payments',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('user_id', postgresql.UUID(), nullable=True),
-    sa.Column('subscription_id', postgresql.UUID(), nullable=True),
-    sa.Column('payment_amount', sa.DECIMAL(precision=None)),
-    sa.Column('payment_status', sa.String(), nullable=True),
-    sa.Column('is_active', sa.BOOLEAN(), default=True),
-    sa.Column('external_payment_id', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['content.user.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['subscription_id'], ['content.subscription.id'], ondelete='CASCADE'),
-    schema='content'
-    )
-    op.create_table('refunds',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('payment_id', postgresql.UUID(), nullable=True),
-    sa.Column('refund_amount', sa.DECIMAL(precision=None)),
-    sa.Column('refund_status', sa.String(), nullable=True),
-    sa.Column('external_refund_id', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['payment_id'], ['content.payment.id'], ondelete='CASCADE'),
-    schema='content'
-    )
     # ### end Alembic commands ###
 
 
@@ -129,10 +91,6 @@ def downgrade() -> None:
     op.drop_table('person', schema='content')
     op.drop_table('genre', schema='content')
     op.drop_table('film_work', schema='content')
-    op.drop_table('subscriptions', schema='content')
-    op.drop_table('subscription_types', schema='content')
-    op.drop_table('payments', schema='content')
-    op.drop_table('refunds', schema='content')
 
     drop_schema = DDL('''
             CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

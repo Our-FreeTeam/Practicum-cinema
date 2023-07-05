@@ -191,7 +191,6 @@ services:
     networks:
       - cinema_network
 
-
   tests_auth:
     build: tests_auth/functional
     volumes:

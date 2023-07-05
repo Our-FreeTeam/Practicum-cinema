@@ -3,14 +3,6 @@ from typing import Optional
 from pydantic import BaseSettings, Field
 
 
-class PGDB(BaseSettings):
-    dbname: str = Field(..., env="KC_DB_NAME")
-    user: str = Field(..., env="KC_DB_USERNAME")
-    password: str = Field(..., env="KC_DB_PASSWORD")
-    host: Optional[str] = Field(..., env="KC_DB_HOST")
-    port: int = Field(..., env="KC_DB_PORT")
-
-
 class Settings(BaseSettings):
     keycloak_url: str = Field(..., env='KEYCLOAK_URL')
     client_id: str = Field(..., env='KEYCLOAK_CLIENT_ID')
@@ -54,4 +46,3 @@ class Config:
 
 
 settings = Settings()
-pgdb = PGDB()

@@ -1,4 +1,14 @@
+from typing import Optional
+
 from pydantic import BaseSettings, Field
+
+
+class PGDB(BaseSettings):
+    dbname: str = Field(..., env="BILL_DB_NAME")
+    user: str = Field(..., env="BILL_DB_USERNAME")
+    password: str = Field(..., env="BILL_DB_PASSWORD")
+    host: Optional[str] = Field(..., env="BILL_DB_HOST")
+    port: int = Field(..., env="BILL_DB_PORT")
 
 
 class Settings(BaseSettings):
@@ -26,3 +36,4 @@ class Config:
 
 
 settings = Settings()
+pgdb = PGDB()
