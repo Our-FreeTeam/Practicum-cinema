@@ -17,6 +17,23 @@ services:
     networks:
       - cinema_network
 
+  db_bill:
+    image: postgres:15.2-alpine
+    volumes:
+      - ./_postgres_data_bill:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${BILL_DB_USERNAME}
+      - POSTGRES_PASSWORD=${BILL_DB_PASSWORD}
+      - POSTGRES_DB=${BILL_DB_NAME}
+    hostname: db_bill
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - cinema_network
+
   redis_cache:
     build: redis_config
     hostname: redis
