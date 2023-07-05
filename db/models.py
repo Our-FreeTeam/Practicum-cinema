@@ -102,7 +102,7 @@ class Payments(Base, UUIDMixin, TimeStapleMixin):
     subscription_id = Column(UUID, ForeignKey('content.subscription.id', ondelete='CASCADE'))
     payment_amount = Column(DECIMAL(precision=None))
     payment_status = Column(String, nullable=True)
-    external_payment_id = Column(String, nullable=True)
+    external_payment_id = Column(String, nullable=False)
 
 
 class Refunds(Base, UUIDMixin, TimeStapleMixin):
@@ -114,4 +114,4 @@ class Refunds(Base, UUIDMixin, TimeStapleMixin):
     payment_id = Column(UUID, ForeignKey('content.payment.id', ondelete='CASCADE'))
     refund_amount = Column(DECIMAL(precision=None))
     refund_status = Column(String, nullable=True)
-    external_refund_id = Column(String, nullable=True)
+    external_refund_id = Column(String, nullable=False)
