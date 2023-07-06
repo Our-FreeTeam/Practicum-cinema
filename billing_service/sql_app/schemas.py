@@ -55,8 +55,3 @@ class Refunds(BaseOrjsonModel):
     refund_amount: Decimal
     refund_status: str
     external_refund_id: str
-
-
-
-
-
