@@ -8,6 +8,7 @@ from psycopg2.extras import DictCursor
 from billing_cron_service.utils.backoff import backoff, log
 from billing_cron_service.db.sql import sql
 from billing_cron_service.settings.settings import settings, pgdb
+from utils.rabbit_connection import rabbit_conn
 
 
 @log
@@ -30,6 +31,25 @@ def get_subscribed_users():
         users = cur.fetchall()
 
     return users
+
+
+@rabbit_conn
+async def rabbit_send(mail_list, time_shift, channel, queue_name):
+
+    # Declare the delayed exchange
+    exchange = await channel.declare_exchange(
+        name=settings.rabbitmq_exchange,
+        type='x-delayed-message',
+        arguments={'x-delayed-type': 'direct'}
+    )
+
+    # Publish the serialized user list to the delayed exchange
+
+    # Declare the queue
+    queue = await channel.declare_queue(name=queue_name, durable=True)
+
+    # Bind the queue to the exchange
+    await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_queue_name)
 
 
 async def main():
