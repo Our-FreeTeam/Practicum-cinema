@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseSettings, Field
 
 
@@ -23,7 +25,8 @@ class Settings(BaseSettings):
     rabbitmq_host: str = Field(..., env='RABBIT_HOST')
     rabbitmq_port: int = Field(..., env='RABBIT_PORT')
     rabbitmq_exchange = 'delayed_exchange'
-    rabbitmq_raw_queue: str = Field(..., env='RABBIT_QUEUE')
+    rabbitmq_queue_name: str = Field(..., env='RABBIT_QUEUE')
+    rabbitmq_subscription_queue: str = Field(..., env='RABBIT_SUBSCRIPTION_QUEUE')
 
     rabbitmq_full_exchange = 'full_exchange'
     rabbitmq_full_queue: str = Field(..., env='RABBIT_FULL_QUEUE')
@@ -35,7 +38,6 @@ class Settings(BaseSettings):
     auth_url: str = Field(..., env='AUTH_URL')
 
     debug_mode: int = Field(0, env='MAILCRON_DEBUG')
-
 
 
 class Config:

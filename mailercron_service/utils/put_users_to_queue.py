@@ -12,7 +12,7 @@ from settings import settings
 
 
 @rabbit_conn
-async def rabbit_send(mail_list, time_shift, channel):
+async def rabbit_send(mail_list, time_shift, channel, queue_name):
 
     # Declare the delayed exchange
     exchange = await channel.declare_exchange(
@@ -24,17 +24,17 @@ async def rabbit_send(mail_list, time_shift, channel):
     # Publish the serialized user list to the delayed exchange
 
     # Declare the queue
-    queue = await channel.declare_queue(name=settings.rabbitmq_raw_queue, durable=True)
+    queue = await channel.declare_queue(name=queue_name, durable=True)
 
     # Bind the queue to the exchange
-    await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_raw_queue)
+    await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_queue_name)
 
     processed_count = 0
     for user_email in mail_list:
         if user_email:
             prep_data = f"{user_email}:watched_film"
             await exchange.publish(
-                routing_key=settings.rabbitmq_raw_queue,
+                routing_key=settings.rabbitmq_queue_name,
                 message=Message(bytes(prep_data, "utf-8"),
                                 content_type="text/plain",
                                 headers={'x-delay': time_shift * 1000}),
@@ -91,7 +91,11 @@ async def process_list(user_list):
         # Calculate the difference
         time_difference = next_friday - current_time
 
-        await rabbit_send(email_list, int(time_difference.total_seconds()))
+        await rabbit_send(
+            mail_list=email_list,
+            time_shift=int(time_difference.total_seconds()),
+            queue_name=settings.rabbitmq_queue_name
+        )
 
 
 async def main():

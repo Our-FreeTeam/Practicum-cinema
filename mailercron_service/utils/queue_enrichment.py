@@ -13,7 +13,7 @@ from settings import settings
 
 @rabbit_conn
 async def get_message(channel):
-    queue = settings.rabbitmq_raw_queue
+    queue = settings.rabbitmq_queue_name
 
     await channel.set_qos(prefetch_count=10)
 

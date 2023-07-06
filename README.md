@@ -268,6 +268,7 @@ https://mvnrepository.com/artifact/ru.playa.keycloak/keycloak-russian-providers/
 |:------------------------------------------------:|:-----------------------:|:---------------------------:|
 |            docker-compose-rabbit.yml             | db<br/>rabbit_api       | "5435:5432"<br/>"8001:8000" |
 | docker-compose.yml<br/>docker-compose-tests.yml  |  fastapi_service<br/>   | "8000:8000"<br/>"5432:5432" |
+| docker-compose.yml  |  billing_cron_service<br/>   | "8010:8000"<br/>"5438:5432" |
  
 
 **FlaskAPI**

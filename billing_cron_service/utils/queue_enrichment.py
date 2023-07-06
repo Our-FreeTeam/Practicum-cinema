@@ -1,7 +1,7 @@
 import asyncio
 import logging
 
-from settings import settings
+from billing_cron_service.settings.settings import settings
 
 
 async def main():
