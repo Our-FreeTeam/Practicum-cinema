@@ -6,6 +6,7 @@ from api.v1 import subscriptions
 from core.config import settings
 from yookassa import Configuration, Payment
 
+from sql_app.database import PostgresDatabase
 
 db = PostgresDatabase()
 
