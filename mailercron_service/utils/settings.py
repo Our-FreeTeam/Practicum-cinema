@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     rabbitmq_host: str = Field(..., env='RABBIT_HOST')
     rabbitmq_port: int = Field(..., env='RABBIT_PORT')
     rabbitmq_exchange = 'delayed_exchange'
-    rabbitmq_raw_queue: str = Field(..., env='RABBIT_QUEUE')
+    rabbitmq_queue_name: str = Field(..., env='RABBIT_QUEUE')
     rabbitmq_subscription_queue: str = Field(..., env='RABBIT_SUBSCRIPTION_QUEUE')
 
     rabbitmq_full_exchange = 'full_exchange'

@@ -42,7 +42,8 @@ services:
       timeout: 3s
       retries: 30
     ports:
-      - "5438:5432"
+      - "5438:5438"
+    command: -p 5438
     networks:
       - cinema_network
 

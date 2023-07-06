@@ -27,14 +27,14 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name):
     queue = await channel.declare_queue(name=queue_name, durable=True)
 
     # Bind the queue to the exchange
-    await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_raw_queue)
+    await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_queue_name)
 
     processed_count = 0
     for user_email in mail_list:
         if user_email:
             prep_data = f"{user_email}:watched_film"
             await exchange.publish(
-                routing_key=settings.rabbitmq_raw_queue,
+                routing_key=settings.rabbitmq_queue_name,
                 message=Message(bytes(prep_data, "utf-8"),
                                 content_type="text/plain",
                                 headers={'x-delay': time_shift * 1000}),
@@ -94,7 +94,7 @@ async def process_list(user_list):
         await rabbit_send(
             mail_list=email_list,
             time_shift=int(time_difference.total_seconds()),
-            queue_name=settings.rabbitmq_raw_queue
+            queue_name=settings.rabbitmq_queue_name
         )
 
 
