@@ -10,38 +10,42 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
+from alembic_utils.pg_trigger import PGTrigger
 from sqlalchemy import func
 from sqlalchemy.dialects import postgresql
+
+from db.sql import update_subscription_history, update_payment_history, update_subscription_type_history, \
+    update_refund_history
 
 revision = 'a070fecf1016'
 down_revision = None
 branch_labels = None
 depends_on = None
 
-# subscription_history_trigger = PGTrigger(
-#     schema="content",
-#     signature="subscription_history_trigger",
-#     on_entity="content.subscription_history",
-#     definition=update_subscription_history
-# )
-# payment_history_trigger = PGTrigger(
-#     schema="content",
-#     signature="payment_history_trigger",
-#     on_entity="content.payment_history",
-#     definition=update_payment_history
-# )
-# subscription_type_history_trigger = PGTrigger(
-#     schema="content",
-#     signature="subscription_type_history_trigger",
-#     on_entity="content.subscription_type_history",
-#     definition=update_subscription_type_history
-# )
-# refund_history_trigger = PGTrigger(
-#     schema="content",
-#     signature="refund_history_trigger",
-#     on_entity="content.refund_history",
-#     definition=update_refund_history
-# )
+subscription_history_trigger = PGTrigger(
+    schema="content",
+    signature="subscription_history_trigger",
+    on_entity="content.subscription_history",
+    definition=update_subscription_history
+)
+payment_history_trigger = PGTrigger(
+    schema="content",
+    signature="payment_history_trigger",
+    on_entity="content.payment_history",
+    definition=update_payment_history
+)
+subscription_type_history_trigger = PGTrigger(
+    schema="content",
+    signature="subscription_type_history_trigger",
+    on_entity="content.subscription_type_history",
+    definition=update_subscription_type_history
+)
+refund_history_trigger = PGTrigger(
+    schema="content",
+    signature="refund_history_trigger",
+    on_entity="content.refund_history",
+    definition=update_refund_history
+)
 
 
 def upgrade() -> None:
@@ -136,10 +140,10 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['refund_amount'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.execute("CREATE TRIGGER subscription_history_trigger")
-    op.execute("CREATE TRIGGER subscription_type_history_trigger")
-    op.execute("CREATE TRIGGER payment_history_trigger")
-    op.execute("CREATE TRIGGER refund_history_trigger")
+    op.create_trigger(subscription_history_trigger)
+    op.create_trigger(payment_history_trigger)
+    op.create_trigger(subscription_type_history_trigger)
+    op.create_trigger(refund_history_trigger)
     # ### end Alembic commands ###
 
 
@@ -153,8 +157,8 @@ def downgrade() -> None:
     op.drop_table('subscription_type_history')
     op.drop_table('payment_history')
     op.drop_table('subscription_history')
-    op.execute("DROP TRIGGER subscription_history_trigger")
-    op.execute("DROP TRIGGER subscription_type_history_trigger")
-    op.execute("DROP TRIGGER payment_history_trigger")
-    op.execute("DROP TRIGGER refund_history_trigger")
+    op.drop_trigger(subscription_history_trigger)
+    op.drop_trigger(payment_history_trigger)
+    op.drop_trigger(subscription_type_history_trigger)
+    op.drop_trigger(refund_history_trigger)
     # ### end Alembic commands ###
