@@ -2,7 +2,7 @@ import requests
 import json
 
 # The URL of your Flask app's /webhook endpoint
-url = 'https://yptst2023.omnitoring.ru:5005/webhook'
+url = 'https://yptst2023.omnitoring.ru:8443/webhook'
 
 # The data you want to send
 data = {
