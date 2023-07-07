@@ -27,7 +27,7 @@ class ResponseList(GenericModel, Generic[T]):
 
 
 class Subscriptions(BaseOrjsonModel):
-    user_id: UUID
+    person_id: UUID
     start_date: datetime
     end_date: datetime
     subscription_type: str
@@ -43,7 +43,7 @@ class SubscriptionTypes(BaseOrjsonModel):
 
 
 class Payments(BaseOrjsonModel):
-    user_id: UUID
+    person_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
     payment_status: str
@@ -57,6 +57,40 @@ class Refunds(BaseOrjsonModel):
     external_refund_id: str
 
 
+class SubscriptionsHistory(BaseOrjsonModel):
+    person_id: UUID
+    start_date: datetime
+    end_date: datetime
+    subscription_type: str
+    is_active: bool
+    operation_date: datetime
+    operation_type: str
 
 
+class SubscriptionTypesHistory(BaseOrjsonModel):
+    id: UUID
+    subscription_id: UUID
+    name: str
+    amount: Decimal
+    is_active: bool
+    operation_date: datetime
+    operation_type: str
 
+
+class PaymentsHistory(BaseOrjsonModel):
+    person_id: UUID
+    subscription_id: UUID
+    payment_amount: Decimal
+    payment_status: str
+    payment_method_id: str
+    operation_date: datetime
+    operation_type: str
+
+
+class RefundsHistory(BaseOrjsonModel):
+    payment_id: UUID
+    refund_amount: Decimal
+    refund_status: str
+    external_refund_id: str
+    operation_date: datetime
+    operation_type: str
