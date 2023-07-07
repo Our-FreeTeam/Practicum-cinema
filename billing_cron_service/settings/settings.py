@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     rabbitmq_password: str = Field(..., env='RABBIT_PASSWORD')
     rabbitmq_host: str = Field(..., env='RABBIT_HOST')
     rabbitmq_port: int = Field(..., env='RABBIT_PORT')
+    rabbitmq_subscription_queue: str = Field(..., env='RABBIT_SUBSCRIPTION_QUEUE')
 
 
 class Config:
