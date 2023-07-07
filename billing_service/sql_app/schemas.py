@@ -26,12 +26,13 @@ class ResponseList(GenericModel, Generic[T]):
     result_list: list[T] = []
 
 
-class Subscriptions(BaseOrjsonModel):
+class Subscription(BaseOrjsonModel):
     user_id: UUID
-    start_date: datetime
-    end_date: datetime
+    start_date: datetime | None
+    end_date: datetime | None
     subscription_type: str
-    is_active: bool
+    is_active: bool | None
+    is_repeatable: bool
 
 
 class SubscriptionTypes(BaseOrjsonModel):
@@ -55,8 +56,3 @@ class Refunds(BaseOrjsonModel):
     refund_amount: Decimal
     refund_status: str
     external_refund_id: str
-
-
-
-
-
