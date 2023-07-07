@@ -4,8 +4,8 @@ from sqlalchemy.dialects.postgresql import UUID
 
 metadata = MetaData()
 
-subscriptions = Table(
-    "subscriptions",
+subscription = Table(
+    "subscription",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
     Column("person_id", UUID, ForeignKey('content.person.id', ondelete='CASCADE')),
@@ -15,40 +15,40 @@ subscriptions = Table(
     Column("is_active", BOOLEAN, nullable=False)
 )
 
-subscription_types = Table(
-    "subscription_types",
+subscription_type = Table(
+    "subscription_type",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
     Column("name", String, nullable=False),
-    Column("subscriptions_id", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
+    Column("subscription_id", UUID, ForeignKey('subscription.id', ondelete='CASCADE')),
     Column("refund_amount", DECIMAL(precision=None), nullable=False),
     Column("is_active", BOOLEAN, nullable=False),
 )
 
-payments = Table(
-    "payments",
+payment = Table(
+    "payment",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
     Column("person_id", UUID, ForeignKey('content.person.id', ondelete='CASCADE')),
-    Column("subscriptions_id", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
+    Column("subscription_id", UUID, ForeignKey('subscription.id', ondelete='CASCADE')),
     Column("payment_amount", DECIMAL(precision=None), nullable=False),
     Column("payment_status", String, nullable=False),
     Column("payment_method_id", String, nullable=False),
 )
 
-refunds = Table(
-    "refunds",
+refund = Table(
+    "refund",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
-    Column("payments_id", UUID, ForeignKey('payments.id', ondelete='CASCADE')),
-    Column("refund_amount", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
+    Column("payment_id", UUID, ForeignKey('payment.id', ondelete='CASCADE')),
+    Column("refund_amount", UUID, ForeignKey('subscription.id', ondelete='CASCADE')),
     Column("payment_amount", DECIMAL(precision=None), nullable=False),
     Column("refund_status", String, nullable=False),
     Column("external_refund_id", String, nullable=False),
 )
 
-subscriptions_history = Table(
-    "subscriptions_history",
+subscription_history = Table(
+    "subscription_history",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
     Column("person_id", UUID, ForeignKey('content.person.id', ondelete='CASCADE')),
@@ -60,24 +60,24 @@ subscriptions_history = Table(
     Column("operation_type", String, nullable=False)
 )
 
-subscription_types_history = Table(
-    "subscription_types_history",
+subscription_type_history = Table(
+    "subscription_type_history",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
     Column("name", String, nullable=False),
-    Column("subscriptions_id", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
+    Column("subscription_id", UUID, ForeignKey('subscription.id', ondelete='CASCADE')),
     Column("refund_amount", DECIMAL(precision=None), nullable=False),
     Column("is_active", BOOLEAN, nullable=False),
     Column("operation_date", TIMESTAMP, nullable=False),
     Column("operation_type", String, nullable=False)
 )
 
-payments_history = Table(
-    "payments_history",
+payment_history = Table(
+    "payment_history",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
     Column("person_id", UUID, ForeignKey('content.person.id', ondelete='CASCADE')),
-    Column("subscriptions_id", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
+    Column("subscription_id", UUID, ForeignKey('subscription.id', ondelete='CASCADE')),
     Column("payment_amount", DECIMAL(precision=None), nullable=False),
     Column("payment_status", String, nullable=False),
     Column("payment_method_id", String, nullable=False),
@@ -85,12 +85,12 @@ payments_history = Table(
     Column("operation_type", String, nullable=False)
 )
 
-refunds_history = Table(
-    "refunds_history",
+refund_history = Table(
+    "refund_history",
     metadata,
     Column("id", UUID, primary_key=True, server_default=text('uuid_generate_v4()')),
-    Column("payments_id", UUID, ForeignKey('payments.id', ondelete='CASCADE')),
-    Column("refund_amount", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
+    Column("payment_id", UUID, ForeignKey('payment.id', ondelete='CASCADE')),
+    Column("refund_amount", UUID, ForeignKey('subscription.id', ondelete='CASCADE')),
     Column("payment_amount", DECIMAL(precision=None), nullable=False),
     Column("refund_status", String, nullable=False),
     Column("external_refund_id", String, nullable=False),
