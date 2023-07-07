@@ -6,6 +6,15 @@ sql = """
     ORDER BY sub.start_date;
 """
 
+sql_auto_sub = """
+    SELECT sub.person_id, p.payment_method_id, sub.subscription_type, sub_type.amount
+      FROM content.subscription sub
+      LEFT JOIN content.subscription_type sub_type on sub.id = sub_type.subscription_id
+      LEFT JOIN content.payment p on sub.id = p.subscription_id
+     WHERE DATEDIFF(day, datetime.datetime.now(), sub.end_date) < 4 AND sub.is_active = 1
+    ORDER BY sub.start_date;
+"""
+
 update_subscription_history = """
     CREATE OR REPLACE FUNCTION process_sub_history_audit_audit() RETURNS TRIGGER AS $subscription_history_trigger$
         BEGIN

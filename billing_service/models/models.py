@@ -12,7 +12,8 @@ subscription = Table(
     Column("start_date", TIMESTAMP, default=func.now()),
     Column("end_date", TIMESTAMP, nullable=False),
     Column("subscription_type", String, nullable=False),
-    Column("is_active", BOOLEAN, nullable=False)
+    Column("is_active", BOOLEAN, nullable=False),
+    Column("payment_id", String, nullable=False),
 )
 
 subscription_type = Table(
@@ -56,6 +57,7 @@ subscription_history = Table(
     Column("end_date", TIMESTAMP, nullable=False),
     Column("subscription_type", String, nullable=False),
     Column("is_active", BOOLEAN, nullable=False),
+    Column("payment_id", String, nullable=False),
     Column("operation_date", TIMESTAMP, nullable=False),
     Column("operation_type", String, nullable=False)
 )
