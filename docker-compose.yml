@@ -272,7 +272,6 @@ volumes:
   _postgres_data:
   _es_data:
   _redis_data:
-  _postgres_data_cloak:
   tests_auth:
 
 
