@@ -6,10 +6,7 @@ from api.v1 import subscriptions
 from core.config import settings
 from yookassa import Configuration, Payment
 
-from sql_app.database import PostgresDatabase
-
-db = PostgresDatabase()
-
+from sql_app.database import db
 
 app = FastAPI(
     title="API для приема и возврата платежей за подписку",

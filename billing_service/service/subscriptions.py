@@ -1,10 +1,16 @@
 from monthdelta import monthdelta
+from sqlalchemy import select, and_
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import UUID
 
+from sql_app.schemas import Subscription
 
-async def check_subscription_active(user_id: UUID):
-    pass
-    # return is_active = default false, subs_end = default now
+
+async def get_active_subscription(user_id: UUID, db: AsyncSession):
+    subscription = await db.execute(
+        select(Subscription).where(and_(Subscription.user_id == user_id,
+                                        Subscription.is_active)))
+    return subscription.fetchone()
 
 
 def get_subscription_duration(subscription_type_id: UUID):

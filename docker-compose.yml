@@ -37,13 +37,31 @@ services:
       - POSTGRES_DB=${BILL_DB_NAME}
     hostname: db_bill
     healthcheck:
-      test: [ "CMD", "pg_isready", "-d", "${DB_NAME}", "-U", "${DB_USER}" ]
+      test: [ "CMD", "pg_isready", "-d", "${BILL_DB_NAME}", "-U", "${BILL_DB_USERNAME}", "-p", "${BILL_DB_PORT}"]
       interval: 1s
       timeout: 3s
       retries: 30
     ports:
       - "5438:5438"
     command: -p 5438
+    networks:
+      - cinema_network
+
+  billing_service:
+    build: billing_service
+    image: billing-image
+    env_file:
+      - .env
+    ports:
+      - "8200:8200"
+    depends_on:
+      db_bill:
+        condition: service_healthy
+#    logging:
+#      driver: "fluentd"
+#      options:
+#        fluentd-address: "host.docker.internal:24224"
+#        tag: "fastapi_cinema_api"
     networks:
       - cinema_network
 

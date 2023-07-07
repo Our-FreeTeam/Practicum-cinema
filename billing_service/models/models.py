@@ -12,7 +12,8 @@ subscriptions = Table(
     Column("start_date", TIMESTAMP, default=func.now()),
     Column("end_date", TIMESTAMP),
     Column("subscription_type", String, nullable=True),
-    Column("is_active", BOOLEAN)
+    Column("is_active", BOOLEAN),
+    Column("is_repeatable", BOOLEAN)
 )
 
 subscription_types = Table(

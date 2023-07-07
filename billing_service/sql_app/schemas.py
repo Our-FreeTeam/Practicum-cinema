@@ -34,6 +34,9 @@ class Subscription(BaseOrjsonModel):
     is_active: bool | None
     is_repeatable: bool
 
+    class Config:
+        orm_mode = True
+
 
 class SubscriptionTypes(BaseOrjsonModel):
     id: UUID

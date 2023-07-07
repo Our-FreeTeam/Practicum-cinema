@@ -12,5 +12,6 @@ RUN  pip install --upgrade pip \
 
 COPY . .
 
+RUN chmod +x entrypoint.sh
 
-CMD ["uvicorn", "main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "8200"]
+CMD ["/opt/fastapi/entrypoint.sh"]

@@ -25,7 +25,7 @@ class Database(ABC):
 
 # database/postgres.py
 def get_connection_string(driver: str = "asyncpg") -> str:
-    return f"postgresql://{settings.db_user}:{settings.db_password}@" \
+    return f"postgresql+asyncpg://{settings.db_user}:{settings.db_password}@" \
            f"{settings.db_host}:{settings.db_port}/{settings.db_name}"
 
 
@@ -35,3 +35,6 @@ class PostgresDatabase(Database):
             get_connection_string(),
         )
         self.async_sessionmaker = sessionmaker(async_engine, class_=AsyncSession)
+
+
+db = PostgresDatabase()

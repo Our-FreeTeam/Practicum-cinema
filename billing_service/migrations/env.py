@@ -6,18 +6,18 @@ from sqlalchemy import pool
 from alembic import context
 
 from models.models import metadata
-from settings.settings import pgdb
+from core.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "BILL_DB_HOST", pgdb.host)
-config.set_section_option(section, "BILL_DB_PORT", pgdb.port)
-config.set_section_option(section, "BILL_DB_USERNAME", pgdb.user)
-config.set_section_option(section, "BILL_DB_NAME", pgdb.dbname)
-config.set_section_option(section, "BILL_DB_PASSWORD", pgdb.password)
+config.set_section_option(section, "BILL_DB_HOST", settings.db_host)
+config.set_section_option(section, "BILL_DB_PORT", settings.db_port)
+config.set_section_option(section, "BILL_DB_USERNAME", settings.db_user)
+config.set_section_option(section, "BILL_DB_NAME", settings.db_name)
+config.set_section_option(section, "BILL_DB_PASSWORD", settings.db_password)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
