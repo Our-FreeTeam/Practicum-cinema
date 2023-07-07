@@ -68,6 +68,8 @@ subscription_types_history = Table(
     Column("subscriptions_id", UUID, ForeignKey('subscriptions.id', ondelete='CASCADE')),
     Column("refund_amount", DECIMAL(precision=None), nullable=False),
     Column("is_active", BOOLEAN, nullable=False),
+    Column("operation_date", TIMESTAMP, nullable=False),
+    Column("operation_type", String, nullable=False)
 )
 
 payments_history = Table(
@@ -79,6 +81,8 @@ payments_history = Table(
     Column("payment_amount", DECIMAL(precision=None), nullable=False),
     Column("payment_status", String, nullable=False),
     Column("payment_method_id", String, nullable=False),
+    Column("operation_date", TIMESTAMP, nullable=False),
+    Column("operation_type", String, nullable=False)
 )
 
 refunds_history = Table(
@@ -90,4 +94,6 @@ refunds_history = Table(
     Column("payment_amount", DECIMAL(precision=None), nullable=False),
     Column("refund_status", String, nullable=False),
     Column("external_refund_id", String, nullable=False),
+    Column("operation_date", TIMESTAMP, nullable=False),
+    Column("operation_type", String, nullable=False)
 )
