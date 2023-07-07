@@ -7,7 +7,7 @@ sql = """
 """
 
 update_subscriptions_history = """
-    CREATE OR REPLACE FUNCTION process_sub_history_audit_audit() RETURNS TRIGGER AS $subscriptions_history$
+    CREATE OR REPLACE FUNCTION process_sub_history_audit_audit() RETURNS TRIGGER AS $subscriptions_history_trigger$
         BEGIN
             --
             -- Create a row in subscriptions_history to reflect the operation performed on emp,
@@ -28,13 +28,13 @@ update_subscriptions_history = """
         END;
     $subscriptions_history$ LANGUAGE plpgsql;
     
-    CREATE TRIGGER subscriptions_history
+    CREATE TRIGGER subscriptions_history_trigger
     AFTER INSERT OR UPDATE OR DELETE ON subscriptions_history
         FOR EACH ROW EXECUTE PROCEDURE process_sub_history_audit_audit();
 """
 
 update_subscription_types_history = """
-    CREATE OR REPLACE FUNCTION process_subscription_types_history_audit() RETURNS TRIGGER AS $subscription_types_history$
+    CREATE OR REPLACE FUNCTION process_subscription_types_history_audit() RETURNS TRIGGER AS $subscription_types_history_trigger$
         BEGIN
             --
             -- Create a row in subscriptions_history to reflect the operation performed on emp,
@@ -55,13 +55,13 @@ update_subscription_types_history = """
         END;
     $subscription_types_history$ LANGUAGE plpgsql;
 
-    CREATE TRIGGER subscription_types_history
+    CREATE TRIGGER subscription_types_history_trigger
     AFTER INSERT OR UPDATE OR DELETE ON subscription_types_history
         FOR EACH ROW EXECUTE PROCEDURE process_subscription_types_history_audit();
 """
 
 update_payments_history = """
-    CREATE OR REPLACE FUNCTION process_payments_history_audit() RETURNS TRIGGER AS $payments_history$
+    CREATE OR REPLACE FUNCTION process_payments_history_audit() RETURNS TRIGGER AS $payments_history_trigger$
         BEGIN
             --
             -- Create a row in subscriptions_history to reflect the operation performed on emp,
@@ -82,13 +82,13 @@ update_payments_history = """
         END;
     $payments_history$ LANGUAGE plpgsql;
 
-    CREATE TRIGGER payments_history
+    CREATE TRIGGER payments_history_trigger
     AFTER INSERT OR UPDATE OR DELETE ON payments_history
         FOR EACH ROW EXECUTE PROCEDURE process_payments_history_audit();
 """
 
 update_refunds_history = """
-    CREATE OR REPLACE FUNCTION process_refunds_history_audit() RETURNS TRIGGER AS $refunds_history$
+    CREATE OR REPLACE FUNCTION process_refunds_history_audit() RETURNS TRIGGER AS $refunds_history_trigger$
         BEGIN
             --
             -- Create a row in subscriptions_history to reflect the operation performed on emp,
@@ -109,7 +109,7 @@ update_refunds_history = """
         END;
     $refunds_history$ LANGUAGE plpgsql;
 
-    CREATE TRIGGER refunds_history
+    CREATE TRIGGER refunds_history_trigger
     AFTER INSERT OR UPDATE OR DELETE ON refunds_history
         FOR EACH ROW EXECUTE PROCEDURE process_refunds_history_audit();
 """

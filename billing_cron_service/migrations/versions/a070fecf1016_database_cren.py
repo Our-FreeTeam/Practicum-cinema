@@ -141,8 +141,8 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.execute("CREATE TRIGGER subscriptions_history_trigger")
-    op.execute("CREATE TRIGGER payments_history_trigger")
     op.execute("CREATE TRIGGER subscription_types_history_trigger")
+    op.execute("CREATE TRIGGER payments_history_trigger")
     op.execute("CREATE TRIGGER refunds_history_trigger")
     # ### end Alembic commands ###
 
@@ -158,7 +158,7 @@ def downgrade() -> None:
     op.drop_table('payments_history')
     op.drop_table('subscriptions_history')
     op.execute("DROP TRIGGER subscriptions_history_trigger")
-    op.execute("DROP TRIGGER payments_history_trigger")
     op.execute("DROP TRIGGER subscription_types_history_trigger")
+    op.execute("DROP TRIGGER payments_history_trigger")
     op.execute("DROP TRIGGER refunds_history_trigger")
     # ### end Alembic commands ###
