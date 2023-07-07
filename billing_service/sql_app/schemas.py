@@ -26,15 +26,16 @@ class ResponseList(GenericModel, Generic[T]):
     result_list: list[T] = []
 
 
-class Subscriptions(BaseOrjsonModel):
+class Subscription(BaseOrjsonModel):
     person_id: UUID
-    start_date: datetime
-    end_date: datetime
+    start_date: datetime | None
+    end_date: datetime | None
     subscription_type: str
-    is_active: bool
+    is_active: bool | None
+    is_repeatable: bool
 
 
-class SubscriptionTypes(BaseOrjsonModel):
+class SubscriptionType(BaseOrjsonModel):
     id: UUID
     subscription_id: UUID
     name: str
@@ -42,7 +43,7 @@ class SubscriptionTypes(BaseOrjsonModel):
     is_active: bool
 
 
-class Payments(BaseOrjsonModel):
+class Payment(BaseOrjsonModel):
     person_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
@@ -50,14 +51,14 @@ class Payments(BaseOrjsonModel):
     payment_method_id: str
 
 
-class Refunds(BaseOrjsonModel):
+class Refund(BaseOrjsonModel):
     payment_id: UUID
     refund_amount: Decimal
     refund_status: str
     external_refund_id: str
 
 
-class SubscriptionsHistory(BaseOrjsonModel):
+class SubscriptionHistory(BaseOrjsonModel):
     person_id: UUID
     start_date: datetime
     end_date: datetime
@@ -67,7 +68,7 @@ class SubscriptionsHistory(BaseOrjsonModel):
     operation_type: str
 
 
-class SubscriptionTypesHistory(BaseOrjsonModel):
+class SubscriptionTypeHistory(BaseOrjsonModel):
     id: UUID
     subscription_id: UUID
     name: str
@@ -77,7 +78,7 @@ class SubscriptionTypesHistory(BaseOrjsonModel):
     operation_type: str
 
 
-class PaymentsHistory(BaseOrjsonModel):
+class PaymentHistory(BaseOrjsonModel):
     person_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
@@ -87,7 +88,7 @@ class PaymentsHistory(BaseOrjsonModel):
     operation_type: str
 
 
-class RefundsHistory(BaseOrjsonModel):
+class RefundHistory(BaseOrjsonModel):
     payment_id: UUID
     refund_amount: Decimal
     refund_status: str
