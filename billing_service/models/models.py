@@ -12,8 +12,7 @@ subscription = Table(
     Column("start_date", TIMESTAMP, default=func.now()),
     Column("end_date", TIMESTAMP, nullable=False),
     Column("subscription_type", String, nullable=False),
-    Column("is_active", BOOLEAN, nullable=False),
-    Column("payment_id", String, nullable=False),
+    Column("is_active", BOOLEAN, nullable=False)
 )
 
 subscription_type = Table(
