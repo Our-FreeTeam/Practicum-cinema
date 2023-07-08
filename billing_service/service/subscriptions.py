@@ -3,14 +3,14 @@ from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import UUID
 
-from models.models import Subscriptions
+from models.models import Subscription
 
 
 async def get_active_subscription(user_id: UUID, db: AsyncSession):
     print(user_id)
     subscription = await db.execute(
-        select(Subscriptions).where(and_(Subscriptions.user_id == user_id,
-                                         Subscriptions.is_active)))
+        select(Subscription).where(and_(Subscription.user_id == user_id,
+                                         Subscription.is_active)))
     return subscription.fetchone()
 
 

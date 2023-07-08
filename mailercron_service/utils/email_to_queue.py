@@ -1,14 +1,42 @@
 import asyncio
 import datetime
 import logging
+from contextlib import contextmanager
 
+import psycopg2
 from aio_pika import Message
+from psycopg2.extras import DictCursor
 
 from keycloak_conn import keycloak_admin
 from dateutil.tz import tzoffset
 
+from mailercron_service.utils.backoff import backoff, log
+from mailercron_service.utils.settings import pgdb
+from mailercron_service.utils.sql import sql_get_payment, sql_get_refund
 from rabbit_connection import rabbit_conn
 from settings import settings
+
+
+@log
+@backoff(exception=psycopg2.OperationalError)
+def pg_conn(*args, **kwargs):
+    return psycopg2.connect(*args, **kwargs)
+
+
+@contextmanager
+def pg_conn_context(*args, **kwargs):
+    connection = pg_conn(*args, **kwargs)
+    yield connection
+    connection.close()
+
+
+def get_users_list(sql):
+    with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
+        cur = pg_connect.cursor()
+        cur.execute(sql)
+        users = cur.fetchall()
+
+    return users
 
 
 @rabbit_conn
@@ -30,9 +58,14 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name):
     await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_queue_name)
 
     processed_count = 0
-    for user_email in mail_list:
-        if user_email:
-            prep_data = f"{user_email}:watched_film"
+    if len(mail_list[0]) > 1:
+
+        for el in mail_list:
+            payment_amount = el[0]
+            payment_status = el[1]
+            payment_date = el[2]
+            prep_data = f"Success operation. Status: {payment_status}. Amount: {payment_amount}." \
+                        f"Operation date: {payment_date}"
             await exchange.publish(
                 routing_key=settings.rabbitmq_queue_name,
                 message=Message(bytes(prep_data, "utf-8"),
@@ -41,7 +74,19 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name):
             )
             processed_count += 1
 
-    logging.info("Emails send to delayed q: {:d}".format(processed_count))
+    else:
+        for user_email in mail_list:
+            if user_email:
+                prep_data = f"{user_email}:watched_film"
+                await exchange.publish(
+                    routing_key=settings.rabbitmq_queue_name,
+                    message=Message(bytes(prep_data, "utf-8"),
+                                    content_type="text/plain",
+                                    headers={'x-delay': time_shift * 1000}),
+                )
+                processed_count += 1
+
+        logging.info("Emails send to delayed q: {:d}".format(processed_count))
 
 
 def get_user_list():
@@ -112,9 +157,28 @@ async def main():
 
         emails_list = get_user_list()
 
+        users_payments = get_users_list(sql_get_payment)
+        users_refunds = get_users_list(sql_get_refund)
+
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
             await process_list(emails_list)
+
+        if len(users_payments) > 0:
+            logging.info("Process emails list from Postgres, total count:" + str(len(users_payments)))
+            await rabbit_send(
+                emails_list=users_payments,
+                time_shift=1,
+                queue_name=settings.rabbitmq_queue_name
+            )
+
+        if len(users_refunds) > 0:
+            logging.info("Process emails list from KC, total count:" + str(len(users_refunds)))
+            await rabbit_send(
+                emails_list=users_refunds,
+                time_shift=1,
+                queue_name=settings.rabbitmq_queue_name
+            )
 
 
 if __name__ == "__main__":
