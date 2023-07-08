@@ -4,7 +4,7 @@ from fastapi.responses import ORJSONResponse
 
 from api.v1 import subscriptions
 from core.config import settings
-from yookassa import Configuration, Payment
+from yookassa import Configuration
 
 
 app = FastAPI(

@@ -16,3 +16,5 @@ SQLAlchemy==1.4.42
 psycopg2-binary==2.9.6
 asyncpg==0.27.0
 alembic==1.10.0
+aiohttp==3.8.4
+greenlet==2.0.2
