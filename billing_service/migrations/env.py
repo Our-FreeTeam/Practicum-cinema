@@ -7,9 +7,9 @@ from sqlalchemy import pool
 from alembic import context
 
 from models.models import metadata
-from settings.settings import pgdb
 from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
     refund_history_trigger
+from core.config import settings
 
 # Регистрация триггеров для отслеживания изменений при выполнении миграций в алемдбике
 register_entities(
@@ -25,11 +25,11 @@ register_entities(
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "BILL_DB_HOST", pgdb.host)
-config.set_section_option(section, "BILL_DB_PORT", pgdb.port)
-config.set_section_option(section, "BILL_DB_USERNAME", pgdb.user)
-config.set_section_option(section, "BILL_DB_NAME", pgdb.dbname)
-config.set_section_option(section, "BILL_DB_PASSWORD", pgdb.password)
+config.set_section_option(section, "BILL_DB_HOST", settings.DB_HOST)
+config.set_section_option(section, "BILL_DB_PORT", settings.DB_PORT)
+config.set_section_option(section, "BILL_DB_USERNAME", settings.DB_USER)
+config.set_section_option(section, "BILL_DB_NAME", settings.DB_NAME)
+config.set_section_option(section, "BILL_DB_PASSWORD", settings.DB_PASSWORD)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

@@ -3,24 +3,28 @@ from datetime import datetime
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from main import db
-from service import subscription as subs
+from core.dependency import get_db
+from service import subscriptions as subs_service
 from sql_app.schemas import Subscription
 
 router = APIRouter()
 
 
 @router.post("/add")
-async def add_subscription(subscription: Subscription, session: AsyncSession = Depends(db)):
-    is_subs_active, subs_date_end = await subs.check_subscription_active(subscription.user_id)
-    subs_duration = subs.get_subscription_duration(subscription.subscription_type)
-    new_subs_date = (subs_date_end if is_subs_active else datetime.now()) + subs_duration
+async def add_subscription(subscription: Subscription, session: AsyncSession = Depends(get_db)):
+    active_subscription = await subs_service.get_active_subscription(user_id=subscription.user_id, db=session)
+    print('active_subscription', active_subscription)
 
-    subs_result = await subs.send_subscription_external()
+    subs_duration = subs_service.get_subscription_duration(subscription.subscription_type_id)
+    print('subs_duration', subs_duration)
+    new_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
+    print('new_subs_date', new_subs_date)
+
+    subs_result = await subs_service.send_subscription_external()
     if subs_result:
-        await subs.update_subscription_db()
-        await subs.update_subscription_role()
-        await subs.send_subscription_notification()
+        await subs_service.update_subscription_db()
+        await subs_service.update_subscription_role()
+        await subs_service.send_subscription_notification()
 
     #TODO:
     # Отправляем запрос в сервис оплаты подписки, передаем в него название компании, сумму, название подписки.
