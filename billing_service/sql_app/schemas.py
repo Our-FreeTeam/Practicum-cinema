@@ -27,10 +27,11 @@ class ResponseList(GenericModel, Generic[T]):
 
 
 class Subscription(BaseOrjsonModel):
-    person_id: UUID
+    user_id: UUID
     start_date: datetime | None = datetime.now()
     end_date: datetime | None
     subscription_type_id: UUID
+    payment_id: UUID
     is_active: bool | None
     is_repeatable: bool
 
@@ -40,14 +41,15 @@ class Subscription(BaseOrjsonModel):
 
 class SubscriptionType(BaseOrjsonModel):
     id: UUID
-    subscription_id: UUID
     name: str
+    subscription_id: UUID
     amount: Decimal
     is_active: bool
 
 
 class Payment(BaseOrjsonModel):
-    person_id: UUID
+    id: UUID
+    user_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
     payment_status: str
@@ -56,6 +58,7 @@ class Payment(BaseOrjsonModel):
 
 
 class Refund(BaseOrjsonModel):
+    id: UUID
     payment_id: UUID
     refund_amount: Decimal
     refund_status: str
@@ -64,19 +67,22 @@ class Refund(BaseOrjsonModel):
 
 
 class SubscriptionHistory(BaseOrjsonModel):
-    person_id: UUID
+    id: UUID
+    user_id: UUID
     start_date: datetime
     end_date: datetime
-    subscription_type: str
+    subscription_type_id: str
     is_active: bool
+    is_repeatable: bool
+    payment_id: UUID
     operation_date: datetime
     operation_type: str
 
 
 class SubscriptionTypeHistory(BaseOrjsonModel):
     id: UUID
-    subscription_id: UUID
     name: str
+    subscription_id: UUID
     amount: Decimal
     is_active: bool
     operation_date: datetime
@@ -84,19 +90,23 @@ class SubscriptionTypeHistory(BaseOrjsonModel):
 
 
 class PaymentHistory(BaseOrjsonModel):
-    person_id: UUID
+    id: UUID
+    user_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
     payment_status: str
     payment_method_id: str
+    payment_date: datetime
     operation_date: datetime
     operation_type: str
 
 
 class RefundHistory(BaseOrjsonModel):
+    id: UUID
     payment_id: UUID
     refund_amount: Decimal
     refund_status: str
     external_refund_id: str
+    refund_date: datetime
     operation_date: datetime
     operation_type: str
