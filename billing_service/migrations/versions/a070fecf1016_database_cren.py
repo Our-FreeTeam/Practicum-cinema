@@ -28,16 +28,16 @@ def upgrade() -> None:
 
     op.create_table('subscriptions',
     sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('person_id', postgresql.UUID(), nullable=True),
+    sa.Column('user_id', postgresql.UUID(), nullable=True),
     sa.Column('start_date', sa.TIMESTAMP(), nullable=True),
     sa.Column('end_date', sa.TIMESTAMP(), nullable=True),
-    sa.Column('subscription_type', sa.String(), nullable=True),
+    sa.Column('subscription_type_id', postgresql.UUID(), nullable=True),
     sa.Column('is_active', sa.BOOLEAN(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('payments',
     sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('person_id', postgresql.UUID(), nullable=True),
+    sa.Column('user_id', postgresql.UUID(), nullable=True),
     sa.Column('subscriptions_id', postgresql.UUID(), nullable=True),
     sa.Column('payment_amount', sa.DECIMAL(), nullable=True),
     sa.Column('payment_status', sa.String(), nullable=True),

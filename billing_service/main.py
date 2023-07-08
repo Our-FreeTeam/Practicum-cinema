@@ -6,7 +6,6 @@ from api.v1 import subscriptions
 from core.config import settings
 from yookassa import Configuration, Payment
 
-from sql_app.database import db
 
 app = FastAPI(
     title="API для приема и возврата платежей за подписку",
@@ -20,10 +19,8 @@ app = FastAPI(
 
 @app.on_event('startup')
 async def startup():
-    Configuration.account_id = settings.kassa_account_id
-    Configuration.secret_key = settings.kassa_secret_key
-
-    db.setup()
+    Configuration.account_id = settings.KASSA_ACCOUNT_ID
+    Configuration.secret_key = settings.KASSA_SECRET_KEY
 
 
 app.include_router(subscriptions.router, prefix='/api/v1/subscriptions', tags=['subscriptions'])

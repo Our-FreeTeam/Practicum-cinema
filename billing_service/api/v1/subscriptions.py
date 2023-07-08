@@ -3,20 +3,22 @@ from datetime import datetime
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
+from core.dependency import get_db
 from service import subscriptions as subs_service
-from sql_app.database import db
 from sql_app.schemas import Subscription
 
 router = APIRouter()
 
 
 @router.post("/add")
-async def add_subscription(subscription: Subscription, session: AsyncSession = Depends(db)):
-    subscription = await subs_service.get_active_subscription(subscription.user_id, db)
-    print(subscription)
-    subs_duration = subs_service.get_subscription_duration(subscription.subscription_type)
-    new_subs_date = (subscription.end_date if subscription else datetime.now()) + subs_duration
+async def add_subscription(subscription: Subscription, session: AsyncSession = Depends(get_db)):
+    active_subscription = await subs_service.get_active_subscription(user_id=subscription.user_id, db=session)
+    print('active_subscription', active_subscription)
+
+    subs_duration = subs_service.get_subscription_duration(subscription.subscription_type_id)
+    print('subs_duration', subs_duration)
+    new_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
+    print('new_subs_date', new_subs_date)
 
     subs_result = await subs_service.send_subscription_external()
     if subs_result:

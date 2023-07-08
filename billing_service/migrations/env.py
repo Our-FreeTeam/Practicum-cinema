@@ -13,11 +13,11 @@ from core.config import settings
 config = context.config
 
 section = config.config_ini_section
-config.set_section_option(section, "BILL_DB_HOST", settings.db_host)
-config.set_section_option(section, "BILL_DB_PORT", settings.db_port)
-config.set_section_option(section, "BILL_DB_USERNAME", settings.db_user)
-config.set_section_option(section, "BILL_DB_NAME", settings.db_name)
-config.set_section_option(section, "BILL_DB_PASSWORD", settings.db_password)
+config.set_section_option(section, "BILL_DB_HOST", settings.DB_HOST)
+config.set_section_option(section, "BILL_DB_PORT", settings.DB_PORT)
+config.set_section_option(section, "BILL_DB_USERNAME", settings.DB_USER)
+config.set_section_option(section, "BILL_DB_NAME", settings.DB_NAME)
+config.set_section_option(section, "BILL_DB_PASSWORD", settings.DB_PASSWORD)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

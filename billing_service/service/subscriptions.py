@@ -1,22 +1,23 @@
 from monthdelta import monthdelta
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
-from uuid import UUID
+from sqlalchemy.dialects.postgresql import UUID
 
-from sql_app.schemas import Subscription
+from models.models import Subscriptions
 
 
 async def get_active_subscription(user_id: UUID, db: AsyncSession):
+    print(user_id)
     subscription = await db.execute(
-        select(Subscription).where(and_(Subscription.user_id == user_id,
-                                        Subscription.is_active)))
+        select(Subscriptions).where(and_(Subscriptions.user_id == user_id,
+                                         Subscriptions.is_active)))
     return subscription.fetchone()
 
 
 def get_subscription_duration(subscription_type_id: UUID):
     duration = {'834c0eb9-7ac6-47a8-aa51-19d1f2f58766': monthdelta(1),
                 '339052fe-9f44-4c03-8ccf-e11b9629d6d1': monthdelta(12)}
-    return duration[subscription_type_id]
+    return duration[str(subscription_type_id)]
 
 
 async def send_subscription_external():
