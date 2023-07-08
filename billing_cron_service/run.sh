@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-alembic upgrade head
-
 set -e
 
 # переносим значения переменных из текущего окружения
