@@ -28,11 +28,14 @@ class ResponseList(GenericModel, Generic[T]):
 
 class Subscription(BaseOrjsonModel):
     user_id: UUID
-    start_date: datetime | None
+    start_date: datetime | None = datetime.now()
     end_date: datetime | None
-    subscription_type: str
+    subscription_type_id: UUID
     is_active: bool | None
     is_repeatable: bool
+
+    class Config:
+        orm_mode = True
 
 
 class SubscriptionTypes(BaseOrjsonModel):
@@ -44,11 +47,11 @@ class SubscriptionTypes(BaseOrjsonModel):
 
 
 class Payments(BaseOrjsonModel):
-    user_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
     payment_status: str
     payment_method_id: str
+    payment_date: datetime | None = datetime.now()
 
 
 class Refunds(BaseOrjsonModel):
@@ -56,3 +59,4 @@ class Refunds(BaseOrjsonModel):
     refund_amount: Decimal
     refund_status: str
     external_refund_id: str
+    refund_date: datetime | None = datetime.now()
