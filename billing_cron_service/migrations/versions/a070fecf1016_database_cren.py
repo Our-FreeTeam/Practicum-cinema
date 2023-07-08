@@ -10,42 +10,16 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-from alembic_utils.pg_trigger import PGTrigger
 from sqlalchemy import func
 from sqlalchemy.dialects import postgresql
 
-from db.sql import update_subscription_history, update_payment_history, update_subscription_type_history, \
-    update_refund_history
+from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+    refund_history_trigger
 
 revision = 'a070fecf1016'
 down_revision = None
 branch_labels = None
 depends_on = None
-
-subscription_history_trigger = PGTrigger(
-    schema="content",
-    signature="subscription_history_trigger",
-    on_entity="content.subscription_history",
-    definition=update_subscription_history
-)
-payment_history_trigger = PGTrigger(
-    schema="content",
-    signature="payment_history_trigger",
-    on_entity="content.payment_history",
-    definition=update_payment_history
-)
-subscription_type_history_trigger = PGTrigger(
-    schema="content",
-    signature="subscription_type_history_trigger",
-    on_entity="content.subscription_type_history",
-    definition=update_subscription_type_history
-)
-refund_history_trigger = PGTrigger(
-    schema="content",
-    signature="refund_history_trigger",
-    on_entity="content.refund_history",
-    definition=update_refund_history
-)
 
 
 def upgrade() -> None:

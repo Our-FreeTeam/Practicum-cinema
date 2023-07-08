@@ -1,5 +1,6 @@
 from logging.config import fileConfig
 
+from alembic_utils.replaceable_entity import register_entities
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
@@ -7,7 +8,18 @@ from alembic import context
 
 from models.models import metadata
 from settings.settings import pgdb
+from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+    refund_history_trigger
 
+# Регистрация триггеров для отслеживания изменений при выполнении миграций в алемдбике
+register_entities(
+    entities=[
+        subscription_history_trigger,
+        payment_history_trigger,
+        subscription_type_history_trigger,
+        refund_history_trigger
+    ]
+)
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
