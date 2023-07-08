@@ -11,7 +11,11 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 from sqlalchemy import DDL
-from sqlalchemy.dialects import postgresql
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import UUID
+
+from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+    refund_history_trigger
 
 revision = 'a070fecf1016'
 down_revision = None
@@ -26,52 +30,117 @@ def upgrade() -> None:
     ''')
     create_extension(target=None, bind=op.get_bind())
 
-    op.create_table('subscriptions',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('user_id', postgresql.UUID(), nullable=True),
-    sa.Column('start_date', sa.TIMESTAMP(), nullable=True),
-    sa.Column('end_date', sa.TIMESTAMP(), nullable=True),
-    sa.Column('subscription_type_id', postgresql.UUID(), nullable=True),
-    sa.Column('is_active', sa.BOOLEAN(), nullable=True),
+    op.create_table('subscription',
+    sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    sa.Column('user_id', UUID(as_uuid=True)),
+    sa.Column('start_date', sa.TIMESTAMP(), default=func.now()),
+    sa.Column('end_date', sa.TIMESTAMP()),
+    sa.Column('subscription_type_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('payment_id', UUID(as_uuid=True), nullable=False),
+    sa.Column('is_active', sa.BOOLEAN()),
+    sa.Column('is_repeatable', sa.BOOLEAN()),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('payments',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('user_id', postgresql.UUID(), nullable=True),
-    sa.Column('subscriptions_id', postgresql.UUID(), nullable=True),
-    sa.Column('payment_amount', sa.DECIMAL(), nullable=True),
+    op.create_table('payment',
+    sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
+    sa.Column('user_id', UUID(as_uuid=True), nullable=False),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+    sa.Column('payment_amount', sa.DECIMAL(precision=None)),
     sa.Column('payment_status', sa.String(), nullable=True),
     sa.Column('payment_method_id', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['subscriptions_id'], ['subscriptions.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['content.person.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('subscription_types',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    op.create_table('subscription_type',
+    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('subscriptions_id', postgresql.UUID(), nullable=True),
-    sa.Column('refund_amount', sa.DECIMAL(), nullable=True),
-    sa.Column('is_active', sa.BOOLEAN(), nullable=True),
-    sa.ForeignKeyConstraint(['subscriptions_id'], ['subscriptions.id'], ondelete='CASCADE'),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('amount', sa.DECIMAL(), nullable=False),
+    sa.Column('is_active', sa.BOOLEAN(), nullable=False),
+    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('refunds',
-    sa.Column('id', postgresql.UUID(), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('payments_id', postgresql.UUID(), nullable=True),
-    sa.Column('refund_amount', postgresql.UUID(), nullable=True),
-    sa.Column('payment_amount', sa.DECIMAL(), nullable=True),
-    sa.Column('refund_status', sa.String(), nullable=True),
+    op.create_table('refund',
+    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    sa.Column('payment_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('refund_amount', sa.DECIMAL(precision=None), nullable=False),
+    sa.Column('refund_status', sa.String(), nullable=False),
     sa.Column('external_refund_id', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['payments_id'], ['payments.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['refund_amount'], ['subscriptions.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('subscription_history',
+    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    sa.Column('user_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('start_date', sa.TIMESTAMP(), default=func.now()),
+    sa.Column('end_date', sa.TIMESTAMP()),
+    sa.Column('subscription_type_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('is_active', sa.BOOLEAN()),
+    sa.Column('is_repeatable', sa.BOOLEAN()),
+    sa.Column('payment_id', UUID(as_uuid=True), nullable=False),
+    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('operation_type', sa.String(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['content.person.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('payment_history',
+    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    sa.Column('user_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+    sa.Column('payment_amount', sa.DECIMAL(precision=None)),
+    sa.Column('payment_status', sa.String(), nullable=True),
+    sa.Column('payment_method_id', sa.String(), nullable=False),
+    sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('operation_type', sa.String(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['content.person.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('subscription_type_history',
+    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    sa.Column('name', sa.String(), nullable=False),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('amount', sa.DECIMAL(precision=None), nullable=False),
+    sa.Column('is_active', sa.BOOLEAN(), nullable=False),
+    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('operation_type', sa.String(), nullable=False),
+    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('refund_history',
+    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+    sa.Column('payment_id', UUID(as_uuid=True), nullable=True),
+    sa.Column('refund_amount', UUID(as_uuid=True), nullable=False),
+    sa.Column('refund_status', sa.String(), nullable=False),
+    sa.Column('external_refund_id', sa.String(), nullable=False),
+    sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+    sa.Column('operation_type', sa.String(), nullable=False),
+    sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['refund_amount'], ['subscription.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_trigger(subscription_history_trigger)
+    op.create_trigger(payment_history_trigger)
+    op.create_trigger(subscription_type_history_trigger)
+    op.create_trigger(refund_history_trigger)
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('refunds')
-    op.drop_table('subscription_types')
-    op.drop_table('payments')
-    op.drop_table('subscriptions')
+    op.drop_table('refund')
+    op.drop_table('subscription_type')
+    op.drop_table('payment')
+    op.drop_table('subscription')
+    op.drop_table('refund_history')
+    op.drop_table('subscription_type_history')
+    op.drop_table('payment_history')
+    op.drop_table('subscription_history')
+    op.drop_trigger(subscription_history_trigger)
+    op.drop_trigger(payment_history_trigger)
+    op.drop_trigger(subscription_type_history_trigger)
+    op.drop_trigger(refund_history_trigger)
     # ### end Alembic commands ###

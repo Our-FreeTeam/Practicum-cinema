@@ -1,5 +1,5 @@
-insert_subscriptions = """
-insert into content.subscriptions (id, user_id, start_date, end_date, subscription_type, is_active)
+insert_subscription = """
+insert into subscription (id, user_id, start_date, end_date, subscription_type, is_active)
 values  ('96876723-ea9f-4c0a-a087-8e5a269d232c', 'a5a8f573-3cee-4ccc-8a2b-91cb9f55250a', '2022-06-16 20:14:09.313290', '2023-06-16 20:14:09.313290', 'year', True),
         ('4ebbfeb5-25d3-4b63-936b-db903239bee4', '26e83050-29ef-4163-a99d-b546cac208f8', '2021-07-16 20:14:09.313290', '2022-07-16 20:14:09.313290', 'year', False),
         ('fd5468d8-83b4-48b0-9500-39f7a7b30f42', 'a1758395-9578-41af-88b8-3f9456e6d938', '2023-07-10 20:14:09.313290', '2023-08-10 20:14:09.313290', 'month', True),

@@ -6,42 +6,93 @@ Base = declarative_base()
 metadata = MetaData()
 
 
-class Subscriptions(Base):
-    __tablename__ = "subscriptions"
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'))
+class Subscription(Base):
+    __tablename__ = "subscription"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     user_id = Column(UUID(as_uuid=True))
     start_date = Column(TIMESTAMP, default=func.now())
     end_date = Column(TIMESTAMP)
     subscription_type_id = Column(UUID(as_uuid=True), nullable=True)
+    payment_id = Column(UUID(as_uuid=True), nullable=False)
     is_active = Column(BOOLEAN)
     is_repeatable = Column(BOOLEAN)
 
 
-class SubscriptionTypes(Base):
-    __tablename__ = "subscription_types"
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'))
+class SubscriptionType(Base):
+    __tablename__ = "subscription_type"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     name = Column(String, nullable=False)
-    subscriptions_id = Column(UUID(as_uuid=True), ForeignKey('subscriptions.id', ondelete='CASCADE'))
-    refund_amount = Column(DECIMAL(precision=None))
+    subscriptions_id = Column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="CASCADE"))
+    amount = Column(DECIMAL(precision=None))
     is_active = Column(BOOLEAN)
 
 
-class Payments(Base):
-    __tablename__ = "payments"
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'))
-    subscriptions_id = Column(UUID(as_uuid=True), ForeignKey('subscriptions.id', ondelete='CASCADE'))
+class Payment(Base):
+    __tablename__ = "payment"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    user_id = Column("user_id", UUID(as_uuid=True), ForeignKey("content.person.id", ondelete="CASCADE"))
+    subscriptions_id = Column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="CASCADE"))
     payment_amount = Column(DECIMAL(precision=None))
     payment_status = Column(String, nullable=True)
     payment_method_id = Column(String, nullable=False)
     payment_date = Column(TIMESTAMP, nullable=False)
 
 
-class Refunds(Base):
-    __tablename__ = "refunds"
-    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text('uuid_generate_v4()'))
-    payments_id = Column(UUID(as_uuid=True), ForeignKey('payments.id', ondelete='CASCADE'))
-    refund_amount = Column(DECIMAL(precision=None), ForeignKey('subscriptions.id', ondelete='CASCADE'))
-    payment_amount = Column(DECIMAL(precision=None))
+class Refund(Base):
+    __tablename__ = "refund"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    payment_id = Column(UUID(as_uuid=True), ForeignKey("payment.id", ondelete="CASCADE"))
+    refund_amount = Column(DECIMAL(precision=None), nullable=False)
     refund_status = Column(String, nullable=True)
     external_refund_id = Column(String, nullable=False)
     refund_date = Column(TIMESTAMP, nullable=False)
+
+
+class SubscriptionHistory(Base):
+    __tablename__ = "subscription_history"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    user_id = Column("user_id", UUID, ForeignKey("content.person.id", ondelete="CASCADE"))
+    start_date = Column(TIMESTAMP, default=func.now())
+    end_date = Column(TIMESTAMP)
+    subscription_type_id = Column(UUID(as_uuid=True), nullable=True)
+    is_active = Column(BOOLEAN)
+    is_repeatable = Column(BOOLEAN)
+    payment_id = Column(UUID(as_uuid=True), nullable=False)
+    operation_date = Column(TIMESTAMP, nullable=False)
+    operation_type = Column(String, nullable=False)
+
+
+class SubscriptionTypeHistory(Base):
+    __tablename__ = "subscription_type_history"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    name = Column(String, nullable=False)
+    subscriptions_id = Column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="CASCADE"))
+    amount = Column(DECIMAL(precision=None))
+    is_active = Column(BOOLEAN)
+    operation_date = Column(TIMESTAMP, nullable=False)
+    operation_type = Column(String, nullable=False)
+
+
+class PaymentHistory(Base):
+    __tablename__ = "payment_history"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    user_id = Column("user_id", UUID, ForeignKey("content.person.id", ondelete="CASCADE"))
+    subscriptions_id = Column(UUID(as_uuid=True), ForeignKey("subscriptions.id", ondelete="CASCADE"))
+    payment_amount = Column(DECIMAL(precision=None))
+    payment_status = Column(String, nullable=True)
+    payment_method_id = Column(String, nullable=False)
+    payment_date = Column(TIMESTAMP, nullable=False)
+    operation_date = Column(TIMESTAMP, nullable=False)
+    operation_type = Column(String, nullable=False)
+
+
+class RefundHistory(Base):
+    __tablename__ = "refund_history"
+    id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
+    payment_id = Column(UUID(as_uuid=True), ForeignKey("payment.id", ondelete="CASCADE"))
+    refund_amount = Column(DECIMAL(precision=None), ForeignKey("subscriptions.id", ondelete="CASCADE"))
+    refund_status = Column(String, nullable=True)
+    external_refund_id = Column(String, nullable=False)
+    refund_date = Column(TIMESTAMP, nullable=False)
+    operation_date = Column(TIMESTAMP, nullable=False)
+    operation_type = Column(String, nullable=False)
