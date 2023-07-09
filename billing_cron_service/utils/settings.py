@@ -41,8 +41,6 @@ class Settings(BaseSettings):
     rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
     rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
 
-    rabbitmq_uri = f"amqp://guest:guest@rabbitmq:5672/filestream"
-
     KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
     KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
 
