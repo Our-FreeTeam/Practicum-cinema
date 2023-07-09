@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.dependency import get_db
 from service import subscriptions as subs_service
+from service.subscriptions import check_saving_payment_method
 from sql_app.schemas import Subscription
 
 router = APIRouter()
@@ -12,12 +13,17 @@ router = APIRouter()
 
 @router.post("/add")
 async def add_subscription(subscription: Subscription, session: AsyncSession = Depends(get_db)):
+    check_saving_payment_method(subscription)
+
     active_subscription = await subs_service.get_active_subscription(user_id=subscription.user_id, db=session)
 
     subs_duration = subs_service.get_subscription_duration(subscription.subscription_type_id)
     new_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
 
-    subs_result = await subs_service.send_subscription_external(subscription.subscription_type_id, session)
+    subs_result = await subs_service.send_subscription_external(
+        subscription.subscription_type_id,
+        subscription.save_payment_method,
+        session)
     if subs_result:
         await subs_service.update_subscription_db()
         await subs_service.update_subscription_role()
