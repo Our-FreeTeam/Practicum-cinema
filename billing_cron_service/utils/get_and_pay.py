@@ -15,7 +15,7 @@ async def main():
 
     async with connection:
         channel = await connection.channel()
-        queue = await channel.declare_queue('subscribed_users', durable=True)
+        queue = await channel.declare_queue(settings.rabbitmq_subscription_queue, durable=True)
         await channel.set_qos(prefetch_count=10)
 
         async with queue.iterator() as queue_iter:
