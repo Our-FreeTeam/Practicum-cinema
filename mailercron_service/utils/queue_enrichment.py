@@ -24,6 +24,10 @@ async def get_message(channel):
         async for message in queue_iter:
             async with message.process():
                 email, event_type = message.body.decode().replace('"', '').split(':')
+                # Проверка event_type на содержание информации об оплате/возврате
+                if event_type.startswith("Success operation"):
+                    event_type = "payment/refund"
+
                 # Acknowledge the message
                 message = await get_processed_message(email, event_type)
                 await send_message(email, message, event_type, channel)

@@ -38,13 +38,24 @@ def get_user_email(user_id):
     return email
 
 
-def get_user_list_from_postgres(sql):
+def get_user_list_from_postgres(sql) -> list:
+    context = []
     with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
         cur = pg_connect.cursor()
         cur.execute(sql)
         users = cur.fetchall()
 
-    return users
+    for user in users:
+        user_dict = {
+            "user_id": user[0],
+            "amount": user[1],
+            "status": user[2],
+            "date": user[3],
+            "email": get_user_email(user[0])
+        }
+        context.append(user_dict)
+
+    return context
 
 
 @rabbit_conn
@@ -69,10 +80,10 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name, flag=False ):
     if flag:
 
         for el in mail_list:
-            amount = el[1]
-            status = el[2]
-            pay_date = el[3]
-            email = el[4]
+            amount = el.amount
+            status = el.status
+            pay_date = el.date
+            email = el.email
             prep_data = f"{email}:Success operation - {status}.Amount - {amount}. Operation date - {pay_date}"
             await exchange.publish(
                 routing_key=settings.rabbitmq_queue_name,
@@ -173,13 +184,6 @@ async def main():
             await process_list(emails_list)
 
         if users_payments:
-            for user in users_payments:
-                user = list(user)
-                user_id = user[0]
-                user_email = get_user_email(user_id)
-                user.append(user_email)
-                user = tuple(user)
-
             logging.info("Process emails list from Postgres, total count:" + str(len(users_payments)))
             await rabbit_send(
                 emails_list=users_payments,
@@ -189,13 +193,6 @@ async def main():
             )
 
         if users_refunds:
-            for user in users_refunds:
-                user = list(user)
-                user_id = user[0]
-                user_email = get_user_email(user_id)
-                user.append(user_email)
-                user = tuple(user)
-
             logging.info("Process emails list from KC, total count:" + str(len(users_refunds)))
             await rabbit_send(
                 emails_list=users_refunds,
