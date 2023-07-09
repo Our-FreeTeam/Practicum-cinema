@@ -1,16 +1,19 @@
+import uuid
+
+import aiohttp
 from monthdelta import monthdelta
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import UUID
 
-from models.models import Subscriptions
+from core.config import settings
+from models.models import Subscription, SubscriptionType
 
 
 async def get_active_subscription(user_id: UUID, db: AsyncSession):
-    print(user_id)
     subscription = await db.execute(
-        select(Subscriptions).where(and_(Subscriptions.user_id == user_id,
-                                         Subscriptions.is_active)))
+        select(Subscription).where(and_(Subscription.user_id == user_id,
+                                         Subscription.is_active)))
     return subscription.fetchone()
 
 
@@ -20,8 +23,41 @@ def get_subscription_duration(subscription_type_id: UUID):
     return duration[str(subscription_type_id)]
 
 
-async def send_subscription_external():
-    pass
+async def send_subscription_external(
+        subscription_type_id: UUID,
+        db: AsyncSession):
+    payment_url = 'https://api.yookassa.ru/v3/payments'
+    payment_id = uuid.uuid4()
+    headers = {'Idempotence-Key': str(payment_id),
+               'Content-Type': 'application/json'}
+    auth = aiohttp.BasicAuth(login=settings.KASSA_ACCOUNT_ID, password=settings.KASSA_SECRET_KEY)
+    subscription_data = await db.execute(select(SubscriptionType).
+                                         where(SubscriptionType.id == subscription_type_id))
+    subscription_data = subscription_data.fetchone()[0]
+    body = {
+        "amount": {
+            "value": str(subscription_data.amount),
+            "currency": "RUB"
+        },
+        "payment_method_data": {
+            "type": "bank_card"
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": "https://www.example.com/return_url"
+        },
+        "description": f" Оплата подписки '{subscription_data.name}'"
+    }
+
+    async with aiohttp.ClientSession() as session:
+        result = await session.post(
+            payment_url,
+            json=body,
+            headers=headers,
+            auth=auth,
+            verify_ssl=False
+        )
+        return result
 
 
 async def update_subscription_db():
