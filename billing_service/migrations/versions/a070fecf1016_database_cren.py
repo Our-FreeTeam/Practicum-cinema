@@ -8,13 +8,13 @@ Create Date: 2023-07-05 22:42:03.424550
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 from sqlalchemy import DDL
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 
-from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+from sql_app.triggers import subscription_history_trigger, payment_history_trigger, \
+    subscription_type_history_trigger, \
     refund_history_trigger
 
 revision = 'a070fecf1016'
@@ -79,7 +79,6 @@ def upgrade() -> None:
     sa.Column('payment_id', UUID(as_uuid=True), nullable=False),
     sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_type', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['content.person.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('payment_history',
@@ -118,10 +117,10 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['refund_amount'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_trigger(subscription_history_trigger)
-    op.create_trigger(payment_history_trigger)
-    op.create_trigger(subscription_type_history_trigger)
-    op.create_trigger(refund_history_trigger)
+    # op.create_entity(subscription_history_trigger)
+    # op.create_entity(payment_history_trigger)
+    # op.create_entity(subscription_type_history_trigger)
+    # op.create_entity(refund_history_trigger)
     # ### end Alembic commands ###
 
 
@@ -135,8 +134,8 @@ def downgrade() -> None:
     op.drop_table('subscription_type_history')
     op.drop_table('payment_history')
     op.drop_table('subscription_history')
-    op.drop_trigger(subscription_history_trigger)
-    op.drop_trigger(payment_history_trigger)
-    op.drop_trigger(subscription_type_history_trigger)
-    op.drop_trigger(refund_history_trigger)
+    # op.drop_trigger(subscription_history_trigger)
+    # op.drop_trigger(payment_history_trigger)
+    # op.drop_trigger(subscription_type_history_trigger)
+    # op.drop_trigger(refund_history_trigger)
     # ### end Alembic commands ###

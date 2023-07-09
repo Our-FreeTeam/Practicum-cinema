@@ -6,7 +6,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from billing_service.service.triggers import subscription_history_trigger, payment_history_trigger, \
+from sql_app.triggers import subscription_history_trigger, payment_history_trigger, \
     subscription_type_history_trigger, refund_history_trigger
 from models.models import metadata
 
