@@ -10,9 +10,9 @@ from psycopg2.extras import DictCursor
 from keycloak_conn import keycloak_admin
 from dateutil.tz import tzoffset
 
-from mailercron_service.utils.backoff import backoff, log
-from mailercron_service.utils.settings import pgdb
-from mailercron_service.utils.sql import sql_get_payment, sql_get_refund
+from backoff import backoff, log
+from settings import pgdb
+from sql import sql_get_payment, sql_get_refund
 from rabbit_connection import rabbit_conn
 from settings import settings
 

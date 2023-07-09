@@ -1,6 +1,7 @@
 from alembic_utils.pg_trigger import PGTrigger
 
-from db.sql import update_subscription_history, update_payment_history, update_subscription_type_history, \
+from sql_app.sql import update_subscription_history, update_payment_history, \
+    update_subscription_type_history, \
     update_refund_history
 
 subscription_history_trigger = PGTrigger(

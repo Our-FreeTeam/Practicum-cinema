@@ -262,7 +262,7 @@ services:
     networks:
       - cinema_network
 
-  mailercron:
+  mailer_cron:
     build: mailercron_service
     env_file:
       - .env
@@ -273,6 +273,19 @@ services:
         tag: "Mailer Scheduler"
     networks:
       - cinema_network
+
+  billing_cron:
+    build: billing_cron_service
+    env_file:
+      - .env
+#    logging:
+#      driver: "fluentd"
+#      options:
+#        fluentd-address: "host.docker.internal:24224"
+#        tag: "Billing Scheduler"
+    networks:
+      - cinema_network
+
 
   tests_ugc:
     build: tests_analytic/functional

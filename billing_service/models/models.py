@@ -43,6 +43,7 @@ class Refund(Base):
     payment_id = Column(UUID(as_uuid=True), ForeignKey("payment.id", ondelete="CASCADE"))
     refund_amount = Column(DECIMAL(precision=None), nullable=False)
     refund_status = Column(String, nullable=True)
+    subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
     external_refund_id = Column(String, nullable=False)
     refund_date = Column(TIMESTAMP, nullable=False)
 
@@ -90,6 +91,7 @@ class RefundHistory(Base):
     payment_id = Column(UUID(as_uuid=True), ForeignKey("payment.id", ondelete="CASCADE"))
     refund_amount = Column(DECIMAL(precision=None), ForeignKey("subscription.id", ondelete="CASCADE"))
     refund_status = Column(String, nullable=True)
+    subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
     external_refund_id = Column(String, nullable=False)
     refund_date = Column(TIMESTAMP, nullable=False)
     operation_date = Column(TIMESTAMP, nullable=False)

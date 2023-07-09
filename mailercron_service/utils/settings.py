@@ -3,14 +3,6 @@ from typing import Optional
 from pydantic import BaseSettings, Field
 
 
-class PGDB(BaseSettings):
-    dbname: str = Field(..., env="BILL_DB_NAME")
-    user: str = Field(..., env="BILL_DB_USERNAME")
-    password: str = Field(..., env="BILL_DB_PASSWORD")
-    host: Optional[str] = Field(..., env="BILL_DB_HOST")
-    port: int = Field(..., env="BILL_DB_PORT")
-
-
 class Settings(BaseSettings):
     keycloak_url: str = Field(..., env='KEYCLOAK_URL')
     client_id: str = Field(..., env='KEYCLOAK_CLIENT_ID')
@@ -38,6 +30,7 @@ class Settings(BaseSettings):
     rabbitmq_full_exchange = 'full_exchange'
     rabbitmq_full_queue: str = Field(..., env='RABBIT_FULL_QUEUE')
 
+
     rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
     rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
 
@@ -45,6 +38,13 @@ class Settings(BaseSettings):
     auth_url: str = Field(..., env='AUTH_URL')
 
     debug_mode: int = Field(0, env='MAILCRON_DEBUG')
+
+class PGDB(BaseSettings):
+    dbname: str = Field(..., env="BILL_DB_NAME")
+    user: str = Field(..., env="BILL_DB_USERNAME")
+    password: str = Field(..., env="BILL_DB_PASSWORD")
+    host: Optional[str] = Field(..., env="BILL_DB_HOST")
+    port: int = Field(..., env="BILL_DB_PORT")
 
 
 class Config:

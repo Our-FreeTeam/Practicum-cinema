@@ -8,13 +8,13 @@ Create Date: 2023-07-05 22:42:03.424550
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
 from sqlalchemy import DDL
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 
-from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+from sql_app.triggers import subscription_history_trigger, payment_history_trigger, \
+    subscription_type_history_trigger, \
     refund_history_trigger
 
 revision = 'a070fecf1016'
@@ -46,6 +46,7 @@ def upgrade() -> None:
     sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
     sa.Column('payment_amount', sa.DECIMAL(precision=None), nullable=False),
     sa.Column('payment_status', sa.String(), nullable=True),
+    sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('payment_method_id', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -64,7 +65,10 @@ def upgrade() -> None:
     sa.Column('payment_id', UUID(as_uuid=True), nullable=True),
     sa.Column('refund_amount', sa.DECIMAL(precision=None), nullable=False),
     sa.Column('refund_status', sa.String(), nullable=False),
+    sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('external_refund_id', sa.String(), nullable=False),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+
     sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -79,7 +83,6 @@ def upgrade() -> None:
     sa.Column('payment_id', UUID(as_uuid=True), nullable=False),
     sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_type', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['content.person.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('payment_history',
@@ -114,14 +117,16 @@ def upgrade() -> None:
     sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_type', sa.String(), nullable=False),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+
     sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['refund_amount'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_trigger(subscription_history_trigger)
-    op.create_trigger(payment_history_trigger)
-    op.create_trigger(subscription_type_history_trigger)
-    op.create_trigger(refund_history_trigger)
+    # op.create_entity(subscription_history_trigger)
+    # op.create_entity(payment_history_trigger)
+    # op.create_entity(subscription_type_history_trigger)
+    # op.create_entity(refund_history_trigger)
     # ### end Alembic commands ###
 
 
@@ -135,8 +140,8 @@ def downgrade() -> None:
     op.drop_table('subscription_type_history')
     op.drop_table('payment_history')
     op.drop_table('subscription_history')
-    op.drop_trigger(subscription_history_trigger)
-    op.drop_trigger(payment_history_trigger)
-    op.drop_trigger(subscription_type_history_trigger)
-    op.drop_trigger(refund_history_trigger)
+    # op.drop_trigger(subscription_history_trigger)
+    # op.drop_trigger(payment_history_trigger)
+    # op.drop_trigger(subscription_type_history_trigger)
+    # op.drop_trigger(refund_history_trigger)
     # ### end Alembic commands ###

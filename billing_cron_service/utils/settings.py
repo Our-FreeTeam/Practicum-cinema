@@ -35,6 +35,16 @@ class Settings(BaseSettings):
     rabbitmq_port: int = Field(..., env='RABBIT_PORT')
     rabbitmq_subscription_queue: str = Field(..., env='RABBIT_SUBSCRIPTION_QUEUE')
 
+    rabbitmq_exchange = 'delayed_exchange'
+    rabbitmq_queue_name: str = Field(..., env='RABBIT_SUBSCRIPTION_QUEUE')
+
+    rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
+    rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
+
+    rabbitmq_uri = f"amqp://guest:guest@rabbitmq:5672/filestream"
+
+    KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
+    KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
 
 class Config:
     env_file = '.env'

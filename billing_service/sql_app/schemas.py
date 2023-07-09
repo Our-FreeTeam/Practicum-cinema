@@ -49,7 +49,6 @@ class SubscriptionType(BaseOrjsonModel):
         orm_mode = True
 
 
-
 class Payment(BaseOrjsonModel):
     id: UUID
     subscription_id: UUID
@@ -64,6 +63,7 @@ class Refund(BaseOrjsonModel):
     payment_id: UUID
     refund_amount: Decimal
     refund_status: str
+    subscription_id: UUID
     external_refund_id: str
     refund_date: datetime | None = datetime.now()
 
@@ -107,6 +107,7 @@ class RefundHistory(BaseOrjsonModel):
     payment_id: UUID
     refund_amount: Decimal
     refund_status: str
+    subscription_id: UUID
     external_refund_id: str
     refund_date: datetime
     operation_date: datetime
