@@ -7,7 +7,8 @@ from sqlalchemy import pool
 from alembic import context
 
 from models.models import metadata
-from utils.triggers import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+from service.triggers import subscription_history_trigger, payment_history_trigger, \
+    subscription_type_history_trigger, \
     refund_history_trigger
 from core.config import settings
 

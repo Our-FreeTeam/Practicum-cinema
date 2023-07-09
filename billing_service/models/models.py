@@ -6,7 +6,7 @@ Base = declarative_base()
 metadata = MetaData()
 
 
-class Subscription(Base):
+class Subscriptions(Base):
     __tablename__ = "subscription"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     user_id = Column(UUID(as_uuid=True))
