@@ -1,22 +1,23 @@
 sql = """
-    SELECT sub.user_id, sub.subscription_type, sub_type.amount
-      FROM subscription sub
-      LEFT JOIN subscription_type sub_type on sub.id = sub_type.subscription_id
-     WHERE DATEDIFF(day, datetime.datetime.now(), sub.end_date) < 4 AND sub.is_active = 1
+    SELECT sub.user_id, sub_type.name as subscription_name, sub_type.amount
+    FROM subscription sub
+    LEFT JOIN subscription_type sub_type on sub.subscription_type_id = sub_type.id
+    WHERE date_part('day', CURRENT_DATE - sub.end_date) < 4 AND sub.is_active = TRUE
     ORDER BY sub.start_date;
 """
 
 sql_auto_sub = """
-    SELECT sub.user_id, p.payment_method_id, sub.subscription_type, sub_type.amount
-      FROM subscription sub
-      LEFT JOIN subscription_type sub_type on sub.id = sub_type.subscription_id
-      LEFT JOIN payment p on sub.id = p.subscription_id
-     WHERE DATEDIFF(day, datetime.datetime.now(), sub.end_date) < 4 AND sub.is_active = 1
+    SELECT sub.user_id, p.payment_method_id, sub_type.name as subscription_name, sub_type.amount
+    FROM subscription sub
+    LEFT JOIN subscription_type sub_type on sub.subscription_type_id = sub_type.id
+    LEFT JOIN payment p on sub.id = p.subscription_id
+    WHERE date_part('day', CURRENT_DATE - sub.end_date) < 4 AND sub.is_active = TRUE
     ORDER BY sub.start_date;
 """
 
-update_subscription_history = """
-    CREATE OR REPLACE FUNCTION process_sub_history_audit_audit() RETURNS TRIGGER AS $subscription_history_trigger$
+subscription_history_func = """
+    CREATE OR REPLACE FUNCTION process_subscription_history_audit() 
+    RETURNS TRIGGER AS $subscription_history_trigger$
         BEGIN
             --
             -- Create a row in subscription_history to reflect the operation performed on emp,
@@ -35,15 +36,12 @@ update_subscription_history = """
             END IF;
             RETURN NULL; -- result is ignored since this is an AFTER trigger
         END;
-    $subscription_history$ LANGUAGE plpgsql;
-    
-    CREATE TRIGGER subscription_history_trigger
-    AFTER INSERT OR UPDATE OR DELETE ON subscription_history
-        FOR EACH ROW EXECUTE PROCEDURE process_sub_history_audit_audit();
+    $subscription_history_trigger$ LANGUAGE plpgsql;
 """
 
-update_subscription_type_history = """
-    CREATE OR REPLACE FUNCTION process_subscription_type_history_audit() RETURNS TRIGGER AS $subscription_type_history_trigger$
+subscription_type_history_func = """
+    CREATE OR REPLACE FUNCTION process_subscription_type_history_audit() 
+    RETURNS TRIGGER AS $subscription_type_history_trigger$
         BEGIN
             --
             -- Create a row in subscription_type to reflect the operation performed on emp,
@@ -62,15 +60,12 @@ update_subscription_type_history = """
             END IF;
             RETURN NULL; -- result is ignored since this is an AFTER trigger
         END;
-    $subscription_type_history$ LANGUAGE plpgsql;
-
-    CREATE TRIGGER subscription_type_history_trigger
-    AFTER INSERT OR UPDATE OR DELETE ON subscription_type_history
-        FOR EACH ROW EXECUTE PROCEDURE process_subscription_type_history_audit();
+    $subscription_type_history_trigger$ LANGUAGE plpgsql;
 """
 
-update_payment_history = """
-    CREATE OR REPLACE FUNCTION process_payment_history_audit() RETURNS TRIGGER AS $payment_history_trigger$
+payment_history_func = """
+    CREATE OR REPLACE FUNCTION process_payment_history_audit() 
+    RETURNS TRIGGER AS $payment_history_trigger$
         BEGIN
             --
             -- Create a row in payment_history to reflect the operation performed on emp,
@@ -89,15 +84,12 @@ update_payment_history = """
             END IF;
             RETURN NULL; -- result is ignored since this is an AFTER trigger
         END;
-    $payment_history$ LANGUAGE plpgsql;
-
-    CREATE TRIGGER payment_history_trigger
-    AFTER INSERT OR UPDATE OR DELETE ON payment_history
-        FOR EACH ROW EXECUTE PROCEDURE process_payment_history_audit();
+    $payment_history_trigger$ LANGUAGE plpgsql;
 """
 
-update_refund_history = """
-    CREATE OR REPLACE FUNCTION process_refund_history_audit() RETURNS TRIGGER AS $refund_history_trigger$
+refund_history_func = """
+    CREATE OR REPLACE FUNCTION process_refund_history_audit() 
+    RETURNS TRIGGER AS $refund_history_trigger$
         BEGIN
             --
             -- Create a row in refund_history to reflect the operation performed on emp,
@@ -116,9 +108,62 @@ update_refund_history = """
             END IF;
             RETURN NULL; -- result is ignored since this is an AFTER trigger
         END;
-    $refund_history$ LANGUAGE plpgsql;
+    $refund_history_trigger$ LANGUAGE plpgsql;
+"""
 
+subscription_history_trigger = """
+    CREATE TRIGGER subscription_history_trigger
+    AFTER INSERT OR UPDATE OR DELETE ON subscription_history
+        FOR EACH ROW EXECUTE PROCEDURE process_subscription_history_audit();
+"""
+
+subscription_type_history_trigger = """
+    CREATE TRIGGER subscription_type_history_trigger
+    AFTER INSERT OR UPDATE OR DELETE ON subscription_type_history
+        FOR EACH ROW EXECUTE PROCEDURE process_subscription_type_history_audit();
+"""
+
+payment_history_trigger = """
+    CREATE TRIGGER payment_history_trigger
+    AFTER INSERT OR UPDATE OR DELETE ON payment_history
+        FOR EACH ROW EXECUTE PROCEDURE process_payment_history_audit();
+"""
+
+refund_history_trigger = """
     CREATE TRIGGER refund_history_trigger
     AFTER INSERT OR UPDATE OR DELETE ON refund_history
         FOR EACH ROW EXECUTE PROCEDURE process_refund_history_audit();
+"""
+
+# Удаление таблиц и триггеров
+drop_subscription_history_func = """
+    DROP FUNCTION IF EXISTS process_subscription_history_audit();
+"""
+
+drop_payment_history_func = """
+    DROP FUNCTION IF EXISTS process_subscription_type_history_audit();
+"""
+
+drop_subscription_type_history_func = """
+    DROP FUNCTION IF EXISTS process_payment_history_audit();
+"""
+
+drop_refund_history_func = """
+    DROP FUNCTION IF EXISTS process_refund_history_audit();
+"""
+
+drop_subscription_history_trigger = """
+    DROP TRIGGER IF EXISTS subscription_history_trigger;
+"""
+
+drop_payment_history_trigger = """
+    DROP TRIGGER IF EXISTS subscription_type_history_trigger;
+"""
+
+drop_subscription_type_history_trigger = """
+    DROP TRIGGER IF EXISTS payment_history_trigger;
+"""
+
+drop_refund_history_trigger = """
+    DROP TRIGGER IF EXISTS refund_history_trigger;
 """

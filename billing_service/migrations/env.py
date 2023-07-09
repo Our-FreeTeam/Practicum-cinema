@@ -6,19 +6,19 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from sql_app.triggers import subscription_history_trigger, payment_history_trigger, \
-    subscription_type_history_trigger, refund_history_trigger
 from models.models import metadata
 
 from core.config import settings
+from sql_app.triggers import trigger_subscription_history, trigger_payment_history, trigger_subscription_type_history, \
+    trigger_refund_history
 
 # Регистрация триггеров для отслеживания изменений при выполнении миграций в алемдбике
 register_entities(
     entities=[
-        subscription_history_trigger,
-        payment_history_trigger,
-        subscription_type_history_trigger,
-        refund_history_trigger
+        trigger_subscription_history,
+        trigger_payment_history,
+        trigger_subscription_type_history,
+        trigger_refund_history
     ]
 )
 # this is the Alembic Config object, which provides

@@ -13,9 +13,24 @@ from sqlalchemy import DDL
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 
-from sql_app.triggers import subscription_history_trigger, payment_history_trigger, \
-    subscription_type_history_trigger, \
+from sql_app.sql import (
+    drop_subscription_history_trigger,
+    drop_payment_history_trigger,
+    drop_subscription_type_history_trigger,
+    drop_refund_history_trigger,
+    drop_subscription_history_func,
+    drop_payment_history_func,
+    drop_subscription_type_history_func,
+    drop_refund_history_func,
+    subscription_history_func,
+    subscription_type_history_func,
+    payment_history_func,
+    refund_history_func,
+    subscription_history_trigger,
+    subscription_type_history_trigger,
+    payment_history_trigger,
     refund_history_trigger
+)
 
 revision = 'a070fecf1016'
 down_revision = None
@@ -54,10 +69,8 @@ def upgrade() -> None:
     op.create_table('subscription_type',
     sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('subscription_id', UUID(as_uuid=True), nullable=True),
     sa.Column('amount', sa.DECIMAL(), nullable=False),
     sa.Column('is_active', sa.BOOLEAN(), nullable=False),
-    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('refund',
@@ -100,12 +113,10 @@ def upgrade() -> None:
     op.create_table('subscription_type_history',
     sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
-    sa.Column('subscription_id', UUID(as_uuid=True), nullable=True),
     sa.Column('amount', sa.DECIMAL(precision=None), nullable=False),
     sa.Column('is_active', sa.BOOLEAN(), nullable=False),
     sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_type', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('refund_history',
@@ -123,10 +134,14 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['refund_amount'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    # op.create_entity(subscription_history_trigger)
-    # op.create_entity(payment_history_trigger)
-    # op.create_entity(subscription_type_history_trigger)
-    # op.create_entity(refund_history_trigger)
+    op.execute(subscription_history_func)
+    op.execute(subscription_type_history_func)
+    op.execute(payment_history_func)
+    op.execute(refund_history_func)
+    op.execute(subscription_history_trigger)
+    op.execute(subscription_type_history_trigger)
+    op.execute(payment_history_trigger)
+    op.execute(refund_history_trigger)
     # ### end Alembic commands ###
 
 
@@ -140,8 +155,12 @@ def downgrade() -> None:
     op.drop_table('subscription_type_history')
     op.drop_table('payment_history')
     op.drop_table('subscription_history')
-    # op.drop_trigger(subscription_history_trigger)
-    # op.drop_trigger(payment_history_trigger)
-    # op.drop_trigger(subscription_type_history_trigger)
-    # op.drop_trigger(refund_history_trigger)
+    op.execute(drop_subscription_history_func)
+    op.execute(drop_payment_history_func)
+    op.execute(drop_subscription_type_history_func)
+    op.execute(drop_refund_history_func)
+    op.execute(drop_subscription_history_trigger)
+    op.execute(drop_payment_history_trigger)
+    op.execute(drop_subscription_type_history_trigger)
+    op.execute(drop_refund_history_trigger)
     # ### end Alembic commands ###
