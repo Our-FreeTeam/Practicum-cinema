@@ -38,7 +38,7 @@ def get_user_email(user_id):
     return email
 
 
-def get_users_list(sql):
+def get_user_list_from_postgres(sql):
     with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
         cur = pg_connect.cursor()
         cur.execute(sql)
@@ -48,7 +48,7 @@ def get_users_list(sql):
 
 
 @rabbit_conn
-async def rabbit_send(mail_list, time_shift, channel, queue_name):
+async def rabbit_send(mail_list, time_shift, channel, queue_name, flag=False ):
 
     # Declare the delayed exchange
     exchange = await channel.declare_exchange(
@@ -66,7 +66,7 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name):
     await queue.bind(settings.rabbitmq_exchange, settings.rabbitmq_queue_name)
 
     processed_count = 0
-    if len(mail_list[0]) > 1:
+    if flag:
 
         for el in mail_list:
             amount = el[1]
@@ -94,10 +94,10 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name):
                 )
                 processed_count += 1
 
-        logging.info("Emails send to delayed q: {:d}".format(processed_count))
+    logging.info("Emails send to delayed q: {:d}".format(processed_count))
 
 
-def get_user_list():
+def get_user_list_from_keycloak():
     users = keycloak_admin.get_users({})
     logging.info("Getting user list from KC...")
     user_list = {}
@@ -163,10 +163,10 @@ async def main():
         if settings.debug_mode == 1:
             logging.warning("Debug mode enabled")
 
-        emails_list = get_user_list()
+        emails_list = get_user_list_from_keycloak()
 
-        users_payments = get_users_list(sql_get_payment)
-        users_refunds = get_users_list(sql_get_refund)
+        users_payments = get_user_list_from_postgres(sql_get_payment)
+        users_refunds = get_user_list_from_postgres(sql_get_refund)
 
         if emails_list:
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
@@ -184,7 +184,8 @@ async def main():
             await rabbit_send(
                 emails_list=users_payments,
                 time_shift=1,
-                queue_name=settings.rabbitmq_queue_name
+                queue_name=settings.rabbitmq_queue_name,
+                flag=True
             )
 
         if users_refunds:
@@ -199,7 +200,8 @@ async def main():
             await rabbit_send(
                 emails_list=users_refunds,
                 time_shift=1,
-                queue_name=settings.rabbitmq_queue_name
+                queue_name=settings.rabbitmq_queue_name,
+                flag=True
             )
 
 

@@ -30,7 +30,6 @@ class SubscriptionType(Base):
 class Payment(Base):
     __tablename__ = "payment"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
-    user_id = Column("user_id", UUID(as_uuid=True), ForeignKey("content.person.id", ondelete="CASCADE"))
     subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
     payment_amount = Column(DECIMAL(precision=None), nullable=False)
     payment_status = Column(String, nullable=True)
@@ -76,7 +75,6 @@ class SubscriptionTypeHistory(Base):
 class PaymentHistory(Base):
     __tablename__ = "payment_history"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
-    user_id = Column("user_id", UUID, ForeignKey("content.person.id", ondelete="CASCADE"))
     subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
     payment_amount = Column(DECIMAL(precision=None), nullable=False)
     payment_status = Column(String, nullable=True)
