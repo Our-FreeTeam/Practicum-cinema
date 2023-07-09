@@ -31,7 +31,6 @@ class Subscription(BaseOrjsonModel):
     start_date: datetime | None = datetime.now()
     end_date: datetime | None
     subscription_type_id: UUID
-    payment_id: UUID
     is_active: bool | None
     is_repeatable: bool
 
@@ -45,6 +44,10 @@ class SubscriptionType(BaseOrjsonModel):
     subscription_id: UUID
     amount: Decimal
     is_active: bool
+
+    class Config:
+        orm_mode = True
+
 
 
 class Payment(BaseOrjsonModel):
