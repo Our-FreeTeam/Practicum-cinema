@@ -28,7 +28,7 @@ fi
 
 
 
-sh /opt/app/run_em.sh
+python3 /opt/app/utils/email_to_queue.py
 
 #cron -f
 busybox syslogd -C; cron -L 2 -f

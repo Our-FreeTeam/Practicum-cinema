@@ -38,6 +38,13 @@ class Settings(BaseSettings):
 
     debug_mode: int = Field(0, env='MAILCRON_DEBUG')
 
+class PGDB(BaseSettings):
+    dbname: str = Field(..., env="BILL_DB_NAME")
+    user: str = Field(..., env="BILL_DB_USERNAME")
+    password: str = Field(..., env="BILL_DB_PASSWORD")
+    host: Optional[str] = Field(..., env="BILL_DB_HOST")
+    port: int = Field(..., env="BILL_DB_PORT")
+
 
 class Config:
     env_file = '.env'
@@ -45,3 +52,4 @@ class Config:
 
 
 settings = Settings()
+pgdb = PGDB()
