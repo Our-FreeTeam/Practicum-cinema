@@ -25,11 +25,12 @@ if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     echo "================ FIRST RUN ================"
 fi
 
-# TODO: изменить название скрипта
-python3 /opt/app/utils/queue_enrichment.py &
+# check users and send to Q
+python3 /opt/app/utils/put_users_to_queue.py
 
-# TODO: изменить название скрипта
-sh /opt/app/run_em.sh
+# process Q
+python3 /opt/app/utils/get_and_pay.py
+
 
 #cron -f
 busybox syslogd -C; cron -L 2 -f
