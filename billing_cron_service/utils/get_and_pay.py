@@ -1,8 +1,3 @@
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 import aiohttp
 import asyncio
 import aio_pika
@@ -26,14 +21,14 @@ async def main():
         async with queue.iterator() as queue_iter:
             async for message in queue_iter:
                 async with message.process():
-                    person_id, payment_id, payment_description, amount = message.body.decode().split(',')
-                    if person_id and payment_id and payment_description and amount:
-                        await make_payment(person_id, payment_id, payment_description, float(amount))
+                    user_id, payment_id, payment_description, amount = message.body.decode().split(',')
+                    if user_id and payment_id and payment_description and amount:
+                        await make_payment(user_id, payment_id, payment_description, float(amount))
                     else:
                         print("Error: Incorrect message format")
 
 
-async def make_payment(person_id, payment_id, payment_description, amount):
+async def make_payment(user_id, payment_id, payment_description, amount):
 
     payment_description = "OnlineCinema subscription for: " + payment_description
 
