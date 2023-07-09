@@ -41,7 +41,6 @@ class Subscription(BaseOrjsonModel):
 class SubscriptionType(BaseOrjsonModel):
     id: UUID
     name: str
-    subscription_id: UUID
     amount: Decimal
     is_active: bool
 
@@ -84,7 +83,6 @@ class SubscriptionHistory(BaseOrjsonModel):
 class SubscriptionTypeHistory(BaseOrjsonModel):
     id: UUID
     name: str
-    subscription_id: UUID
     amount: Decimal
     is_active: bool
     operation_date: datetime

@@ -1,30 +1,29 @@
 from alembic_utils.pg_trigger import PGTrigger
 
-from sql_app.sql import update_subscription_history, update_payment_history, \
-    update_subscription_type_history, \
-    update_refund_history
+from sql_app.sql import subscription_history_trigger, payment_history_trigger, subscription_type_history_trigger, \
+    refund_history_trigger
 
-subscription_history_trigger = PGTrigger(
+trigger_subscription_history = PGTrigger(
     schema="public",
-    signature="subscription_history_trigger",
+    signature="trigger_subscription_history",
     on_entity="public.subscription_history",
-    definition=update_subscription_history
+    definition=subscription_history_trigger
 )
-payment_history_trigger = PGTrigger(
+trigger_payment_history = PGTrigger(
     schema="public",
-    signature="payment_history_trigger",
+    signature="trigger_payment_history",
     on_entity="public.payment_history",
-    definition=update_payment_history
+    definition=payment_history_trigger
 )
-subscription_type_history_trigger = PGTrigger(
+trigger_subscription_type_history = PGTrigger(
     schema="public",
-    signature="subscription_type_history_trigger",
+    signature="trigger_subscription_type_history",
     on_entity="public.subscription_type_history",
-    definition=update_subscription_type_history
+    definition=subscription_type_history_trigger
 )
-refund_history_trigger = PGTrigger(
+trigger_refund_history = PGTrigger(
     schema="public",
-    signature="refund_history_trigger",
+    signature="trigger_refund_history",
     on_entity="public.refund_history",
-    definition=update_refund_history
+    definition=refund_history_trigger
 )

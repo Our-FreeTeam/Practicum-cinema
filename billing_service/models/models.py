@@ -22,7 +22,6 @@ class SubscriptionType(Base):
     __tablename__ = "subscription_type"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     name = Column(String, nullable=False)
-    subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
     amount = Column(DECIMAL(precision=None))
     is_active = Column(BOOLEAN)
 
@@ -66,7 +65,6 @@ class SubscriptionTypeHistory(Base):
     __tablename__ = "subscription_type_history"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
     name = Column(String, nullable=False)
-    subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
     amount = Column(DECIMAL(precision=None))
     is_active = Column(BOOLEAN)
     operation_date = Column(TIMESTAMP, nullable=False)
