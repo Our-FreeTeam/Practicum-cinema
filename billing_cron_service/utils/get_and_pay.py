@@ -4,7 +4,7 @@ import aio_pika
 import json
 import uuid
 
-from billing_cron_service.settings.settings import settings
+from settings.settings import settings
 
 shop_id = settings.KASSA_ACCOUNT_ID
 secret_key = settings.KASSA_SECRET_KEY

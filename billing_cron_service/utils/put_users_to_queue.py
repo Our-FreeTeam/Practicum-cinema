@@ -5,10 +5,10 @@ from contextlib import contextmanager
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from billing_cron_service.utils.backoff import backoff, log
-from billing_cron_service.db.sql import sql
-from billing_cron_service.settings.settings import settings, pgdb
-from utils.rabbit_connection import rabbit_conn
+from backoff import backoff, log
+from db.sql import sql
+from settings.settings import settings, pgdb
+from rabbit_connection import rabbit_conn
 
 
 @log
