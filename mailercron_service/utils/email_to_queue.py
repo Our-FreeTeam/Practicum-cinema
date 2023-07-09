@@ -32,9 +32,9 @@ def pg_conn_context(*args, **kwargs):
 
 def get_user_email(user_id):
     email = None
-    users = keycloak_admin.get_users(query={'id': user_id})
-    if users:
-        email = users[0]['email']
+    user = keycloak_admin.get_user(user_id)
+    if user:
+        email = user['email']
     return email
 
 

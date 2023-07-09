@@ -6,10 +6,10 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from billing_service.service.triggers import subscription_history_trigger, payment_history_trigger, \
+    subscription_type_history_trigger, refund_history_trigger
 from models.models import metadata
-from service.triggers import subscription_history_trigger, payment_history_trigger, \
-    subscription_type_history_trigger, \
-    refund_history_trigger
+
 from core.config import settings
 
 # Регистрация триггеров для отслеживания изменений при выполнении миграций в алемдбике
