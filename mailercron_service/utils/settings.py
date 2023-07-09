@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     rabbitmq_full_exchange = 'full_exchange'
     rabbitmq_full_queue: str = Field(..., env='RABBIT_FULL_QUEUE')
 
+
     rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
     rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
 

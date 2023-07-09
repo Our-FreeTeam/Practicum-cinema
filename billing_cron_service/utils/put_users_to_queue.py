@@ -7,8 +7,8 @@ import psycopg2
 from psycopg2.extras import DictCursor
 
 from backoff import backoff, log
-from db.sql import sql
-from settings.settings import settings, pgdb
+from sql import sql
+from settings import settings, pgdb
 from rabbit_connection import rabbit_conn
 
 

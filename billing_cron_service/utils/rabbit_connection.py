@@ -1,11 +1,7 @@
 import logging
-
 import aio_pika
 
 from settings import settings
-
-
-settings = settings.settings
 
 
 def rabbit_conn(func):

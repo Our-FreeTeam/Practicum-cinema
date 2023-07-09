@@ -46,6 +46,7 @@ def upgrade() -> None:
     sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
     sa.Column('payment_amount', sa.DECIMAL(precision=None), nullable=False),
     sa.Column('payment_status', sa.String(), nullable=True),
+    sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('payment_method_id', sa.String(), nullable=False),
     sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
@@ -64,7 +65,10 @@ def upgrade() -> None:
     sa.Column('payment_id', UUID(as_uuid=True), nullable=True),
     sa.Column('refund_amount', sa.DECIMAL(precision=None), nullable=False),
     sa.Column('refund_status', sa.String(), nullable=False),
+    sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('external_refund_id', sa.String(), nullable=False),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+
     sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -113,6 +117,8 @@ def upgrade() -> None:
     sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
     sa.Column('operation_type', sa.String(), nullable=False),
+    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+
     sa.ForeignKeyConstraint(['payment_id'], ['payment.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['refund_amount'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
