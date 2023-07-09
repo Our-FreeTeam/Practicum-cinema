@@ -30,6 +30,14 @@ def pg_conn_context(*args, **kwargs):
     connection.close()
 
 
+def get_user_email(user_id):
+    email = None
+    users = keycloak_admin.get_users(query={'id': user_id})
+    if users:
+        email = users[0]['email']
+    return email
+
+
 def get_users_list(sql):
     with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
         cur = pg_connect.cursor()
@@ -61,16 +69,16 @@ async def rabbit_send(mail_list, time_shift, channel, queue_name):
     if len(mail_list[0]) > 1:
 
         for el in mail_list:
-            payment_amount = el[0]
-            payment_status = el[1]
-            payment_date = el[2]
-            prep_data = f"Success operation. Status: {payment_status}. Amount: {payment_amount}." \
-                        f"Operation date: {payment_date}"
+            amount = el[1]
+            status = el[2]
+            pay_date = el[3]
+            email = el[4]
+            prep_data = f"{email}:Success operation - {status}.Amount - {amount}. Operation date - {pay_date}"
             await exchange.publish(
                 routing_key=settings.rabbitmq_queue_name,
                 message=Message(bytes(prep_data, "utf-8"),
                                 content_type="text/plain",
-                                headers={'x-delay': time_shift * 1000}),
+                                headers={'x-delay': time_shift}),
             )
             processed_count += 1
 
@@ -164,7 +172,14 @@ async def main():
             logging.info("Process emails list from KC, total count:" + str(len(emails_list)))
             await process_list(emails_list)
 
-        if len(users_payments) > 0:
+        if users_payments:
+            for user in users_payments:
+                user = list(user)
+                user_id = user[0]
+                user_email = get_user_email(user_id)
+                user.append(user_email)
+                user = tuple(user)
+
             logging.info("Process emails list from Postgres, total count:" + str(len(users_payments)))
             await rabbit_send(
                 emails_list=users_payments,
@@ -172,7 +187,14 @@ async def main():
                 queue_name=settings.rabbitmq_queue_name
             )
 
-        if len(users_refunds) > 0:
+        if users_refunds:
+            for user in users_refunds:
+                user = list(user)
+                user_id = user[0]
+                user_email = get_user_email(user_id)
+                user.append(user_email)
+                user = tuple(user)
+
             logging.info("Process emails list from KC, total count:" + str(len(users_refunds)))
             await rabbit_send(
                 emails_list=users_refunds,
