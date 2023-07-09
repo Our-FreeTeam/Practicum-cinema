@@ -93,7 +93,6 @@ class SubscriptionTypeHistory(BaseOrjsonModel):
 
 class PaymentHistory(BaseOrjsonModel):
     id: UUID
-    user_id: UUID
     subscription_id: UUID
     payment_amount: Decimal
     payment_status: str
