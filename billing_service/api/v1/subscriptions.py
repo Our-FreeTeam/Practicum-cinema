@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from fastapi import APIRouter, Depends
@@ -19,6 +20,9 @@ async def add_subscription(subscription: Subscription, session: AsyncSession = D
 
     subs_result = await subs_service.send_subscription_external(subscription.subscription_type_id, session)
     if subs_result:
+
+        logging.info(subs_result)
+
         await subs_service.update_subscription_db()
         await subs_service.update_subscription_role()
         await subs_service.send_subscription_notification()
