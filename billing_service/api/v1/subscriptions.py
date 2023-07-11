@@ -1,37 +1,57 @@
 import logging
 from datetime import datetime
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.dependency import get_db
 from service import subscriptions as subs_service
-from service.subscriptions import check_saving_payment_method
-from sql_app.schemas import Subscription
+from service.subscriptions import check_saving_payment_method, create_subscription_db
+from sql_app.schemas import Subscription, ConfirmationUrl
 
 router = APIRouter()
 
 
-@router.post("/add")
-async def add_subscription(subscription: Subscription, session: AsyncSession = Depends(get_db)):
+@router.post("/add_1_step", response_model=ConfirmationUrl)
+async def add_subscription_1_step(request: Request,
+                                  subscription: Subscription,
+                                  session: AsyncSession = Depends(get_db)):
     check_saving_payment_method(subscription)
 
     active_subscription = await subs_service.get_active_subscription(user_id=subscription.user_id, db=session)
 
     subs_duration = subs_service.get_subscription_duration(subscription.subscription_type_id)
-    new_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
+    end_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
 
-    subs_result = await subs_service.send_subscription_external(
+    subscription_data = {
+        'user_id': request.get('user_id'),
+        'start_date': datetime.now(),
+        'end_date': end_subs_date,
+        'subscription_type_id': subscription.subscription_type_id,
+        'is_active': False,
+        'is_repeatable': subscription.is_repeatable
+    }
+    subscription_id = await create_subscription_db(subscription_data, session)
+    logging.info(subscription_id, subscription_data)
+
+    payment_data, confirmation_url = await subs_service.send_subscription_external(
         subscription.subscription_type_id,
         subscription.save_payment_method,
         session)
-    if subs_result:
+    payment_data['subscription_id'] = subscription_id
+    payment_id = await subs_service.create_payment_db(payment_data, session)
+    logging.info(payment_id, payment_data)
 
-        logging.info(subs_result)
+    await session.commit()
+    return {'url': confirmation_url}
 
-        await subs_service.update_subscription_db()
-        await subs_service.update_subscription_role()
-        await subs_service.send_subscription_notification()
+
+@router.post("/add_2_step")
+async def add_subscription_2_step():
+    #     parse_response
+    subs_service.update_subscription_db()
+    await subs_service.update_subscription_role()
+    await subs_service.send_subscription_notification()
 
     #TODO:
     # Отправляем запрос в сервис оплаты подписки, передаем в него название компании, сумму, название подписки.

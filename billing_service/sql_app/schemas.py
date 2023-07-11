@@ -60,7 +60,6 @@ class Payment(BaseOrjsonModel):
 
 class Refund(BaseOrjsonModel):
     id: UUID
-    payment_id: UUID
     refund_amount: Decimal
     refund_status: str
     subscription_id: UUID
@@ -76,7 +75,6 @@ class SubscriptionHistory(BaseOrjsonModel):
     subscription_type_id: str
     is_active: bool
     is_repeatable: bool
-    payment_id: UUID
     operation_date: datetime
     operation_type: str
 
@@ -103,7 +101,6 @@ class PaymentHistory(BaseOrjsonModel):
 
 class RefundHistory(BaseOrjsonModel):
     id: UUID
-    payment_id: UUID
     refund_amount: Decimal
     refund_status: str
     subscription_id: UUID
@@ -111,3 +108,7 @@ class RefundHistory(BaseOrjsonModel):
     refund_date: datetime
     operation_date: datetime
     operation_type: str
+
+
+class ConfirmationUrl(BaseOrjsonModel):
+    url: str

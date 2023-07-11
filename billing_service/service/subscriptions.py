@@ -1,15 +1,19 @@
+import json
 import uuid
+from datetime import datetime
+from http import HTTPStatus
 
+from fastapi import HTTPException
 from yookassa import Configuration, Payment
 
 from monthdelta import monthdelta
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import UUID
 
 from core import messages
 from core.config import settings
-from models.models import Subscription, SubscriptionType
+from models.models import Subscription, SubscriptionType, Payment as PaymentModel
 
 
 async def get_active_subscription(user_id: UUID, db: AsyncSession):
@@ -58,10 +62,28 @@ async def send_subscription_external(
         "description": f" Оплата подписки '{subscription_data.name}'"
     }
 
-    payment = await Payment.create(body, uuid.uuid4())
+    payment = json.loads((await Payment.create(body, uuid.uuid4())).json())
+    payment_data = {
+        'payment_amount': payment['amount']['value'],
+        'payment_status': payment['status'],
+        'payment_date': datetime.strptime(payment['created_at'], '%Y-%m-%dT%H:%M:%S.%fZ'),
+        'payment_method_id': payment['id']
+    }
+    return payment_data, payment['confirmation']['confirmation_url']
 
-    print(payment.json())
-    return payment
+
+async def create_subscription_db(subscription_data: dict, db: AsyncSession):
+    subs_id = await db.execute(insert(Subscription)
+                               .values(**subscription_data)
+                               .returning(Subscription.id))
+    return subs_id.fetchone()[0]
+
+
+async def create_payment_db(payment_data: str, db: AsyncSession):
+    payment_id = await db.execute(insert(PaymentModel)
+                                  .values(**payment_data)
+                                  .returning(PaymentModel.id))
+    return payment_id.fetchone()[0]
 
 
 async def update_subscription_db():
