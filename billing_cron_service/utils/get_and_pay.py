@@ -26,12 +26,16 @@ async def main():
                         amount = message.body.decode().split(',')
 
                     if user_id and payment_id and payment_description and amount:
+                        logging.info("Going to make autopayment for user", user_id)
 
                         payment_processor = YooKassaPaymentProcessor(account_id=settings.KASSA_ACCOUNT_ID,
                                                                      secret_key=settings.KASSA_SECRET_KEY)
-                        asyncio.run(payment_processor.make_payment(payment_id,
-                                                                   float(amount),
-                                                                   payment_description))
+
+                        result = await payment_processor.make_payment(payment_id,
+                                                                      float(amount),
+                                                                      payment_description)
+
+                        logging.debug("Payment result", result)
                     else:
                         logging.error("Error: Incorrect queue-message format")
 

@@ -1,8 +1,7 @@
 import uuid
-from http import HTTPStatus
 
-import aiohttp
-from fastapi import HTTPException
+from yookassa import Configuration, Payment
+
 from monthdelta import monthdelta
 from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,12 +36,11 @@ def get_subscription_duration(subscription_type_id: UUID) -> monthdelta:
 async def send_subscription_external(
         subscription_type_id: UUID,
         save_payment_method: bool,
-        db: AsyncSession) -> dict:
-    payment_url = 'https://api.yookassa.ru/v3/payments'
-    payment_id = uuid.uuid4()
-    headers = {'Idempotence-Key': str(payment_id),
-               'Content-Type': 'application/json'}
-    auth = aiohttp.BasicAuth(login=settings.KASSA_ACCOUNT_ID, password=settings.KASSA_SECRET_KEY)
+        db: AsyncSession):
+
+    Configuration.account_id = settings.KASSA_ACCOUNT_ID
+    Configuration.secret_key = settings.KASSA_SECRET_KEY
+
     subscription_data = await db.execute(select(SubscriptionType).
                                          where(SubscriptionType.id == subscription_type_id))
     subscription_data = subscription_data.fetchone()[0]
@@ -60,26 +58,10 @@ async def send_subscription_external(
         "description": f" Оплата подписки '{subscription_data.name}'"
     }
 
-    async with aiohttp.ClientSession() as session:
-        response = await session.post(
-            payment_url,
-            json=body,
-            headers=headers,
-            auth=auth,
-            verify_ssl=False
-        )
-        if response.status != HTTPStatus.OK:
-            raise HTTPException(
-                status_code=response.status,
-                detail=await response.text(),
-            )
-        response_json = await response.json()
-        ready_response = {
-            'payment_amount': response_json['amount']['value'],
-            'payment_date': response_json['created_at'],
-            'payment_status': response_json['status'],
-        }
-        return ready_response
+    payment = await Payment.create(body, uuid.uuid4())
+
+    print(payment.json())
+    return payment
 
 
 async def update_subscription_db():

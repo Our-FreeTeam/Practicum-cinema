@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import uuid
-import aiohttp
-import json
+
+from yookassa import Configuration, Payment
 
 
 class AbstractPaymentProcessor(ABC):
@@ -21,37 +21,21 @@ class AbstractPaymentProcessor(ABC):
 class YooKassaPaymentProcessor(AbstractPaymentProcessor):
 
     async def make_payment(self, payment_id, amount, description):
-        data = {
+        Configuration.account_id = self.account_id
+        Configuration.secret_key = self.secret_key
+
+        payment = await Payment.create({
             "amount": {
                 "value": str(amount),
                 "currency": "RUB"
             },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": "https://www.example.com/return_url"
+            },
             "capture": True,
             "payment_method_id": payment_id,
-            "description": description
-        }
+            "description": f" Оплата подписки '{description}'"
+        }, uuid.uuid4())
 
-        url = 'https://api.yookassa.ru/v3/payments'
-        headers = {
-            'Content-Type': 'application/json',
-            'Idempotence-Key': str(uuid.uuid4())
-        }
-
-        auth = aiohttp.BasicAuth(self.account_id, self.secret_key)
-
-        async with aiohttp.ClientSession(auth=auth) as session:
-            async with session.post(url, headers=headers, data=json.dumps(data)) as resp:
-                response = await resp.json()
-                return self.process_response(response)
-
-    def process_response(self, response):
-        payment_status = response.get('status')
-        payment_paid = response.get('paid')
-        payment_amount = response.get('amount', {}).get('value')
-        payment_captured_at = response.get('captured_at')
-        payment_method_title = response.get('payment_method', {}).get('title')
-        payment_test = response.get('test')
-
-        print(f'Status: {payment_status}, Paid: {payment_paid}, Amount: {payment_amount}, Captured At: {payment_captured_at}, Title: {payment_method_title}, Test: {payment_test}')
-        return payment_status, payment_paid, payment_amount, payment_captured_at, payment_method_title, payment_test
-
+        return payment.json()
