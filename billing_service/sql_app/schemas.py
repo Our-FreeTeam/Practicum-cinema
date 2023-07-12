@@ -112,3 +112,7 @@ class RefundHistory(BaseOrjsonModel):
 
 class ConfirmationUrl(BaseOrjsonModel):
     url: str
+
+
+class SubscriptionProcessing(BaseOrjsonModel):
+    external_data: list[dict]

@@ -1,13 +1,16 @@
 import logging
 from datetime import datetime
+from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core import messages
 from core.dependency import get_db
 from service import subscriptions as subs_service
-from service.subscriptions import check_saving_payment_method, create_subscription_db
-from sql_app.schemas import Subscription, ConfirmationUrl
+from service.subscriptions import check_saving_payment_method, create_subscription_db, parse_external_data, \
+    get_subscription_by_payment
+from sql_app.schemas import Subscription, ConfirmationUrl, SubscriptionProcessing
 
 router = APIRouter()
 
@@ -21,6 +24,9 @@ async def add_subscription_1_step(request: Request,
     active_subscription = await subs_service.get_active_subscription(user_id=subscription.user_id, db=session)
 
     subs_duration = subs_service.get_subscription_duration(subscription.subscription_type_id)
+    if not subs_duration:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_TYPE_NOT_FOUND)
+
     end_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
 
     subscription_data = {
@@ -47,16 +53,22 @@ async def add_subscription_1_step(request: Request,
 
 
 @router.post("/add_2_step")
-async def add_subscription_2_step():
-    #     parse_response
-    subs_service.update_subscription_db()
+async def add_subscription_2_step(request: Request,
+                                  subscription: SubscriptionProcessing,
+                                  session: AsyncSession = Depends(get_db)):
+    parsed_result = parse_external_data(subscription.external_data)
+    for row in parsed_result:
+        await process_one_row(row, session)
+    await session.commit()
+
+
+async def process_one_row(row: dict, db: AsyncSession):
+    payment_id = row['id']
+    subscription_id = await get_subscription_by_payment(payment_id, db)
+    await subs_service.update_subscription_db(id=subscription_id, is_active=True, db=db)
+    await subs_service.update_payment_db(id=payment_id,
+                                         payment_method_id=row['payment_method_id'],
+                                         payment_status=row['status'],
+                                         db=db)
     await subs_service.update_subscription_role()
     await subs_service.send_subscription_notification()
-
-    #TODO:
-    # Отправляем запрос в сервис оплаты подписки, передаем в него название компании, сумму, название подписки.
-    # Если оплата неуспешна, возвращаем сообщение о неуспешности оплаты и просьбой повторить оплату позже.
-    # Если оплата успешна:
-    # 1) обновить в БД информацию о наличии подписки
-    # 2) добавляем пользователю роль подписчика
-    # 3) формируем нотификацию об успешной оплате
