@@ -23,6 +23,8 @@ class Settings(BaseSettings):
 
     DB_URI: AsyncPostgresDsn | None
 
+    CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
+
     @validator('DB_URI')
     def construct_db_uri(cls, v: str | None, values: dict):
         if isinstance(v, str):

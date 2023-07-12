@@ -13,7 +13,6 @@ class Subscription(Base):
     start_date = Column(TIMESTAMP, default=func.now())
     end_date = Column(TIMESTAMP)
     subscription_type_id = Column(UUID(as_uuid=True), nullable=True)
-    payment_id = Column(UUID(as_uuid=True), nullable=False)
     is_active = Column(BOOLEAN)
     is_repeatable = Column(BOOLEAN)
 
@@ -39,7 +38,6 @@ class Payment(Base):
 class Refund(Base):
     __tablename__ = "refund"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
-    payment_id = Column(UUID(as_uuid=True), ForeignKey("payment.id", ondelete="CASCADE"))
     refund_amount = Column(DECIMAL(precision=None), nullable=False)
     refund_status = Column(String, nullable=True)
     subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
@@ -56,7 +54,6 @@ class SubscriptionHistory(Base):
     subscription_type_id = Column(UUID(as_uuid=True), nullable=True)
     is_active = Column(BOOLEAN)
     is_repeatable = Column(BOOLEAN)
-    payment_id = Column(UUID(as_uuid=True), nullable=False)
     operation_date = Column(TIMESTAMP, nullable=False)
     operation_type = Column(String, nullable=False)
 
@@ -86,7 +83,6 @@ class PaymentHistory(Base):
 class RefundHistory(Base):
     __tablename__ = "refund_history"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=text("uuid_generate_v4()"))
-    payment_id = Column(UUID(as_uuid=True), ForeignKey("payment.id", ondelete="CASCADE"))
     refund_amount = Column(DECIMAL(precision=None), ForeignKey("subscription.id", ondelete="CASCADE"))
     refund_status = Column(String, nullable=True)
     subscription_id = Column(UUID(as_uuid=True), ForeignKey("subscription.id", ondelete="CASCADE"))
