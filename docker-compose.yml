@@ -278,6 +278,9 @@ services:
     build: billing_cron_service
     env_file:
       - .env
+    depends_on:
+      db_bill:
+        condition: service_started
 #    logging:
 #      driver: "fluentd"
 #      options:
@@ -291,6 +294,9 @@ services:
     env_file:
       - .env
     restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
 #    logging:
 #      driver: "fluentd"
 #      options:
