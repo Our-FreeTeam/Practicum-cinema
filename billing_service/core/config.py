@@ -25,6 +25,9 @@ class Settings(BaseSettings):
 
     CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
 
+    AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
+    AUTH_PASSWORD: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU_PSW')
+
     @validator('DB_URI')
     def construct_db_uri(cls, v: str | None, values: dict):
         if isinstance(v, str):
