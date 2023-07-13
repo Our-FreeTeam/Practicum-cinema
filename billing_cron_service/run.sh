@@ -28,10 +28,6 @@ fi
 # check users and send to Q
 python3 /opt/app/utils/put_users_to_queue.py
 
-# process Q
-python3 /opt/app/utils/get_and_pay.py
-
-
 #cron -f
 busybox syslogd -C; cron -L 2 -f
 

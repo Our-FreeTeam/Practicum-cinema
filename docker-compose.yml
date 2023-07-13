@@ -286,6 +286,19 @@ services:
     networks:
       - cinema_network
 
+  money_maker:
+    build: money_maker_service
+    env_file:
+      - .env
+    restart: on-failure
+#    logging:
+#      driver: "fluentd"
+#      options:
+#        fluentd-address: "host.docker.internal:24224"
+#        tag: "Billing Scheduler"
+    networks:
+      - cinema_network
+
 
   tests_ugc:
     build: tests_analytic/functional

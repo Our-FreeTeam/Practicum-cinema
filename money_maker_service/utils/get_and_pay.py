@@ -1,6 +1,7 @@
 import asyncio
 import aio_pika
 import logging
+import time
 
 from payment_prc import YooKassaPaymentProcessor
 
@@ -10,9 +11,7 @@ from settings import settings
 async def main():
     connection = await aio_pika.connect(
         host=settings.rabbitmq_host,
-        port=settings.rabbitmq_port,
-        login=settings.rabbitmq_user,
-        password=settings.rabbitmq_password)
+        port=settings.rabbitmq_port)
 
     async with connection:
         channel = await connection.channel()
@@ -42,5 +41,7 @@ async def main():
 
 if __name__ == "__main__":
     logging.basicConfig(format=settings.log_format, level="INFO")
+    logging.info("Pause for 10 sec")
+    time.sleep(10)
     logging.info("Going to take they money :) ")
     asyncio.run(main())
