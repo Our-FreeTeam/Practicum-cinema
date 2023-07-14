@@ -22,7 +22,7 @@ async def create_notification(
         request: Request,
         event: schemas.Event,
         session: AsyncSession = Depends(get_db),
-        connection=get_rabbit
+        connection=Depends(get_rabbit)
 ):
     """
     Create a notification with all the information:
