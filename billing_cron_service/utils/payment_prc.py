@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import uuid
 
+from core.config import settings
 from yookassa import Configuration, Payment
 
 
@@ -31,7 +32,7 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
             },
             "confirmation": {
                 "type": "redirect",
-                "return_url": "https://www.example.com/return_url"
+                "return_url": settings.CONFIRMATION_URL
             },
             "capture": True,
             "payment_method_id": payment_id,

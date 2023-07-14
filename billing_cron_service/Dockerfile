@@ -18,4 +18,6 @@ COPY . .
 
 RUN crontab /etc/cron.d/crontab
 
+RUN chmod +x /opt/app/run.sh
+
 ENTRYPOINT ["/opt/app/run.sh"]

@@ -2,7 +2,7 @@
 # local docker components
 
 import requests
-# import settings
+from settings import settings
 import logging
 
 def main():
@@ -20,7 +20,8 @@ def main():
 
         pay_data = last_entry['pay_data']
 
-        post_response = requests.post('http://billing_service:8200/api/v1/subscriptions/add_2_step',
+        post_response = requests.post(
+            settings.billing_service_url + '/api/v1/subscriptions/add_2_step',
             json=pay_data)
         if post_response.status_code == 200:
             logging.info("Job done")
@@ -29,6 +30,6 @@ def main():
         logging.error("There is error with request to webhook_log_service %d".format(response.status_code))
 
 if __name__ == "__main__":
-    logging.basicConfig(format="%(asctime)s:%(levelname)s:%(name)s:%(message)s", level="INFO")
+    logging.basicConfig(format=settings.log_format, level=settings.log_level)
     logging.info("Router started")
     main()

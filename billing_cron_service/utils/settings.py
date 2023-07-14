@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     keycloak_admin_login: str = Field(..., env='KEYCLOAK_ADMIN')
     keycloak_admin_password: str = Field(..., env='KEYCLOAK_ADMIN_PASSWORD')
     keycloak_service_email: str = Field(..., env='KEYCLOAK_SERVICE_EMAIL')
+
+
     log_format: str = Field(..., env='LOG_FORMAT')
     log_level: int = Field(..., env='LOG_LEVEL')
 
@@ -43,6 +45,14 @@ class Settings(BaseSettings):
 
     KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
     KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
+
+    CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
+
+    billing_service_url : str = Field(..., env='BILLING_SERVICE_URL')
+
+    keycloak_admin_password: str = Field(..., env="KEYCLOAK_ADMIN_PASSWORD")
+    keycloak_realm_su_psw: str = Field(..., env="KEYCLOAK_REALM_SU_PSW")
+
 
 class Config:
     env_file = '.env'
