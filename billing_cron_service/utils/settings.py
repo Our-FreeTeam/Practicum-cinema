@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     service_account: str = Field(..., env='KEYCLOAK_SERVICE_ACCOUNT')
 
     keycloak_admin_login: str = Field(..., env='KEYCLOAK_ADMIN')
-    keycloak_admin_password: str = Field(..., env='KEYCLOAK_ADMIN_PASSWORD')
+    keycloak_admin_password: str = Field(..., env='KK_ADMIN_PASSWORD')
     keycloak_service_email: str = Field(..., env='KEYCLOAK_SERVICE_EMAIL')
 
 
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     log_level: int = Field(..., env='LOG_LEVEL')
 
     keycloak_realm_su: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
-    keycloak_realm_su_psw: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU_PSW')
+    keycloak_realm_su_psw: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
     debug_mode: int = Field(0, env='BILLING_DEBUG')
 
@@ -49,10 +49,6 @@ class Settings(BaseSettings):
     CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
 
     billing_service_url : str = Field(..., env='BILLING_SERVICE_URL')
-
-    keycloak_admin_password: str = Field(..., env="KEYCLOAK_ADMIN_PASSWORD")
-    keycloak_realm_su_psw: str = Field(..., env="KEYCLOAK_REALM_SU_PSW")
-
 
 class Config:
     env_file = '.env'
