@@ -281,6 +281,7 @@ services:
     depends_on:
       db_bill:
         condition: service_started
+    restart: on-failure
 #    logging:
 #      driver: "fluentd"
 #      options:
