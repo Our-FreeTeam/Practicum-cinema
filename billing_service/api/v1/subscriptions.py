@@ -27,7 +27,7 @@ async def add_subscription_1_step(request: Request,
     if not subs_duration:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_TYPE_NOT_FOUND)
 
-    end_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
+    end_subs_date = (active_subscription[0].end_date if active_subscription else datetime.now()) + subs_duration
 
     subscription_data = {
         'user_id': request.get('user_id'),

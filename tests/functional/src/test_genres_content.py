@@ -9,7 +9,7 @@ from helpers import make_get_request
         (200, '/api/v1/genres/5b73b2c3-dac0-4c48-b917-a8efba4b3456', 4),
         (200, '/api/v1/genres/5b73b2c3-dac0-4c48-b917-a8efba4b3456', 4),
         (200, '/api/v1/genres/', 5),
-        (404, '/api/v1/genres/8886a39b-9a9f-4b1a-b8d7-139d1f5b5a92', 1),  # Жанрв с таким uuid нет
+        (404, '/api/v1/genres/8886a39b-9a9f-4b1a-b8d7-139d1f5b5a92', 1),  # Жанра с таким uuid нет
     ], ids=['Search for genre "Multiplication" by UUID',
             'Search for genre "Multiplication" by UUID from cache',
             'Show all genres from ES',

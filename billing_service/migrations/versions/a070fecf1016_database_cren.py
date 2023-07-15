@@ -13,6 +13,9 @@ from sqlalchemy import DDL
 from sqlalchemy import func
 from sqlalchemy.dialects.postgresql import UUID
 
+from migrations.data.subscriptions import insert_subscription
+
+from migrations.data.subscription_types import insert_subscription_type
 from sql_app.sql import (
     drop_subscription_history_trigger,
     drop_payment_history_trigger,
@@ -126,6 +129,8 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
+    op.execute(insert_subscription)
+    op.execute(insert_subscription_type)
     op.execute(subscription_history_func)
     op.execute(subscription_type_history_func)
     op.execute(payment_history_func)

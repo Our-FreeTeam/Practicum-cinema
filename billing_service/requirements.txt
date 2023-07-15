@@ -20,3 +20,5 @@ alembic_utils==0.8.1
 aiohttp==3.8.4
 greenlet==2.0.2
 yookassa-async==0.1.5
+pytest==7.2.0
+requests==2.31.0
