@@ -88,6 +88,15 @@
     "client": {
       "theatre": [
         {
+          "id": "6fcb6d6e-6434-42e7-8b26-2784acc26ed0",
+          "name": "subscriber",
+          "description": "",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "184474ca-6d98-49b1-983a-d839a2556ac2",
+          "attributes": {}
+        },
+        {
           "id": "9c1d6811-7d6a-4535-aecf-94314adf02b2",
           "name": "theatre_admin",
           "composite": false,
