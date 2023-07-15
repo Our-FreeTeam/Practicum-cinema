@@ -103,8 +103,8 @@ services:
       CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
     volumes:
       - ./_kafka_data/connect:/var/lib/kafka/data:rw
-      - ./kafka-config/connectors:/usr/share/kafka-plugins
-      - ./kafka-config/sink_conf:/etc/kafka-connect/jars
+#      - ./kafka-config/connectors:/usr/share/kafka-plugins
+#      - ./kafka-config/sink_conf:/etc/kafka-connect/jars
     networks:
       - cinema_network
 
@@ -174,51 +174,6 @@ services:
       KAFKA_REST_BOOTSTRAP_SERVERS: 'broker:29092'
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082"
       KAFKA_REST_SCHEMA_REGISTRY_URL: 'http://schema-registry:8084'
-    networks:
-      - cinema_network
-
-  analytical_service:
-    build: analytic-solution
-    image: analytic-image
-    hostname: analytical_service
-    env_file:
-      - .env
-    ports:
-      - "8004:8004"
-    depends_on:
-      - control-center
-      - redis_cache_ugc
-    networks:
-      - cinema_network
-
-  redis_cache_ugc:
-    build: redis_config_ugc
-    hostname: redis_ugc
-    ports:
-      - "6378:6378"
-    volumes:
-      - ./_redis_data_ugc:/opt/redis/db
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-p", "6378", "--raw", "incr", "ping" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    depends_on:
-      - control-center
-    networks:
-      - cinema_network
-
-  tests_analytic:
-    build: tests_analytic/functional
-    volumes:
-      - ./tests_analytic:/tests_analytic
-    env_file:
-      - .env
-    depends_on:
-      analytical_service:
-        condition: service_started
-      redis_cache_ugc:
-        condition: service_healthy
     networks:
       - cinema_network
 
