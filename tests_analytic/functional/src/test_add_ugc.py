@@ -19,7 +19,7 @@ keycloak_client_id = os.environ.get('KEYCLOAK_CLIENT_ID')
 keycloak_client_secret = os.environ.get('KEYCLOAK_SECRET_KEY')
 
 keycloak_admin_name = os.environ.get('KEYCLOAK_ADMIN')
-keycloak_admin_psw = os.environ.get('KEYCLOAK_ADMIN_PASSWORD')
+keycloak_admin_psw = os.environ.get('KK_ADMIN_PASSWORD')
 
 
 def get_user_id(user_name) -> str:

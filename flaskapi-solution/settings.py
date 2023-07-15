@@ -9,13 +9,13 @@ class Settings(BaseSettings):
     service_account: str = Field(..., env='KEYCLOAK_SERVICE_ACCOUNT')
 
     keycloak_admin_login: str = Field(..., env='KEYCLOAK_ADMIN')
-    keycloak_admin_password: str = Field(..., env='KEYCLOAK_ADMIN_PASSWORD')
+    keycloak_admin_password: str = Field(..., env='KK_ADMIN_PASSWORD')
     keycloak_service_email: str = Field(..., env='KEYCLOAK_SERVICE_EMAIL')
     log_format: str = Field(..., env='LOG_FORMAT')
     log_level: int = Field(..., env='LOG_LEVEL')
 
     keycloak_realm_su: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
-    keycloak_realm_su_psw: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU_PSW')
+    keycloak_realm_su_psw: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
     redis_host: str = Field(..., env='REDIS_HOST')
     redis_port: int = Field(..., env='REDIS_PORT')
