@@ -1,4 +1,5 @@
 from datetime import datetime
+from uuid import UUID
 
 from pydantic import BaseModel, EmailStr, validator
 
@@ -54,6 +55,11 @@ class RoleIds(BaseModel):
 
 class UserRole(BaseModel):
     user_name: str
+    role_name: str
+
+
+class UserIdRole(BaseModel):
+    user_id: UUID
     role_name: str
 
 

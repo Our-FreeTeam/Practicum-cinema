@@ -1,13 +1,14 @@
 import logging
 from datetime import datetime
 from http import HTTPStatus
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core import messages
 from core.dependency import get_db
-from service import subscriptions as subs_service
+from service import subscriptions as subs_service, auth
 from service.subscriptions import check_saving_payment_method, create_subscription_db, parse_external_data, \
     get_subscription_by_payment
 from sql_app.schemas import Subscription, ConfirmationUrl, SubscriptionProcessing
@@ -58,17 +59,17 @@ async def add_subscription_2_step(request: Request,
                                   session: AsyncSession = Depends(get_db)):
     parsed_result = parse_external_data(subscription.external_data)
     for row in parsed_result:
-        await process_one_row(row, session)
+        await process_one_row(row, request.get('user_id'), session)
     await session.commit()
 
 
-async def process_one_row(row: dict, db: AsyncSession):
+async def process_one_row(row: dict, user_id: UUID, db: AsyncSession):
     payment_id = row['id']
     subscription_id = await get_subscription_by_payment(payment_id, db)
-    await subs_service.update_subscription_db(id=subscription_id, is_active=True, db=db)
-    await subs_service.update_payment_db(id=payment_id,
-                                         payment_method_id=row['payment_method_id'],
-                                         payment_status=row['status'],
-                                         db=db)
-    await subs_service.update_subscription_role()
+    # await subs_service.update_subscription_db(id=subscription_id, is_active=True, db=db)
+    # await subs_service.update_payment_db(id=payment_id,
+    #                                      payment_method_id=row['payment_method_id'],
+    #                                      payment_status=row['status'],
+    #                                      db=db)
+    await auth.update_subscription_role()
     await subs_service.send_subscription_notification()
