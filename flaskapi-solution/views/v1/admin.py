@@ -17,7 +17,8 @@ from keycloak import KeycloakDeleteError, KeycloakPostError, KeycloakPutError
 
 def prep_user_data(body):
     client_id = keycloak_admin.get_client_id(settings.client_id)
-    user_id = keycloak_admin.get_user_id(body.get('user_name'))
+    user_name = body.get('user_name')
+    user_id = keycloak_admin.get_user_id(user_name) if user_name else None
     role_id = keycloak_admin.get_client_role(client_id=client_id, role_name=body['role_name'])
 
     return client_id, user_id, role_id

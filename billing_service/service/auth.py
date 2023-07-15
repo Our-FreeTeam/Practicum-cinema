@@ -6,21 +6,21 @@ import aiohttp
 import requests
 from fastapi import HTTPException
 
+from core import messages
 from core.config import settings
-from utils import backoff
+import backoff
 
 
-async def update_subscription_role(user_id: UUID, role_name: str = 'Subscriber'):
+async def update_subscription_role(user_id: UUID, role_name: str = 'subscriber'):
     async with aiohttp.ClientSession() as session:
         token_headers = await get_token(session)
-        await grant_role(session, user_id, role_name, token_headers)
+        await grant_role(user_id, role_name, session, token_headers)
 
 
 async def get_token(session):
-    auth_url = settings.auth_url
     async with session.post(
-            f'{auth_url}v1/auth/login',
-            json={"user": settings.auth_user, "password": settings.auth_password}) as token:
+            f'{settings.AUTH_URL}v1/auth/login',
+            json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD}) as token:
         headers = {}
         if (token.headers.get("access_token") is not None and
                 token.headers.get("refresh_token") is not None):
@@ -30,9 +30,8 @@ async def get_token(session):
 
 
 async def grant_role(user_id: UUID, role_name: str, session: aiohttp.ClientSession, headers: dict):
-    auth_url = settings.auth_url
     async with session.post(
-            f'{auth_url}v1/admin/grant_role_by_id',
+            f'{settings.AUTH_URL}v1/admin/grant_role_by_id',
             json={"user_id": user_id, "role_name": role_name},
             headers=headers
     ) as response:
@@ -41,7 +40,8 @@ async def grant_role(user_id: UUID, role_name: str, session: aiohttp.ClientSessi
                                 detail=await response.text())
 
 
-def is_authorized(func):
+# Декоратор для проверки токена и получения user_id
+def get_user_id(func):
     @wraps(func)
     async def inner(*args, **kwargs):  # noqa: WPS430
         request = kwargs.get('request')
@@ -51,16 +51,11 @@ def is_authorized(func):
                 'access_token': headers.get('access_token'),
                 'refresh_token': headers.get('refresh_token'),
             }
-            dict_keys = list(kwargs.keys())
-            dict_keys.remove('request')
-
-            user = kwargs.get('user_id')
-            get_user_id = user if user else kwargs[dict_keys[0]].user_id
             if tokens['access_token']:
-                return await request_auth(*args, exec_func=func, tokens=tokens, get_user_id=get_user_id, **kwargs)
+                return await request_auth(*args, exec_func=func, tokens=tokens, **kwargs)
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED,
-            detail=messages.INCORRECT_TOKEN,
+            detail=messages.AUTH_ERROR,
         )
     return inner
 
@@ -74,7 +69,7 @@ def is_authorized(func):
 async def request_auth(*args, **kwargs):
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            f'{settings.auth_url}v1/admin/user/{kwargs.pop("get_user_id")}/check_authorization',
+            f'{settings.AUTH_URL}v1/admin/get_user_id_by_token',
             headers={'Content-Type': 'application/json'} | kwargs.pop('tokens'),
         ) as response:
             if response.status != HTTPStatus.OK:
@@ -82,5 +77,7 @@ async def request_auth(*args, **kwargs):
                     status_code=response.status,
                     detail=await response.text(),
                 )
+            user_id = (await response.json())['user_id']
             exec_func = kwargs.pop('exec_func')
-            return await exec_func(*args, **kwargs)
+            kwargs.pop('user_id')
+            return await exec_func(*args, user_id=user_id, **kwargs)
