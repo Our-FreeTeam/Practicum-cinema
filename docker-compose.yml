@@ -278,6 +278,26 @@ services:
     build: billing_cron_service
     env_file:
       - .env
+    depends_on:
+      db_bill:
+        condition: service_started
+    restart: on-failure
+#    logging:
+#      driver: "fluentd"
+#      options:
+#        fluentd-address: "host.docker.internal:24224"
+#        tag: "Billing Scheduler"
+    networks:
+      - cinema_network
+
+  money_maker:
+    build: money_maker_service
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
 #    logging:
 #      driver: "fluentd"
 #      options:

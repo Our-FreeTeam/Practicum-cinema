@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+#alembic upgrade head
+
 set -e
 
 # переносим значения переменных из текущего окружения
@@ -20,19 +22,12 @@ CONTAINER_FIRST_STARTUP="CONTAINER_FIRST_STARTUP"
 if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
     touch /$CONTAINER_FIRST_STARTUP
     # first startup.
+#    bash /opt/app/create_es_schema.sh
+#    rm -rf /opt/app/create_es_schema.sh
+#    rm -rf /opt/app/requirements.txt
     touch /var/log/cron.log
     locale -a
-    echo "================ FIRST RUN ================"
 fi
-
-# check users and send to Q
-python3 /opt/app/utils/put_users_to_queue.py
-
-# process Q
-python3 /opt/app/utils/get_and_pay.py
-
 
 #cron -f
 busybox syslogd -C; cron -L 2 -f
-
-wait

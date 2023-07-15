@@ -203,4 +203,5 @@ async def main():
 
 
 if __name__ == "__main__":
+    logging.info("Email-to-Q started...")
     asyncio.run(main())

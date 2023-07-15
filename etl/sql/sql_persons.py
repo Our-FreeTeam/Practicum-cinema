@@ -9,7 +9,7 @@ sql = """
                )
            ) as films
       from content.person p
-      left join content.person_film_work pfw on p.id = pfw.user_id
+      left join content.person_film_work pfw on p.id = pfw.person_id
      where updated_at >= %s
     group by p.id, p.full_name, p.updated_at
     order by updated_at asc;

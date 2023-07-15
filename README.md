@@ -1,20 +1,8 @@
-# Проектная работа 10 спринта Notification
+# Дипломная работа - биллинг сервис для онлайнкинотеатра
 
-Задание Notification (RabbitMQ)
-
-1. Сервис mailercron_service-e2q собирает раз в неделю почтовые адреса пользователей из сервиса
-   авторизации и отправляет в точку обмена с задержкой отправки равной времени в секундах
-   до ближайшей пятницы 15:00 по местному времени получателя (планируем отправить пользователю
-   еженедельную рассылку с информацией о том сколько фильмов он посмотрел)
-
-2. Сервис mailercron_service-qe забирает адреса пользователей из очереди (при достижении 
-   правильного времени)
-   и создает текст письма обращаясь к API ugc (получая оттуда данные по просмотрам фильмов для)
-   пользователей и отправляет обратно в новую очередь
-
-3. Сервис sender получает из очереди письма и отправляет их конечным пользователям
-   (попытка интегрировать подключение к sendgrid не увенчалась успехом, при попытке обращения
-   к API сервиса с правильным ключом возвращается ошибка 404)
+Создаем систему биллинга, включающую в себя контроль прав пользователя доступа к платному контенту,
+api сервис приема платежей, cron сервис который проверяет подходит ли срок автопродления у 
+пользователя
 
 
 Для разворачивания проекта использовать env.example и build_dev.bat,
@@ -34,21 +22,49 @@ docker-compose.yml,
 
 # Структура проекта
 ```
-├── UML_schema/                         # Папка с архитектурой проекта в UML (спринт 8)
+├── UML_schema/                     # Папка с архитектурой проекта в UML (спринт 8)
     ├── current/                        
-        ├── current_uml_schema_C1.txt   #  текущая - уровень C1
-        ├── current_uml_schema_C2.txt   #  текущая - уровень C2
+        ├── c2-scheme.txt           # текущая - уровень C2
     ├── planned/                        
-        ├── next_uml_schema_C1.txt      #  новая - уровень C1
-        ├── next_uml_schema_C2.txt      #  новая - уровень C2 
-        ├── next_uml_schema_C3.txt      #  новая - уровень C3                
+        ├── c2-scheme.txt           # новая - уровень C2 
 
 
-├── flaskapi-solution/              # Основная папка приложения Flask
+├── billing_cron_service/           # Сервис биллинга на базе cron
+    ├── utils/                        
+        ├── payment_prc.py          # модуль с abs классом для работы с платежами
+        ├── put_user_to_queue.py    # модуль авто отправки пользователей на продление подписки
+        ├── rabbit_connection.py    # модуль подключения к rabbit
+        ├── settings.py             # файл импорта настроек
+        ├── sql.py                  # sql скрипты для выбора пользователей под автоплатеж
+        ├── yookassa_router.py      # скрипт трансляции подтверждения оплаты из внешного webhook в 
+                                    # в эндпоинт add_2_step сервиса billing_serivce
+    ├── crontab                     # файл настрое crontab для запуска 2х сервисов                
+    ├── requirements.txt            # файл с зависимостями
+    ├── Dockerfile                  # Dockerfile контейнера
+    ├── run.sh                      # скрипт entrypoint 
+             
+
+
+├── mailercron_service/            
+    ├── current/                        
+        ├── c2-scheme.txt          
+
+
+├── money_maker_service/            
+    ├── current/                        
+        ├── c2-scheme.txt           
+
+
+├── billing_service/                
+    ├── current/                        
+        ├── c2-scheme.txt           
+
+
+├── flaskapi-solution/              # API сервис на Flask для авторизации и регистрации
     ├── views/                        
         ├── v1/                     # Папка с api версии 1
-            ├── admin.py            # файл ручек админа
-            ├── auth.py      
+            ├── admin.py            # эндпойнты админа
+            ├── auth.py             # эндпойнты регистрации-авторизации пользователей
     ├── models/                  
         ├── models.py               # файл со всеми моделями проекта  
     ├── app.py                      # основной файл запуска проекта
@@ -62,7 +78,7 @@ docker-compose.yml,
     ├── wait_for_keycloak.py        # Вейтер запуска KeyCloak
 
 
-├── keycloak/                       # папка KeyCloak
+├── keycloak/                       # Сервис управления доступом KeyCloak
     ├── import                      # 
         ├── realm-export.json       # файл с базовыми настройками сервиса KeyCloak, в т.ч. 
                                     # настройки Realm - Cinema и клиента Theatre с помощью 
@@ -72,7 +88,8 @@ docker-compose.yml,
     ├── Dockerfile                  # Dockerfile контейнера KeyCloak
 
 
-├── fastapi-solution/               # Основная папка приложения FastAPI
+├── fastapi-solution/               # Основной сервис онлайн кинотеатра получение информации о 
+                                    # фильмах, актерах, поиск фильмов и т.п. На FastAPI
     ├── api/                        
         ├── v1/                     # Папка с api версии 1
             ├── films.py            # поиск по фильмам
@@ -98,12 +115,12 @@ docker-compose.yml,
     ├── Dockerfile                  # Dockerfile контейнера FastApi-solution
        
 
-├── db/                             # Работа с БД
+├── db/                             # Исходные данные с фильмами, актерами итп
     ├── models.py                   # Модели SQLAlchemy
     ├── movies_dataclasses.py       # Датаклассы для переливки данных из SQLite в PostgreSQL
     
     
-├── etl/                            # Работа с ETL
+├── etl/                            # ETL скрипты для перелива информации из PG в Elastic
     ├── sql/                        # папка с данными из БД в формате sql
     ├── alembic.ini                 # Конфигурационный файл alembic
     ├── create_es_schema.sh         # Скрипт создания индексов в ElasticSearch
@@ -126,7 +143,7 @@ docker-compose.yml,
     ├── script.py.mako              # Шаблон миграции Alembic
     
     
-├── tests/                                  # Папка с комплектов тестов
+├── tests/                                  # Комплект тестов для сервиса онлайн кинотеарта
     ├── functional/                         # Функциональные тесты
         ├── src                             # Папка с тестами
             ├── test_cache.py               # тесты кеширования
@@ -150,7 +167,7 @@ docker-compose.yml,
         ├── settings.py                     # Файл настроек
 
 
-├── tests_auth/                             # Папка с комплектов тестов для AUTH сервиса
+├── tests_auth/                             # Комплект тестов для Flask AUTH сервиса
     ├── functional/                         # Функциональные тесты
         ├── src                             # Папка с тестами
             ├── test_flask_admin.py         # тесты административных API
@@ -163,7 +180,7 @@ docker-compose.yml,
         ├── conftest.py                     # Хелперы
 
 
-├── tests_analytic/                         # Папка с комплектов тестов для UTG-1
+├── tests_analytic/                         # Комплект тестов для UTG-1 API сервиса
     ├── functional/                         # Функциональные тесты
         ├── src                             # Папка с тестами
             ├── test_add_ugc.py             # тесты добавления таймштампа на фильм
@@ -172,24 +189,24 @@ docker-compose.yml,
         ├── wait_for_fastapi.py             # Вейтер запуска FastAPI
 
 
-├── nginx_config/                   # Папка с настройками nginx
+├── nginx_config/                   # Nginx сервис для проекта
     ├── conf.d/                     # Папка с настройками сайтов
         ├── site.conf               # Настройка для проекта fastapi
     ├── nginx.conf                  # Файо с общими настройками nginx
 
 
-├── logstash/                       # Папка с настройками сервиса logstash
+├── logstash/                       # Logstash сервис
     ├── logstash.conf               # файл настроек сервиса logstash 
    
  
-├── fluentd/                        # Папка с настройками сервиса fluentd
+├── fluentd/                        # Fluentd сервис
     ├── conf/                       # Папка с настройками сервиса
         ├── fluent.conf             # Файл настроек сервиса fluentd
     ├── Dockerfile                  # Dockerfile контейнера с установкой плагина GELF
 
 
-├── rabbit_api/                     # Папка с FastAPI для API сервиса записи контента от 
-                                      пользователей (лайки, обзоры, таймстампы, лайки обзорам)
+├── rabbit_api/                     # Сервис UGC API (FastAPI) для работы с контентом от 
+                                    # пользователей (лайки, обзоры, таймстампы, лайки обзорам)
     ├── mq/                        
         ├── conf/                   # Папка с настройками для rabbitmq
             ├── rabbitmq.conf       # сохранение пользователем места просмотра фильма
@@ -207,18 +224,18 @@ docker-compose.yml,
         ├── Dockerfile              # Dockerfile контейнера rabbit-render
 
     
-├── redis_config/                   # Папка с Redis Cache
+├── redis_config/                   # RedisCache кеширования запросов к Elastic с фильмами и т.п.
     ├── redis.conf                  # Файл с настройками для Redis
     ├── Dockerfile                  # Dockerfile контейнера ETL
 
 
-├── redis_config_ugc/               # Папка с настройками Redis Cache - UGC
+├── redis_config_ugc/               # RedisCache UGC сервис кеширования данных от пользоватеоей
     ├── redis.conf                  # Файл с настройками для Redis
     ├── Dockerfile                  # Dockerfile контейнера ETL
 
 
-├── ugc_api/                        # Папка с FastAPI для API сервиса записи контента от 
-                                      пользователей (лайки, обзоры, таймстампы, лайки обзорам)
+├── ugc_api/                        # UGC Api сервис на FastAPI для работы с контентом от 
+                                    # пользователей (лайки, обзоры, таймстампы, лайки обзорам)
     ├── api/                        
         ├── v1/                     # Папка с api версии 1
             ├── frame.py            # сохранение пользователем места просмотра фильма
@@ -238,12 +255,14 @@ docker-compose.yml,
 
 ├── .env.example                    # Пример файла с переменными окружения
 ├── build_dev.bat                   # файл для сборки проекта под Windows
-├── docker-compose.yml              # dev файл для сборки проекта в докере
-├── docker-compose-logs.yml         # файл для сборки системы логгирования в докере
-├── docker-compose-prod.yml         # product файл для сборки проекта в докере
-├── docker-compose-tests.yml        # product файл для сборки проекта в докере
-├── docker-compose-mongo-solo.yml   # компоуз для сборки системы mongo
+├── docker-compose.yml              # dev файл для сборки ядра проекта 
+├── docker-compose-authsubsys.yml   # сборка системы Auth 
+├── docker-compose-logs.yml         # сборка системы логгирования 
+├── docker-compose-rabbit.yml       # сборка системы очереди на Rabbit
+├── docker-compose-sender.yml       # сборка системы почтовой рассылки 
+├── docker-compose-mongo-solo.yml   # сборка системы mongo
 
+├── docker-compose-tests.yml        # product файл для сборки проекта в докере
 
 ├── setup.cfg                       # настройки flake8 и mypy
 ├── GITHUB_ACTION.md                # workflow github action
