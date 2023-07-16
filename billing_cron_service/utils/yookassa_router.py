@@ -29,6 +29,7 @@ def main():
     else:
         logging.error("There is error with request to webhook_log_service %d".format(response.status_code))
 
+
 if __name__ == "__main__":
     logging.basicConfig(format=settings.log_format, level=settings.log_level)
     logging.info("Router started")
