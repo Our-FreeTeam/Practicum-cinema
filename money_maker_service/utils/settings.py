@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
     KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
 
+
 class Config:
     env_file = '.env'
     env_file_encoding = 'utf-8'

@@ -1,7 +1,7 @@
 """Database cren
 
 Revision ID: a070fecf1016
-Revises: 
+Revises:
 Create Date: 2023-07-05 22:42:03.424550
 
 """
@@ -45,86 +45,94 @@ def upgrade() -> None:
     ''')
     create_extension(target=None, bind=op.get_bind())
 
-    op.create_table('subscription',
-    sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('user_id', UUID(as_uuid=True)),
-    sa.Column('start_date', sa.TIMESTAMP(), default=func.now()),
-    sa.Column('end_date', sa.TIMESTAMP()),
-    sa.Column('subscription_type_id', UUID(as_uuid=True), nullable=True),
-    sa.Column('is_active', sa.BOOLEAN()),
-    sa.Column('is_repeatable', sa.BOOLEAN()),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'subscription',
+        sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('user_id', UUID(as_uuid=True)),
+        sa.Column('start_date', sa.TIMESTAMP(), default=func.now()),
+        sa.Column('end_date', sa.TIMESTAMP()),
+        sa.Column('subscription_type_id', UUID(as_uuid=True), nullable=True),
+        sa.Column('is_active', sa.BOOLEAN()),
+        sa.Column('is_repeatable', sa.BOOLEAN()),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('payment',
-    sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
-    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
-    sa.Column('payment_amount', sa.DECIMAL(precision=None), nullable=False),
-    sa.Column('payment_status', sa.String(), nullable=True),
-    sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('payment_method_id', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'payment',
+        sa.Column('id', UUID(as_uuid=True), primary_key=True, server_default=sa.text('uuid_generate_v4()')),
+        sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+        sa.Column('payment_amount', sa.DECIMAL(precision=None), nullable=False),
+        sa.Column('payment_status', sa.String(), nullable=True),
+        sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('payment_method_id', sa.String(), nullable=False),
+        sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('subscription_type',
-    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('amount', sa.DECIMAL(), nullable=False),
-    sa.Column('is_active', sa.BOOLEAN(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'subscription_type',
+        sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('amount', sa.DECIMAL(), nullable=False),
+        sa.Column('is_active', sa.BOOLEAN(), nullable=False),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('refund',
-    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('refund_amount', sa.DECIMAL(precision=None), nullable=False),
-    sa.Column('refund_status', sa.String(), nullable=False),
-    sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('external_refund_id', sa.String(), nullable=False),
-    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'refund',
+        sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('refund_amount', sa.DECIMAL(precision=None), nullable=False),
+        sa.Column('refund_status', sa.String(), nullable=False),
+        sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('external_refund_id', sa.String(), nullable=False),
+        sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('subscription_history',
-    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('user_id', UUID(as_uuid=True), nullable=True),
-    sa.Column('start_date', sa.TIMESTAMP(), default=func.now()),
-    sa.Column('end_date', sa.TIMESTAMP()),
-    sa.Column('subscription_type_id', UUID(as_uuid=True), nullable=True),
-    sa.Column('is_active', sa.BOOLEAN()),
-    sa.Column('is_repeatable', sa.BOOLEAN()),
-    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('operation_type', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'subscription_history',
+        sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('user_id', UUID(as_uuid=True), nullable=True),
+        sa.Column('start_date', sa.TIMESTAMP(), default=func.now()),
+        sa.Column('end_date', sa.TIMESTAMP()),
+        sa.Column('subscription_type_id', UUID(as_uuid=True), nullable=True),
+        sa.Column('is_active', sa.BOOLEAN()),
+        sa.Column('is_repeatable', sa.BOOLEAN()),
+        sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('operation_type', sa.String(), nullable=False),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('payment_history',
-    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
-    sa.Column('payment_amount', sa.DECIMAL(precision=None), nullable=False),
-    sa.Column('payment_status', sa.String(), nullable=True),
-    sa.Column('payment_method_id', sa.String(), nullable=False),
-    sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('operation_type', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'payment_history',
+        sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+        sa.Column('payment_amount', sa.DECIMAL(precision=None), nullable=False),
+        sa.Column('payment_status', sa.String(), nullable=True),
+        sa.Column('payment_method_id', sa.String(), nullable=False),
+        sa.Column('payment_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('operation_type', sa.String(), nullable=False),
+        sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('subscription_type_history',
-    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.Column('amount', sa.DECIMAL(precision=None), nullable=False),
-    sa.Column('is_active', sa.BOOLEAN(), nullable=False),
-    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('operation_type', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'subscription_type_history',
+        sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('amount', sa.DECIMAL(precision=None), nullable=False),
+        sa.Column('is_active', sa.BOOLEAN(), nullable=False),
+        sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('operation_type', sa.String(), nullable=False),
+        sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('refund_history',
-    sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
-    sa.Column('refund_amount', UUID(as_uuid=True), nullable=False),
-    sa.Column('refund_status', sa.String(), nullable=False),
-    sa.Column('external_refund_id', sa.String(), nullable=False),
-    sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
-    sa.Column('operation_type', sa.String(), nullable=False),
-    sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
-    sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    op.create_table(
+        'refund_history',
+        sa.Column('id', UUID(as_uuid=True), server_default=sa.text('uuid_generate_v4()'), nullable=False),
+        sa.Column('refund_amount', UUID(as_uuid=True), nullable=False),
+        sa.Column('refund_status', sa.String(), nullable=False),
+        sa.Column('external_refund_id', sa.String(), nullable=False),
+        sa.Column('refund_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('operation_date', sa.TIMESTAMP(), nullable=False),
+        sa.Column('operation_type', sa.String(), nullable=False),
+        sa.Column('subscription_id', UUID(as_uuid=True), nullable=False),
+        sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
+        sa.PrimaryKeyConstraint('id')
     )
     op.execute(subscription_history_func)
     op.execute(subscription_type_history_func)

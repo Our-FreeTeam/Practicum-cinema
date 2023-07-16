@@ -8,7 +8,6 @@ from payment_prc import YooKassaPaymentProcessor
 from settings import settings
 
 
-
 # TODO получать результаты обработки оплаты и записывать их в PG billing
 async def main():
     connection = await aio_pika.connect(
