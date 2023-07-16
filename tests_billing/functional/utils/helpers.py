@@ -11,6 +11,8 @@ from tests_billing.functional.utils.backoff import log, backoff
 
 TEST_USERS_LIST = ["test_user"]
 TEST_ROLES_LIST = ["test_role"]
+HEADERS = {'Content-Type': "application/json", 'Accept': "application/json", "access_token": "",
+           "refresh_token": ""}
 
 
 @log

@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 from http import HTTPStatus
 
@@ -6,15 +5,43 @@ import pytest
 import requests
 
 from tests_billing.settings import settings
-from tests_billing.functional.utils.helpers import get_active_subscription
+from tests_billing.functional.utils.helpers import get_active_subscription, HEADERS
 
 sub_url = settings.subscription_url
+headers = HEADERS
 
 
 @pytest.mark.asyncio
-async def test_create_and_pay_payment():
+@pytest.mark.parametrize(
+    'answer_code, req_type, api_url, body',
+    [
+     (200, 'POST', 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
+     ],
+)
+async def test_create_and_pay_payment(
+        answer_code,
+        req_type,
+        api_url,
+        body,
+        create_remove_test_user_and_role,
+        get_user_id
+):
+    site_url = settings.auth_url
+    url_params = {
+        "url": site_url + api_url,
+        "json": body,
+        "headers": headers
+    }
+    url_step_1 = "api/v1/subscriptions/add_1_step"
+    result = requests.post(**url_params)
+    if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
+        headers["access_token"] = result.headers.get("access_token")
+        headers["refresh_token"] = result.headers.get("refresh_token")
+    assert result.status_code == answer_code
+
+    user_id = get_user_id(body["user"])
     body_step_1 = {
-        "user_id": "a5a8f573-3cee-4ccc-8a2b-91cb9f55250a",
+        "user_id": user_id,
         "start_date": "2022-06-16 20:14:09.31329",
         "end_date": "2023-06-16 20:14:09.31329",
         "subscription_type_id": "834c0eb9-7ac6-47a8-aa51-19d1f2f58766",
@@ -22,7 +49,7 @@ async def test_create_and_pay_payment():
         "is_repeatable": True,
         "save_payment_method": True
     }
-    url_step_1 = "api/v1/subscriptions/add_1_step"
+
     response = requests.post(sub_url + url_step_1, json=body_step_1)
     assert response.status_code == HTTPStatus.OK
     resp_url = response.json()["url"]

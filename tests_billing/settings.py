@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     keycloak_admin_login: str = Field(..., env='KEYCLOAK_ADMIN_LOGIN')
     keycloak_admin_psw: str = Field(..., env='KEYCLOAK_ADMIN_PSW')
 
+    auth_url: str = Field(..., env='AUTH_URL')
+
     class Config:
         env_file = '.env'
         env_file_encoding = 'utf-8'
