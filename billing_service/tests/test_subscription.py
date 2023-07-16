@@ -1,24 +1,14 @@
 from http import HTTPStatus
 
-import aiohttp
 import pytest
-from fastapi.testclient import TestClient
+import requests
 
 from core.config import settings
-from main import app
-
-client = TestClient(app)
-
-
-async def make_get_request(url: str, json: dict):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(settings.service_url + url, json=json) as response:
-            return await response.json()
 
 
 @pytest.mark.asyncio
 async def test_create_sub_step_1():
-    body = {
+    body_step_1 = {
         "user_id": "a5a8f573-3cee-4ccc-8a2b-91cb9f55250a",
         "start_date": "2022-06-16 20:14:09.31329",
         "end_date": "2023-06-16 20:14:09.31329",
@@ -27,8 +17,27 @@ async def test_create_sub_step_1():
         "is_repeatable": True,
         "save_payment_method": True
     }
-    url = 'api/v1/subscriptions/add_1_step'
-    # response = await make_get_request(url="api/v1/subscriptions/add_1_step", json=body)
-    c = 1
-    response = client.post("api/v1/subscriptions/add_1_step", json=body)
+    url_step_1 = "api/v1/subscriptions/add_1_step"
+    response = requests.post(settings.SUBSCRIPTION_URL + url_step_1, json=body_step_1)
+    assert response.status_code == HTTPStatus.OK
+    resp_url = response.json()["url"]
+    body_step_2 = {
+        "external_data": [
+            {
+                "url": resp_url,
+                "pay_data": {
+                    "event": "payment.succeeded",
+                    "object": {
+                        "id": "8d327690-ce91-459d-a743-ef31a15476a8",
+                        "status": "succeeded",
+                        "payment_method": {
+                            "id": "215d8da0-000f-50be-b000-0003308c89be"
+                        }
+                    }
+                },
+            }
+        ]
+    }
+    url_step_2 = "api/v1/subscriptions/add_2_step"
+    response = requests.post(settings.SUBSCRIPTION_URL + url_step_2, json=body_step_2)
     assert response.status_code == HTTPStatus.OK
