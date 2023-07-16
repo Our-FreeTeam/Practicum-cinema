@@ -3,9 +3,11 @@ from http import HTTPStatus
 
 import pytest
 import requests
+from dateutil.relativedelta import relativedelta
 
 from tests_billing.settings import settings
-from tests_billing.functional.utils.helpers import get_active_subscription, HEADERS
+from tests_billing.functional.utils.helpers import get_active_subscription, HEADERS, get_payment_id, duration
+
 
 sub_url = settings.subscription_url
 headers = HEADERS
@@ -24,7 +26,7 @@ async def test_create_and_pay_payment(
         api_url,
         body,
         create_remove_test_user_and_role,
-        get_user_id
+        get_user
 ):
     site_url = settings.auth_url
     url_params = {
@@ -39,7 +41,8 @@ async def test_create_and_pay_payment(
         headers["refresh_token"] = result.headers.get("refresh_token")
     assert result.status_code == answer_code
 
-    user_id = get_user_id(body["user"])
+    user_id = get_user(body["user"])
+    subscription_id = await get_active_subscription(user_id=user_id)
     body_step_1 = {
         "user_id": user_id,
         "start_date": "2022-06-16 20:14:09.31329",
@@ -53,6 +56,8 @@ async def test_create_and_pay_payment(
     response = requests.post(sub_url + url_step_1, json=body_step_1)
     assert response.status_code == HTTPStatus.OK
     resp_url = response.json()["url"]
+
+    payment_id = get_payment_id(subscription_id[0])
     body_step_2 = {
         "external_data": [
             {
@@ -63,7 +68,7 @@ async def test_create_and_pay_payment(
                         "id": "8d327690-ce91-459d-a743-ef31a15476a8",
                         "status": "succeeded",
                         "payment_method": {
-                            "id": "215d8da0-000f-50be-b000-0003308c89be"
+                            "id": payment_id[0]
                         }
                     }
                 },
@@ -131,5 +136,6 @@ async def test_correct_dates():
     active_subscription = await get_active_subscription(user_id=user_id)
     sub_start_date = active_subscription[2]
     sub_end_date = active_subscription[3]
+    subscription_type_id = active_subscription[4]
     assert isinstance(sub_start_date, datetime)
-    assert isinstance(sub_end_date, datetime)
+    assert sub_end_date == sub_start_date + relativedelta(months=duration[subscription_type_id])

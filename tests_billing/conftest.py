@@ -1,5 +1,3 @@
-import os
-
 import pytest
 import requests
 
@@ -13,15 +11,20 @@ from tests_billing.functional.utils.helpers import (
     TEST_ROLES_LIST,
     create_test_role
 )
+from tests_billing.settings import settings
+
+
+keycloak_url = settings.keycloak_url
+keycloak_realm_id = settings.keycloak_realm_id
 
 
 @pytest.fixture(scope='session')
 def remove_test_users():
     yield None
 
-    base_url = os.environ.get('KEYCLOAK_URL')
+    base_url = keycloak_url
     headers = get_auth_headers()
-    realm_id = os.environ.get('KEYCLOAK_REALM_ID')
+    realm_id = keycloak_realm_id
 
     for user in TEST_USERS_LIST:
         remove_user(user, base_url, headers, realm_id)
@@ -30,21 +33,21 @@ def remove_test_users():
 @pytest.fixture(scope='session')
 def remove_test_roles():
     yield None
-    base_url = os.environ.get('KEYCLOAK_URL')
+    base_url = keycloak_url
     headers = get_auth_headers()
     client_id = get_client_id(base_url, headers)
-    realm_id = os.environ.get('KEYCLOAK_REALM_ID')
+    realm_id = keycloak_realm_id
 
     remove_all_test_roles(base_url, headers, client_id, realm_id)
 
 
 @pytest.fixture(scope='session')
 def create_remove_test_user_and_role():
-    base_url = os.environ.get('KEYCLOAK_URL')
+    base_url = keycloak_url
 
     headers = get_auth_headers()
     client_id = get_client_id(base_url, headers)
-    realm_id = os.environ.get('KEYCLOAK_REALM_ID')
+    realm_id = keycloak_realm_id
 
     for user in TEST_USERS_LIST:
         create_test_user(user, base_url, headers, realm_id)
@@ -60,12 +63,12 @@ def create_remove_test_user_and_role():
 
 
 @pytest.fixture(scope='session')
-def get_user_id():
+def get_user():
     def inner(username):
-        base_url = os.environ.get('KEYCLOAK_URL')
+        base_url = keycloak_url
 
         headers = get_auth_headers()
-        realm_id = os.environ.get('KEYCLOAK_REALM_ID')
+        realm_id = keycloak_realm_id
 
         user_query_url = f"{base_url}/admin/realms/{realm_id}/users?username={username}"
         user_query_response = requests.get(user_query_url, headers=headers)

@@ -20,11 +20,6 @@ async def get_active_subscription(user_id: UUID, db: AsyncSession):
     subscription = await db.execute(
         select(Subscription).where(and_(Subscription.user_id == user_id, Subscription.is_active.is_(True)))
     )
-    if not subscription:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=messages.INCORRECT_CHECK_SUBSCRIPTION,
-        )
     return subscription.fetchone()
 
 
