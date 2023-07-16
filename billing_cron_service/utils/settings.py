@@ -22,7 +22,6 @@ class Settings(BaseSettings):
     keycloak_admin_password: str = Field(..., env='KK_ADMIN_PASSWORD')
     keycloak_service_email: str = Field(..., env='KEYCLOAK_SERVICE_EMAIL')
 
-
     log_format: str = Field(..., env='LOG_FORMAT')
     log_level: int = Field(..., env='LOG_LEVEL')
 
@@ -48,7 +47,8 @@ class Settings(BaseSettings):
 
     CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
 
-    billing_service_url : str = Field(..., env='BILLING_SERVICE_URL')
+    billing_service_url: str = Field(..., env='BILLING_SERVICE_URL')
+
 
 class Config:
     env_file = '.env'

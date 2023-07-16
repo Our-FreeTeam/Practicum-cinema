@@ -18,13 +18,13 @@ class Settings(BaseSettings):
     DB_HOST: str = Field("localhost", env="BILL_DB_HOST")
     DB_PORT: str = Field('5438', env="BILL_DB_PORT")
 
-    KASSA_ACCOUNT_ID: str = Field("226175", env='KASSA_ACCOUNT_ID')
-    KASSA_SECRET_KEY: str = Field("test_nbWmqq2QhxZG-dqX8W_tbTMEGtM-quiKCa_TvcRzahI", env='KASSA_SECRET_KEY')
+    KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
+    KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
 
     DB_URI: AsyncPostgresDsn | None
 
-    CONFIRMATION_URL: str = Field("", env='CONFIRMATION_URL')
-    SUBSCRIPTION_URL: str = Field("http://localhost:8200/", env='SUBSCRIPTION_URL')
+    CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
+    SUBSCRIPTION_URL: str = Field("localhost", env='SUBSCRIPTION_URL')
 
     @validator('DB_URI')
     def construct_db_uri(cls, v: str | None, values: dict):

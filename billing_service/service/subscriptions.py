@@ -20,6 +20,11 @@ async def get_active_subscription(user_id: UUID, db: AsyncSession):
     subscription = await db.execute(
         select(Subscription).where(and_(Subscription.user_id == user_id, Subscription.is_active.is_(True)))
     )
+    if not subscription:
+        raise HTTPException(
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
+            detail=messages.INCORRECT_CHECK_SUBSCRIPTION,
+        )
     return subscription.fetchone()
 
 
@@ -34,7 +39,6 @@ def check_saving_payment_method(subscription: Subscription):
 def get_subscription_duration(subscription_type_id: UUID) -> monthdelta:
     duration = {'834c0eb9-7ac6-47a8-aa51-19d1f2f58766': monthdelta(1),
                 '339052fe-9f44-4c03-8ccf-e11b9629d6d1': monthdelta(12),
-                '59507685-5b50-4d60-b4d1-6fc0ab1bacd1': monthdelta(1),
                 }
     return duration.get(str(subscription_type_id))
 

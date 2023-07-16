@@ -319,6 +319,18 @@ services:
     networks:
       - cinema_network
 
+  tests_billing:
+    build: tests_billing
+    volumes:
+      - ./billing_service:/billing_service
+    env_file:
+      - tests_billing/.env
+    depends_on:
+      billing_service:
+        condition: service_started
+    networks:
+      - cinema_network
+
 volumes:
   _postgres_data:
   _es_data:
