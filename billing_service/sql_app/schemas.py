@@ -1,11 +1,15 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 from uuid import UUID
 
 from orjson import orjson
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
+
+from fastapi_filter.contrib.sqlalchemy import Filter
+
+from models.models import Subscription as SubModel
 
 
 def orjson_dumps(v, *, default):
@@ -37,6 +41,23 @@ class Subscription(BaseOrjsonModel):
 
     class Config:
         orm_mode = True
+
+
+class SubscriptionFilter(Filter):
+    user_id: Optional[UUID]
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    start_date__lt: Optional[datetime]
+    start_date__gte: Optional[datetime]
+    end_date__lt: Optional[datetime]
+    end_date__gte: Optional[datetime]
+    is_active: Optional[bool]
+    is_repeatable: Optional[bool]
+    save_payment_method: Optional[bool]
+    order_by: Optional[list[str]] = ["start_date"]
+
+    class Constants(Filter.Constants):
+        model = SubModel
 
 
 class SubscriptionType(BaseOrjsonModel):

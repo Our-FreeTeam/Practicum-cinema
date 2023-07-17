@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     AUTH_URL: str = Field(..., env='AUTH_URL')
     AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
-    AUTH_PASSWORD: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU_PSW')
+    AUTH_PASSWORD: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
     @validator('DB_URI')
     def construct_db_uri(cls, v: str | None, values: dict):
