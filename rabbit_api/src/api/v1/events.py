@@ -36,5 +36,5 @@ async def create_notification(
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Event not found")
     message_text = db_template.text.format(**event.data)
     notification = schemas.Notification(**event.dict(), template=message_text, subject=db_template.title)
-    publisher.publish(message=notification.json(), connection=connection, queue=get_queue(db_template.instant_event))
+    publisher.publish(message=notification.json(), queue=get_queue(db_template.instant_event))
     return HTTPStatus.OK
