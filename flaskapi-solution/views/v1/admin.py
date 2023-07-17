@@ -7,7 +7,7 @@ from flask_pydantic_spec import Request, Response
 from keycloak_conn import keycloak_admin
 from main import api, app
 from models.models import (BoolResponse, ErrorStr, Role, RoleCheck, RoleIds,
-                           RoleList, UserRole, StrResponse)
+                           RoleList, UserRole, StrResponse, UserIdRole, UserId)
 from redis_bucket_conn import rate_limiter
 from settings import settings
 from utils import check_session
@@ -17,7 +17,8 @@ from keycloak import KeycloakDeleteError, KeycloakPostError, KeycloakPutError
 
 def prep_user_data(body):
     client_id = keycloak_admin.get_client_id(settings.client_id)
-    user_id = keycloak_admin.get_user_id(body['user_name'])
+    user_name = body.get('user_name')
+    user_id = keycloak_admin.get_user_id(user_name) if user_name else None
     role_id = keycloak_admin.get_client_role(client_id=client_id, role_name=body['role_name'])
 
     return client_id, user_id, role_id
@@ -80,6 +81,16 @@ def check_authorization(user_id: str, token_info: dict):
         if set(user_roles) & set(['theatre_admin']):
             return jsonify({'result': True})
     return messages.INSUFFICIENT_PRIVILEGES
+
+
+@app.route('/v1/admin/get_user_id_by_token', methods=['GET'])
+@check_session
+@rate_limiter(settings.rate_limit, settings.time_period)
+@api.validate(resp=Response(HTTP_200=UserId, HTTP_403=None, HTTP_429=ErrorStr), tags=['admin'])
+def get_user_id_by_token(token_info: dict):
+    """ Получение user_id по токену """
+
+    return jsonify({'user_id': token_info['sub']})
 
 
 @app.route('/v1/admin/roles/create', methods=['POST'])
@@ -206,6 +217,24 @@ def grant_role():
         body = request.json
         client_id, user_id, role_id = prep_user_data(body)
         keycloak_admin.assign_client_role(client_id=client_id, user_id=user_id, roles=role_id)
+        return jsonify({'result': True})
+    except KeycloakPostError as e:
+        return json.loads(e.response_body)['errorMessage'], e.response_code
+
+
+@app.route('/v1/admin/grant_role_by_id', methods=['POST'])
+@rate_limiter(settings.rate_limit, settings.time_period)
+@api.validate(body=Request(UserIdRole),
+              resp=Response(HTTP_200=BoolResponse, HTTP_400=None, HTTP_409=None,
+                            HTTP_429=ErrorStr),
+              tags=['admin'])
+@check_role_wrap(['theatre_admin'])
+def grant_role_by_id():
+    """ Выдать роль пользователю """
+    try:
+        body = request.json
+        client_id, _, role_id = prep_user_data(body)
+        keycloak_admin.assign_client_role(client_id=client_id, user_id=body.get('user_id'), roles=role_id)
         return jsonify({'result': True})
     except KeycloakPostError as e:
         return json.loads(e.response_body)['errorMessage'], e.response_code
