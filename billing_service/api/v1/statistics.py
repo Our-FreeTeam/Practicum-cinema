@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Request
 from fastapi_filter import FilterDepends
+from fastapi_pagination import Page, paginate
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,8 +15,7 @@ from sql_app.schemas import Subscription as SubSchema
 router = APIRouter()
 
 
-@router.get("/subscriptions", response_model=list[SubSchema])
-@check_role(["Statistic_manager"])
+@router.get("/subscriptions", response_model=Page[SubSchema])
 async def subscription_statistics(
         request: Request,
         db: AsyncSession = Depends(get_db),
@@ -25,4 +25,4 @@ async def subscription_statistics(
     query = sub_filter.filter(query)
     query = sub_filter.sort(query)
     result = await db.execute(query)
-    return result.scalars().all()
+    return paginate(result.scalars().all())

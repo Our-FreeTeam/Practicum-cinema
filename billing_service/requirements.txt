@@ -15,3 +15,4 @@ alembic_utils==0.8.1
 aiohttp==3.8.4
 yookassa-async==0.1.5
 fastapi-filter==0.6.1
+fastapi-pagination==0.12.6
