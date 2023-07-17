@@ -13,10 +13,10 @@ class AsyncPostgresDsn(PostgresDsn):
 
 class Settings(BaseSettings):
     DB_NAME: str = Field("postgres", env="BILL_DB_NAME")
-    DB_USER: str = Field("postgres", env="BILL_DB_USERNAME")
+    DB_USER: str = Field("user", env="BILL_DB_USERNAME")
     DB_PASSWORD: str = Field("password", env="BILL_DB_PASSWORD")
     DB_HOST: str = Field("localhost", env="BILL_DB_HOST")
-    DB_PORT: str = Field('5432', env="BILL_DB_PORT")
+    DB_PORT: str = Field('5438', env="BILL_DB_PORT")
 
     KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
     KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     DB_URI: AsyncPostgresDsn | None
 
     CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
+    SUBSCRIPTION_URL: str = Field("localhost", env='SUBSCRIPTION_URL')
 
     AUTH_URL: str = Field(..., env='AUTH_URL')
     AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')

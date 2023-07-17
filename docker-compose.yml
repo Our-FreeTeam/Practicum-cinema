@@ -306,7 +306,6 @@ services:
     networks:
       - cinema_network
 
-
   tests_ugc:
     build: tests_analytic/functional
     volumes:
@@ -315,6 +314,18 @@ services:
       - .env
     depends_on:
       ugc_service:
+        condition: service_started
+    networks:
+      - cinema_network
+
+  tests_billing:
+    build: tests_billing
+    volumes:
+      - ./billing_service:/billing_service
+    env_file:
+      - .env
+    depends_on:
+      billing_service:
         condition: service_started
     networks:
       - cinema_network
