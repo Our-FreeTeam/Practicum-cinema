@@ -1,10 +1,8 @@
-import json
-import uuid
 from datetime import datetime
 from http import HTTPStatus
 
 from fastapi import HTTPException
-from yookassa import Configuration, Payment
+from yookassa import Configuration
 
 from monthdelta import monthdelta
 from sqlalchemy import select, and_, insert, update
@@ -14,12 +12,14 @@ from sqlalchemy.dialects.postgresql import UUID
 from core import messages
 from core.config import settings
 from models.models import Subscription, SubscriptionType, Payment as PaymentModel
+from service.payment import YooKassaPaymentProcessor
 
 
 async def get_active_subscription(user_id: UUID, db: AsyncSession):
     subscription = await db.execute(
         select(Subscription).where(and_(Subscription.user_id == user_id, Subscription.is_active.is_(True)))
     )
+
     return subscription.fetchone()
 
 
@@ -48,22 +48,19 @@ async def send_subscription_external(
 
     subscription_data = await db.execute(select(SubscriptionType).
                                          where(SubscriptionType.id == subscription_type_id))
-    subscription_data = subscription_data.fetchone()[0]
-    body = {
-        "amount": {
-            "value": str(subscription_data.amount),
-            "currency": "RUB"
-        },
-        "save_payment_method": str(save_payment_method).lower(),
-        "capture": "true",
-        "confirmation": {
-            "type": "redirect",
-            "return_url": settings.CONFIRMATION_URL
-        },
-        "description": f" Оплата подписки '{subscription_data.name}'"
-    }
+    subscription_data = subscription_data.fetchone()
+    if subscription_data:
+        subscription_data = subscription_data[0]
+    else:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_TYPE_NOT_FOUND)
 
-    payment = json.loads((await Payment.create(body, uuid.uuid4())).json())
+    payment_processor = YooKassaPaymentProcessor(account_id=settings.KASSA_ACCOUNT_ID,
+                                                 secret_key=settings.KASSA_SECRET_KEY)
+
+    payment = await payment_processor.make_payment(subscription_data.amount,
+                                                   subscription_data.name,
+                                                   save_payment_method)
+
     payment_data = {
         'id': payment['id'],
         'payment_amount': payment['amount']['value'],
@@ -119,10 +116,6 @@ def parse_external_data(data: list[dict]):
                 'payment_method_id': object_data['payment_method']['id']
             })
     return parsed_data
-
-
-async def update_subscription_role():
-    pass
 
 
 async def send_subscription_notification():

@@ -16,13 +16,13 @@ sql_auto_sub = """
 """
 
 subscription_history_func = """
-    CREATE OR REPLACE FUNCTION process_subscription_history_audit() 
+    CREATE OR REPLACE FUNCTION process_subscription_history_audit()
     RETURNS TRIGGER AS $subscription_history_trigger$
         BEGIN
             --
             -- Create a row in subscription_history to reflect the operation performed on emp,
             -- make use of the special variable TG_OP to work out the operation.
-            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling 
+            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling
             -- for which operation the trigger was fired.
             IF (TG_OP = 'DELETE') THEN
                 INSERT INTO subscription_history SELECT OLD.*, now(), 'D';
@@ -40,13 +40,13 @@ subscription_history_func = """
 """
 
 subscription_type_history_func = """
-    CREATE OR REPLACE FUNCTION process_subscription_type_history_audit() 
+    CREATE OR REPLACE FUNCTION process_subscription_type_history_audit()
     RETURNS TRIGGER AS $subscription_type_history_trigger$
         BEGIN
             --
             -- Create a row in subscription_type to reflect the operation performed on emp,
             -- make use of the special variable TG_OP to work out the operation.
-            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling 
+            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling
             -- for which operation the trigger was fired.
             IF (TG_OP = 'DELETE') THEN
                 INSERT INTO subscription_type_history SELECT OLD.*, now(), 'D';
@@ -64,13 +64,13 @@ subscription_type_history_func = """
 """
 
 payment_history_func = """
-    CREATE OR REPLACE FUNCTION process_payment_history_audit() 
+    CREATE OR REPLACE FUNCTION process_payment_history_audit()
     RETURNS TRIGGER AS $payment_history_trigger$
         BEGIN
             --
             -- Create a row in payment_history to reflect the operation performed on emp,
             -- make use of the special variable TG_OP to work out the operation.
-            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling 
+            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling
             -- for which operation the trigger was fired.
             IF (TG_OP = 'DELETE') THEN
                 INSERT INTO payment_history SELECT OLD.*, now(), 'D';
@@ -88,13 +88,13 @@ payment_history_func = """
 """
 
 refund_history_func = """
-    CREATE OR REPLACE FUNCTION process_refund_history_audit() 
+    CREATE OR REPLACE FUNCTION process_refund_history_audit()
     RETURNS TRIGGER AS $refund_history_trigger$
         BEGIN
             --
             -- Create a row in refund_history to reflect the operation performed on emp,
             -- make use of the special variable TG_OP to work out the operation.
-            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling 
+            -- TG_OP - Data type text; a string of INSERT, UPDATE, DELETE, or TRUNCATE telling
             -- for which operation the trigger was fired.
             IF (TG_OP = 'DELETE') THEN
                 INSERT INTO refund_history SELECT OLD.*, now(), 'D';

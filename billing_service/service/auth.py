@@ -22,8 +22,7 @@ async def get_token(session):
             f'{settings.AUTH_URL}v1/auth/login',
             json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD}) as token:
         headers = {}
-        if (token.headers.get("access_token") is not None and
-                token.headers.get("refresh_token") is not None):
+        if (token.headers.get("access_token") is not None and token.headers.get("refresh_token") is not None):
             headers['access_token'] = token.headers.get("access_token")
             headers['refresh_token'] = token.headers.get("refresh_token")
         return headers
