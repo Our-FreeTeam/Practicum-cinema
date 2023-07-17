@@ -28,8 +28,8 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
                 "value": str(amount),
                 "currency": "RUB"
             },
-            "save_payment_method": str(save_payment_method).lower(),
-            "capture": "true",
+            "save_payment_method": save_payment_method,
+            "capture": True,
             "confirmation": {
                 "type": "redirect",
                 "return_url": settings.CONFIRMATION_URL
