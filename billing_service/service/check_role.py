@@ -9,7 +9,7 @@ from fastapi import HTTPException
 from core.config import settings
 
 
-# Проверка роли менеджера, имеющего право смотреть статистику по платежам и подпискам
+# Проверка роли менеджера, имеющего право отправлять сообщения пользователям вручную в rabbitapi
 def check_role(roles: list[str]):
     def func_wrapper(func):
         @wraps(func)

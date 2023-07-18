@@ -139,9 +139,9 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['subscription_id'], ['subscription.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.execute(insert_subscription_type)
     op.execute(insert_subscription)
     op.execute(insert_payment)
+    op.execute(insert_subscription_type)
     op.execute(subscription_history_func)
     op.execute(subscription_type_history_func)
     op.execute(payment_history_func)
