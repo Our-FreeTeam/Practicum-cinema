@@ -13,8 +13,12 @@ from tests_billing.functional.utils.backoff import log, backoff
 
 TEST_USERS_LIST = ["test_user"]
 TEST_ROLES_LIST = ["statistic_manager"]
-HEADERS = {'Content-Type': "application/json", 'Accept': "application/json", "access_token": "",
-           "refresh_token": ""}
+HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "access_token": "",
+    "refresh_token": ""
+}
 keycloak_realm_id = settings.keycloak_realm_id
 keycloak_client_id = settings.keycloak_client_id
 duration = {
