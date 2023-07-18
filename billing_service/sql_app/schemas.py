@@ -10,6 +10,7 @@ from pydantic.generics import GenericModel
 from fastapi_filter.contrib.sqlalchemy import Filter
 
 from models.models import Subscription as SubModel
+from models.models import Payment as PayModel
 
 
 def orjson_dumps(v, *, default):
@@ -77,6 +78,23 @@ class Payment(BaseOrjsonModel):
     payment_status: str
     payment_method_id: str
     payment_date: datetime | None = datetime.now()
+
+    class Config:
+        orm_mode = True
+
+
+class PaymentFilter(Filter):
+    subscription_id: Optional[UUID]
+    payment_amount: Optional[Decimal]
+    payment_status: Optional[str]
+    payment_method_id: Optional[str]
+    payment_date: Optional[datetime]
+    payment_date__lt: Optional[datetime]
+    payment_date__gte: Optional[datetime]
+    order_by: Optional[list[str]] = ["payment_date"]
+
+    class Constants(Filter.Constants):
+        model = PayModel
 
 
 class Refund(BaseOrjsonModel):

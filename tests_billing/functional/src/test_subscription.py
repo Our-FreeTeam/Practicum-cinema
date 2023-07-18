@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from http import HTTPStatus
 
@@ -34,7 +35,6 @@ async def test_create_and_pay_payment(
         "json": body,
         "headers": headers
     }
-    url_step_1 = "api/v1/subscriptions/add_1_step"
     result = requests.post(**url_params)
     if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
         headers["access_token"] = result.headers.get("access_token")
@@ -53,8 +53,9 @@ async def test_create_and_pay_payment(
         "save_payment_method": True
     }
 
-    response = requests.post(sub_url + url_step_1, json=body_step_1)
-    assert response.status_code == HTTPStatus.OK
+    url_step_1 = "api/v1/subscriptions/add_1_step"
+    response = requests.post(sub_url + url_step_1, json=body_step_1, headers=result.headers)
+    assert response.status_code == answer_code
     resp_url = response.json()["url"]
 
     payment_id = get_payment_id(subscription_id[0])
@@ -77,7 +78,7 @@ async def test_create_and_pay_payment(
     }
     url_step_2 = "api/v1/subscriptions/add_2_step"
     response = requests.post(sub_url + url_step_2, json=body_step_2)
-    assert response.status_code == HTTPStatus.OK
+    assert response.status_code == answer_code
 
 
 @pytest.mark.parametrize(
@@ -134,6 +135,7 @@ async def test_check_subscription():
 async def test_correct_dates():
     user_id = "a5a8f573-3cee-4ccc-8a2b-91cb9f55250a"
     active_subscription = await get_active_subscription(user_id=user_id)
+    logging.info(f"active_subscription: {active_subscription}")
     sub_start_date = active_subscription[2]
     sub_end_date = active_subscription[3]
     subscription_type_id = active_subscription[4]
