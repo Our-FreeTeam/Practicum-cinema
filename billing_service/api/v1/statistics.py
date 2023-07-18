@@ -19,6 +19,7 @@ disable_installed_extensions_check()
 
 
 @router.get("/subscriptions", response_model=Page[SubSchema])
+@check_role(["statistic_manager"])
 async def subscription_statistics(
         request: Request,
         db: AsyncSession = Depends(get_db),
@@ -32,6 +33,7 @@ async def subscription_statistics(
 
 
 @router.get("/payments", response_model=Page[PaySchema])
+@check_role(["statistic_manager"])
 async def payment_statistics(
         request: Request,
         db: AsyncSession = Depends(get_db),

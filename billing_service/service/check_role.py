@@ -6,10 +6,10 @@ import backoff
 import requests
 from fastapi import HTTPException
 
-from config.settings import settings
+from core.config import settings
 
 
-# Проверка роли менеджера, имеющего право отправлять сообщения пользователям вручную в rabbitapi
+# Проверка роли менеджера, имеющего право смотреть статистику по платежам и подпискам
 def check_role(roles: list[str]):
     def func_wrapper(func):
         @wraps(func)
@@ -31,7 +31,7 @@ def check_role(roles: list[str]):
                       jitter=None)
 async def request_auth(*args, **kwargs):
     async with aiohttp.ClientSession() as session:
-        async with session.post(settings.auth_url + '/v1/admin/check_role',
+        async with session.post(settings.AUTH_URL + '/v1/admin/check_role',
                                 data=json.dumps({'roles': kwargs.pop('roles')}),
                                 headers={'Content-Type': 'application/json'} | kwargs.pop('tokens')) as response:
             if response.status != 200:

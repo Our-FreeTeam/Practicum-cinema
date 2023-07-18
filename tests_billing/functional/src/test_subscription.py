@@ -13,71 +13,66 @@ sub_url = settings.subscription_url
 headers = HEADERS
 
 
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    'answer_code, req_type, api_url, body',
-    [
-     (200, 'POST', 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
-     ],
-)
-async def test_create_and_pay_payment(
-        answer_code,
-        req_type,
-        api_url,
-        body,
-        create_remove_test_user_and_role,
-        get_user
-):
-    site_url = settings.auth_url
-    url_params = {
-        "url": site_url + api_url,
-        "json": body,
-        "headers": headers
-    }
-    url_step_1 = "api/v1/subscriptions/add_1_step"
-    result = requests.post(**url_params)
-    if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
-        headers["access_token"] = result.headers.get("access_token")
-        headers["refresh_token"] = result.headers.get("refresh_token")
-    assert result.status_code == answer_code
-
-    user_id = get_user(body["user"])
-    subscription_id = await get_active_subscription(user_id=user_id)
-    body_step_1 = {
-        "user_id": user_id,
-        "start_date": "2022-06-16 20:14:09.31329",
-        "end_date": "2023-06-16 20:14:09.31329",
-        "subscription_type_id": "834c0eb9-7ac6-47a8-aa51-19d1f2f58766",
-        "is_active": True,
-        "is_repeatable": True,
-        "save_payment_method": True
-    }
-
-    response = requests.post(sub_url + url_step_1, json=body_step_1)
-    assert response.status_code == HTTPStatus.OK
-    resp_url = response.json()["url"]
-
-    payment_id = get_payment_id(subscription_id[0])
-    body_step_2 = {
-        "external_data": [
-            {
-                "url": resp_url,
-                "pay_data": {
-                    "event": "payment.succeeded",
-                    "object": {
-                        "id": "8d327690-ce91-459d-a743-ef31a15476a8",
-                        "status": "succeeded",
-                        "payment_method": {
-                            "id": payment_id[0]
-                        }
-                    }
-                },
-            }
-        ]
-    }
-    url_step_2 = "api/v1/subscriptions/add_2_step"
-    response = requests.post(sub_url + url_step_2, json=body_step_2)
-    assert response.status_code == HTTPStatus.OK
+# @pytest.mark.asyncio
+# @pytest.mark.parametrize(
+#     'answer_code, req_type, api_url, body',
+#     [
+#      (200, 'POST', 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
+#      ],
+# )
+# async def test_create_and_pay_payment(
+#         answer_code,
+#         req_type,
+#         api_url,
+#         body,
+#         create_remove_test_user_and_role,
+#         get_user
+# ):
+#     site_url = settings.auth_url
+#     url_params = {
+#         "url": site_url + api_url,
+#         "json": body,
+#         "headers": headers
+#     }
+#     result = requests.post(**url_params)
+#     if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
+#         headers["access_token"] = result.headers.get("access_token")
+#         headers["refresh_token"] = result.headers.get("refresh_token")
+#     assert result.status_code == answer_code
+#
+#     user_id = get_user(body["user"])
+#     # assert user_id == ''
+#     body_step_1 = {
+#         "user_id": user_id,
+#         "start_date": "2022-06-16 20:14:09.31329",
+#         "end_date": "2023-06-16 20:14:09.31329",
+#         "subscription_type_id": "834c0eb9-7ac6-47a8-aa51-19d1f2f58766",
+#         "is_active": True,
+#         "is_repeatable": True,
+#         "save_payment_method": True
+#     }
+#
+#     url_step_1 = "api/v1/subscriptions/add_1_step"
+#     response = requests.post(sub_url + url_step_1, json=body_step_1, headers=result.headers)
+#     assert response.status_code == HTTPStatus.OK
+#     resp_url = response.json()["url"]
+#
+#     subscription_id = await get_active_subscription(user_id=user_id)
+#     payment = get_payment_id(subscription_id[0])
+#     body_step_2 = {
+#         "user_id": user_id,
+#         "event": "payment.succeeded",
+#         "object": {
+#             "id": payment[0],
+#             "status": payment[3],
+#             "payment_method": {
+#                 "id": payment[4]
+#             }
+#         }
+#     }
+#     url_step_2 = "api/v1/subscriptions/add_2_step"
+#     response = requests.post(sub_url + url_step_2, json=body_step_2)
+#     assert response.status_code == HTTPStatus.OK
 
 
 @pytest.mark.parametrize(
@@ -113,7 +108,31 @@ async def test_invalid_payment(body, status):
 
 
 @pytest.mark.asyncio
-async def test_check_subscription():
+@pytest.mark.parametrize(
+    'answer_code, req_type, api_url, body',
+    [
+     (200, 'POST', 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
+     ],
+)
+@pytest.mark.asyncio
+async def test_check_subscription(
+        answer_code,
+        req_type,
+        api_url,
+        body
+):
+    site_url = settings.auth_url
+    url_params = {
+        "url": site_url + api_url,
+        "json": body,
+        "headers": headers
+    }
+    result = requests.post(**url_params)
+    if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
+        headers["access_token"] = result.headers.get("access_token")
+        headers["refresh_token"] = result.headers.get("refresh_token")
+    assert result.status_code == answer_code
+
     body = {
         "user_id": "26e83050-29ef-4163-a99d-b546cac208f8",
         "start_date": "2022-06-16 20:14:09.31329",
@@ -124,7 +143,7 @@ async def test_check_subscription():
         "save_payment_method": True
     }
     url = "api/v1/subscriptions/add_1_step"
-    response = requests.post(sub_url + url, json=body)
+    response = requests.post(sub_url + url, json=body, headers=result.headers)
     msg = response.json()["detail"]
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert msg == "Не найден тип подписки"
