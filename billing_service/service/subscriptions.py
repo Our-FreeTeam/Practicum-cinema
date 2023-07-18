@@ -98,23 +98,29 @@ async def update_payment_db(db: AsyncSession, **payment_data):
 
 
 async def get_subscription_by_payment(payment_id: UUID, db: AsyncSession):
-    subscription_id = await db.execute(select(PaymentModel.subscription_id)
-                                       .where(PaymentModel.id == payment_id))
-    subscription_id = subscription_id.fetchone()
-    return subscription_id[0] if subscription_id else None
+    subscription_data = await db.execute(select(PaymentModel.subscription_id,
+                                                PaymentModel.payment_status)
+                                         .where(PaymentModel.id == payment_id))
+    subscription_data = subscription_data.fetchone()
+    return subscription_data
+
+
+async def get_user_by_subscription(subscription_id: UUID, db: AsyncSession):
+    user_id = await db.execute(select(Subscription.user_id)
+                               .where(Subscription.id == subscription_id))
+    user_id = user_id.fetchone()
+    return user_id[0] if user_id else None
 
 
 def parse_external_data(data: list[dict]):
-    parsed_data = []
-    for payment_response in data:
-        payment_data = payment_response['pay_data']
-        if payment_data['event'] == 'payment.succeeded':
-            object_data = payment_data['object']
-            parsed_data.append({
-                'id': object_data['id'],
-                'status': object_data['status'],
-                'payment_method_id': object_data['payment_method']['id']
-            })
+    parsed_data = {}
+    if data['event'] == 'payment.succeeded':
+        object_data = data['object']
+        parsed_data = {
+            'id': object_data['id'],
+            'status': object_data['status'],
+            'payment_method_id': object_data['payment_method']['id']
+        }
     return parsed_data
 
 

@@ -27,44 +27,6 @@ services:
     networks:
       - cinema_network
 
-  db_bill:
-    image: postgres:15.2-alpine
-    volumes:
-      - ./_postgres_data_bill:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${BILL_DB_USERNAME}
-      - POSTGRES_PASSWORD=${BILL_DB_PASSWORD}
-      - POSTGRES_DB=${BILL_DB_NAME}
-    hostname: db_bill
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-d", "${BILL_DB_NAME}", "-U", "${BILL_DB_USERNAME}", "-p", "${BILL_DB_PORT}"]
-      interval: 1s
-      timeout: 3s
-      retries: 30
-    ports:
-      - "5438:5438"
-    command: -p 5438
-    networks:
-      - cinema_network
-
-  billing_service:
-    build: billing_service
-    image: billing-image
-    env_file:
-      - .env
-    ports:
-      - "8200:8200"
-    depends_on:
-      db_bill:
-        condition: service_healthy
-#    logging:
-#      driver: "fluentd"
-#      options:
-#        fluentd-address: "host.docker.internal:24224"
-#        tag: "fastapi_cinema_api"
-    networks:
-      - cinema_network
-
   redis_cache:
     build: redis_config
     hostname: redis
@@ -274,38 +236,6 @@ services:
     networks:
       - cinema_network
 
-  billing_cron:
-    build: billing_cron_service
-    env_file:
-      - .env
-    depends_on:
-      db_bill:
-        condition: service_started
-    restart: on-failure
-#    logging:
-#      driver: "fluentd"
-#      options:
-#        fluentd-address: "host.docker.internal:24224"
-#        tag: "Billing Scheduler"
-    networks:
-      - cinema_network
-
-  money_maker:
-    build: money_maker_service
-    env_file:
-      - .env
-    restart: on-failure
-    depends_on:
-      db_bill:
-        condition: service_started
-#    logging:
-#      driver: "fluentd"
-#      options:
-#        fluentd-address: "host.docker.internal:24224"
-#        tag: "Billing Scheduler"
-    networks:
-      - cinema_network
-
   tests_ugc:
     build: tests_analytic/functional
     volumes:
@@ -314,18 +244,6 @@ services:
       - .env
     depends_on:
       ugc_service:
-        condition: service_started
-    networks:
-      - cinema_network
-
-  tests_billing:
-    build: tests_billing
-    volumes:
-      - ./billing_service:/billing_service
-    env_file:
-      - .env
-    depends_on:
-      billing_service:
         condition: service_started
     networks:
       - cinema_network

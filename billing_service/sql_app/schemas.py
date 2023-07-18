@@ -115,4 +115,4 @@ class ConfirmationUrl(BaseOrjsonModel):
 
 
 class SubscriptionProcessing(BaseOrjsonModel):
-    external_data: list[dict]
+    external_data: dict

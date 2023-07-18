@@ -31,7 +31,7 @@ async def get_token(session):
 async def grant_role(user_id: UUID, role_name: str, session: aiohttp.ClientSession, headers: dict):
     async with session.post(
             f'{settings.AUTH_URL}v1/admin/grant_role_by_id',
-            json={"user_id": user_id, "role_name": role_name},
+            json={"user_id": str(user_id), "role_name": role_name},
             headers=headers
     ) as response:
         if response.status != 200:
