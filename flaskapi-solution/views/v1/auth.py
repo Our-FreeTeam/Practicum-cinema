@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime
 
 import messages
@@ -33,6 +34,8 @@ def login_user():
             response = make_response(dict(BoolResponse(result=True)))
             response.headers.set('access_token', token['access_token'])
             response.headers.set('refresh_token', token['refresh_token'])
+
+            response.headers['Access-Control-Expose-Headers'] = 'access_token, refresh_token'
 
         except keycloak.KeycloakPostError as e:
             return e.error_message.decode("utf-8"), str(e.response_code)
@@ -76,6 +79,22 @@ def user_sessions(token_info: dict):
                     for session in sessions]
 
         return jsonify({'sessions': response})
+    except keycloak.KeycloakPostError as e:
+        return e.error_message.decode("utf-8"), str(e.response_code)
+
+
+@app.route('/v1/auth/get_my_id', methods=['GET'])
+@rate_limiter(settings.rate_limit, settings.time_period)
+@check_session
+def get_my_id(token_info: dict):
+    """
+        Получить активные сессии пользователя
+    """
+    try:
+        id_user = keycloak_admin.get_user_id(token_info.get('username'))
+        print(id_user)
+        return jsonify({'id': id_user})
+        # return UserIdResponse(id=id_user)
     except keycloak.KeycloakPostError as e:
         return e.error_message.decode("utf-8"), str(e.response_code)
 

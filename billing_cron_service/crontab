@@ -5,4 +5,6 @@ LC_ALL=en_US.UTF-8
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/sifi/bin:/opt/app:/usr/local/lib/python3.10/site-packages
 # START CRON JOB
 * * * * * . $HOME/.profile; python3 /opt/app/utils/yookassa_router.py >> /var/log/cron.log 2>&1
+* * * * * . $HOME/.profile; python3 /opt/app/utils/message_waiter.py >> /var/log/cron.log 2>&1
+
 0 0 */3 * * . $HOME/.profile; python3 /opt/app/utils/put_users_to_queue.py >> /var/log/cron.log 2>&1

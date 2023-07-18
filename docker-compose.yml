@@ -306,6 +306,19 @@ services:
     networks:
       - cinema_network
 
+  front_demo_service:
+    build: front_demo
+    volumes:
+      - ./front_demo/static/:/opt/fastapi/static/:ro
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cinema_network
 
   tests_ugc:
     build: tests_analytic/functional
@@ -324,7 +337,7 @@ volumes:
   _es_data:
   _redis_data:
   tests_auth:
-
+  front_demo:
 
 networks:
   cinema_network:

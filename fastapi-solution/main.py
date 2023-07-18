@@ -5,6 +5,8 @@ from core.config import settings
 from elasticsearch import AsyncElasticsearch
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, ORJSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 from helios import initialize
 from redis.asyncio import Redis
 
@@ -27,6 +29,15 @@ app = FastAPI(
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
     default_response_class=ORJSONResponse,
+)
+
+origins = ["http://localhost:9000"]  # Update with your front-end URL
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
 )
 
 
