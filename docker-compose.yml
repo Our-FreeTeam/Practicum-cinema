@@ -306,6 +306,17 @@ services:
     networks:
       - cinema_network
 
+  billing_payment_separator:
+    build: billing_payment_separator
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
+    networks:
+      - cinema_network
+
   front_demo_service:
     build: front_demo
     volumes:
