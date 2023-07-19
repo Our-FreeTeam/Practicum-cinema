@@ -1,23 +1,30 @@
+import datetime
 import json
+import uuid
 from contextlib import contextmanager
 
 import psycopg2
 import requests
+from dateutil.relativedelta import relativedelta
 from psycopg2.extras import DictCursor
 
 from tests_billing.settings import pgdb, settings
 from tests_billing.functional.utils.backoff import log, backoff
 
 TEST_USERS_LIST = ["test_user"]
-TEST_ROLES_LIST = ["test_role"]
-HEADERS = {'Content-Type': "application/json", 'Accept': "application/json", "access_token": "",
-           "refresh_token": ""}
+TEST_ROLES_LIST = ["statistic_manager"]
+HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "access_token": "",
+    "refresh_token": ""
+}
 keycloak_realm_id = settings.keycloak_realm_id
 keycloak_client_id = settings.keycloak_client_id
 duration = {
-    "59507685-5b50-4d60-b4d1-6fc0ab1bacd1": 12,
+    "834c0eb9-7ac6-47a8-aa51-19d1f2f58766": 12,
     "339052fe-9f44-4c03-8ccf-e11b9629d6d1": 1,
-    }
+}
 
 
 @log
@@ -113,7 +120,58 @@ async def get_active_subscription(user_id):
     return subscription
 
 
-def get_payment_id(subscription_id):
+async def insert_active_subscription(user_id):
+    sub_id = uuid.uuid4()
+    sql = f"""
+        insert into subscription (id, user_id, start_date, end_date, subscription_type_id, is_active, is_repeatable)
+        values  ('{sub_id}', '{user_id}', '{datetime.datetime.now()}', '2023-06-16 20:14:09.313290', '834c0eb9-7ac6-47a8-aa51-19d1f2f58766', True, True);
+    """
+    with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
+        cur = pg_connect.cursor()
+        cur.execute(sql)
+        pg_connect.commit()
+
+    return str(sub_id)
+
+
+async def delete_active_subscription(subscription_id):
+    sql = f"""
+        DELETE FROM subscription WHERE id = '{subscription_id}';
+    """
+    with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
+        cur = pg_connect.cursor()
+        cur.execute(sql)
+
+    return f"Delete Subscription row with sub id: '{subscription_id}'"
+
+
+async def delete_payment(payment_id):
+    sql = f"""
+        DELETE FROM payment WHERE id = '{payment_id}';
+    """
+    with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
+        cur = pg_connect.cursor()
+        cur.execute(sql)
+
+    return f"Delete Payment row with sub id: '{payment_id}'"
+
+
+async def insert_payment(subscription_id):
+    payment_id = uuid.uuid4()
+    sql = f"""
+        insert into payment (id, subscription_id, payment_amount, payment_status, payment_method_id, payment_date)
+        values  ('{payment_id}', '{subscription_id}', 1000, 'succeeded', 
+        '6c3ec743-1bea-4733-b9c9-21c749517434', '{datetime.datetime.now() + relativedelta(months=1)}');
+    """
+    with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
+        cur = pg_connect.cursor()
+        cur.execute(sql)
+        pg_connect.commit()
+
+    return f"Insert Payment row with pay id: '{payment_id}'"
+
+
+def get_payment(subscription_id):
     sql = f"""
         SELECT * FROM payment p WHERE p.subscription_id = '{subscription_id}'
     """

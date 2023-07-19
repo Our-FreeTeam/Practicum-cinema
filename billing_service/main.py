@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
+from fastapi_pagination import add_pagination
 
-from api.v1 import subscriptions
-
+from api.v1 import subscriptions, statistics
 
 app = FastAPI(
     title="API для приема и возврата платежей за подписку",
@@ -16,6 +16,8 @@ app = FastAPI(
 
 
 app.include_router(subscriptions.router, prefix='/api/v1/subscriptions', tags=['subscriptions'])
+app.include_router(statistics.router, prefix='/api/v1/statistics', tags=['statistics'])
+add_pagination(app)
 
 
 if __name__ == '__main__':

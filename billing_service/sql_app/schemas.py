@@ -1,11 +1,16 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, Optional
 from uuid import UUID
 
 from orjson import orjson
 from pydantic import BaseModel
 from pydantic.generics import GenericModel
+
+from fastapi_filter.contrib.sqlalchemy import Filter
+
+from models.models import Subscription as SubModel
+from models.models import Payment as PayModel
 
 
 def orjson_dumps(v, *, default):
@@ -39,6 +44,23 @@ class Subscription(BaseOrjsonModel):
         orm_mode = True
 
 
+class SubscriptionFilter(Filter):
+    user_id: Optional[UUID]
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    start_date__lt: Optional[datetime]
+    start_date__gte: Optional[datetime]
+    end_date__lt: Optional[datetime]
+    end_date__gte: Optional[datetime]
+    is_active: Optional[bool]
+    is_repeatable: Optional[bool]
+    save_payment_method: Optional[bool]
+    order_by: Optional[list[str]] = ["start_date"]
+
+    class Constants(Filter.Constants):
+        model = SubModel
+
+
 class SubscriptionType(BaseOrjsonModel):
     id: UUID
     name: str
@@ -56,6 +78,23 @@ class Payment(BaseOrjsonModel):
     payment_status: str
     payment_method_id: str
     payment_date: datetime | None = datetime.now()
+
+    class Config:
+        orm_mode = True
+
+
+class PaymentFilter(Filter):
+    subscription_id: Optional[UUID]
+    payment_amount: Optional[Decimal]
+    payment_status: Optional[str]
+    payment_method_id: Optional[str]
+    payment_date: Optional[datetime]
+    payment_date__lt: Optional[datetime]
+    payment_date__gte: Optional[datetime]
+    order_by: Optional[list[str]] = ["payment_date"]
+
+    class Constants(Filter.Constants):
+        model = PayModel
 
 
 class Refund(BaseOrjsonModel):
