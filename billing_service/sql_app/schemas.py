@@ -32,7 +32,6 @@ class ResponseList(GenericModel, Generic[T]):
 
 
 class Subscription(BaseOrjsonModel):
-    user_id: UUID
     start_date: datetime | None = datetime.now()
     end_date: datetime | None
     subscription_type_id: UUID

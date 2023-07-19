@@ -47,6 +47,10 @@ class Settings(BaseSettings):
 
     CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
 
+    AUTH_URL: str = Field(..., env='AUTH_URL')
+    AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
+    AUTH_PASSWORD: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
+
     billing_service_url: str = Field(..., env='BILLING_SERVICE_URL')
 
 

@@ -21,15 +21,29 @@ def main():
 
         pay_data = last_entry['pay_data']
 
+        logging.info(pay_data)
+        token_headers = get_token()
         post_response = requests.post(
             settings.billing_service_url + '/api/v1/subscriptions/add_2_step',
-            json=pay_data)
+            json=pay_data,
+            headers=token_headers
+        )
         if post_response.status_code == 200:
             logging.info("Job done")
         post_response.raise_for_status()  # Raise exception if invalid response
     else:
         logging.error("There is error with request to webhook_log_service {0}".format(response.status_code))
 
+
+def get_token():
+    token = requests.post(
+        f'{settings.AUTH_URL}v1/auth/login',
+        json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD})
+    headers = {}
+    if (token.headers.get("access_token") is not None and token.headers.get("refresh_token") is not None):
+        headers['access_token'] = token.headers.get("access_token")
+        headers['refresh_token'] = token.headers.get("refresh_token")
+    return headers
 
 
 if __name__ == "__main__":

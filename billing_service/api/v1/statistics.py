@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.dependency import get_db
 from models.models import Payment, Subscription
-from service.check_role import check_role
+from service.auth import check_role
 from sql_app.schemas import SubscriptionFilter, PaymentFilter
 from sql_app.schemas import Subscription as SubSchema
 from sql_app.schemas import Payment as PaySchema
