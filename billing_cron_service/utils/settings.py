@@ -53,6 +53,9 @@ class Settings(BaseSettings):
 
     billing_service_url : str = Field(..., env='BILLING_SERVICE_URL')
 
+    redis_host: str = Field(..., env='REDIS_BILLING_HOST')
+    redis_port: int = Field(..., env='REDIS_BILLING_PORT')
+
 class Config:
     env_file = '.env'
     env_file_encoding = 'utf-8'

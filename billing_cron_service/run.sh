@@ -26,6 +26,7 @@ if [ ! -e /$CONTAINER_FIRST_STARTUP ]; then
 fi
 
 python ./utils/wait_for_kafka.py
+python ./utils/wait_for_redis.py
 
 #cron -f
 busybox syslogd -C; cron -L 2 -f

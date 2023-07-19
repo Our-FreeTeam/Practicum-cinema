@@ -281,6 +281,8 @@ services:
     depends_on:
       db_bill:
         condition: service_started
+      redis_billing:
+        condition: service_started
     restart: on-failure
 #    logging:
 #      driver: "fluentd"
@@ -314,6 +316,23 @@ services:
     depends_on:
       db_bill:
         condition: service_started
+    networks:
+      - cinema_network
+
+  redis_billing:
+    build: redis_config
+    hostname: redis_billing
+#    ports:
+#      - "6379:6379"
+    volumes:
+      - ./_redis_billing_data:/opt/redis/db
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "redis_ec_cache"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
     networks:
       - cinema_network
 
