@@ -11,6 +11,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
+from migrations.data.fill_data import insert_templates
+
 # revision identifiers, used by Alembic.
 revision = '123e260f185b'
 down_revision = None
@@ -28,6 +30,7 @@ def upgrade():
                     sa.Column('text', sa.Text()),
                     schema='content'
                     )
+    op.execute(insert_templates)
     # ### end Alembic commands ###
 
 

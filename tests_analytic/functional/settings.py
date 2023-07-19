@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     analytic_url: str = Field(..., env='ANALYTIC_URL')
     ugc_api_service: str = Field(..., env='UGC_API_URL')
 
+
 class Config:
     env_file = '.env'
     env_file_encoding = 'utf-8'

@@ -51,7 +51,7 @@ class Settings(BaseSettings):
 
     CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
 
-    billing_service_url : str = Field(..., env='BILLING_SERVICE_URL')
+    billing_service_url: str = Field(..., env='BILLING_SERVICE_URL')
 
     redis_host: str = Field(..., env='REDIS_BILLING_HOST')
     redis_port: int = Field(..., env='REDIS_BILLING_PORT')

@@ -1,15 +1,10 @@
 fastapi==0.94
 orjson==3.8.7
 pydantic==1.10.6
-python-dotenv==0.21.1
 uvicorn==0.22.0
 uvloop==0.17.0 ; sys_platform != "win32" and implementation_name == "cpython"
 gunicorn==20.1
 backoff==2.2.1
-deprecated==1.2.14
-distro==1.8.0
-netaddr==0.8.0
-wrapt==1.15.0
 yookassa==2.4.0
 MonthDelta==0.9.1
 SQLAlchemy==1.4.42
@@ -17,6 +12,5 @@ psycopg2-binary==2.9.6
 asyncpg==0.27.0
 alembic==1.11.1
 alembic_utils==0.8.1
-aiohttp==3.8.4
-greenlet==2.0.2
 yookassa-async==0.1.5
+aiohttp==3.8.4

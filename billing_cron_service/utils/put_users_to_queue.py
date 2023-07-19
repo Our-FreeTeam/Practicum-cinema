@@ -38,7 +38,7 @@ def get_subscribed_users():
 async def rabbit_send(mail_list, time_shift, channel, queue_name):
 
     # Declare the delayed exchange
-    exchange = await channel.declare_exchange(
+    await channel.declare_exchange(
         name=settings.rabbitmq_exchange,
         type='x-delayed-message',
         arguments={'x-delayed-type': 'direct'}
