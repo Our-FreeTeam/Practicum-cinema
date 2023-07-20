@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     success_pay_topic: str = Field(..., env='SUCCESS_PAY_LOG')
     error_pay_topic: str = Field(..., env='ERROR_PAY_LOG')
 
+    AUTH_URL: str = Field(..., env='AUTH_URL')
+    AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
+    AUTH_PASSWORD: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
+
     # @validator('DB_URI', pre=True)
     def construct_db_uri(cls, v: str | None, values: dict):
         if isinstance(v, str):
