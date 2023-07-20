@@ -5,7 +5,7 @@ LC_ALL=en_US.UTF-8
 PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/usr/local/sifi/bin:/opt/app:/usr/local/lib/python3.10/site-packages
 # START CRON JOB
 # Запуск крона проверки и удаления ролей у пользователей при окончании подписки. Проверка каждые 5 минут
-*/1 * * * * . $HOME/.profile; python3 /opt/app/utils/revoke_router.py >> /var/log/cron.log 2>&1
+*/5 * * * * . $HOME/.profile; python3 /opt/app/utils/revoke_router.py >> /var/log/cron.log 2>&1
 # router from Webhook --> Kafka webhook_log_topic
 * * * * * . $HOME/.profile; python3 /opt/app/utils/yookassa_router.py >> /var/log/cron.log 2>&1
 # find users in PG db with ending subs, and auto subs is ON. and put they in queue to process authosubs
