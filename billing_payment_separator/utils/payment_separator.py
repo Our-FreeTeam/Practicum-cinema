@@ -15,14 +15,14 @@ async def process_message(message, consumer):
     """
     # Parse the corrected JSON string
     data = json.loads(message.value.decode())
-
+    logging.info("Start process message")
     default_topic = settings.error_pay_topic
-    if data['object']['status'] == 'paid':
+
+    if data['event'] == 'payment.succeeded':
         default_topic = settings.success_pay_topic
 
     producer = AIOKafkaProducer(bootstrap_servers=settings.kafka_broker_url)
     await producer.start()
-    logging.info("start process message")
     try:
         # Produce the message to Kafka
         await producer.send_and_wait(
@@ -57,7 +57,7 @@ async def consume_messages():
     try:
         # Consume messages
         async for message in consumer:
-            print("Received message")
+            print("Received message from Kafka")
             await process_message(message, consumer)
 
     finally:

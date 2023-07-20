@@ -19,7 +19,8 @@ router = APIRouter()
 
 
 @router.post("/add_1_step", response_model=ConfirmationUrl)
-@get_user_id
+# TODO временно закоментировано
+# @get_user_id
 async def add_subscription_1_step(request: Request,
                                   subscription: Subscription,
                                   user_id: UUID | None = None,

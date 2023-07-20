@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   db:
-    image: postgres:15.2-alpine
+    image: postgres:15.3-alpine
     hostname: db
     volumes:
       - ./_postgres_data:/var/lib/postgresql/data/
@@ -24,44 +24,6 @@ services:
       options:
         fluentd-address: "host.docker.internal:24224"
         tag: "postgres_cinema"
-    networks:
-      - cinema_network
-
-  db_bill:
-    image: postgres:15.2-alpine
-    volumes:
-      - ./_postgres_data_bill:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=${BILL_DB_USERNAME}
-      - POSTGRES_PASSWORD=${BILL_DB_PASSWORD}
-      - POSTGRES_DB=${BILL_DB_NAME}
-    hostname: db_bill
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-d", "${BILL_DB_NAME}", "-U", "${BILL_DB_USERNAME}", "-p", "${BILL_DB_PORT}"]
-      interval: 1s
-      timeout: 3s
-      retries: 30
-    ports:
-      - "5438:5438"
-    command: -p 5438
-    networks:
-      - cinema_network
-
-  billing_service:
-    build: billing_service
-    image: billing-image
-    env_file:
-      - .env
-    ports:
-      - "8200:8200"
-    depends_on:
-      db_bill:
-        condition: service_healthy
-#    logging:
-#      driver: "fluentd"
-#      options:
-#        fluentd-address: "host.docker.internal:24224"
-#        tag: "fastapi_cinema_api"
     networks:
       - cinema_network
 
@@ -229,24 +191,6 @@ services:
     networks:
       - cinema_network
 
-  tests_auth:
-    build: tests_auth/functional
-    volumes:
-      - ./tests_auth:/tests_auth
-    env_file:
-      - .env
-    depends_on:
-      nginx_service:
-        condition: service_started
-      fastapi_service:
-        condition: service_started
-      elasticsearch:
-        condition: service_healthy
-      redis_cache:
-        condition: service_healthy
-    networks:
-      - cinema_network
-
   ugc_service:
     build: ugc_api
     hostname: ugc_service
@@ -274,93 +218,36 @@ services:
     networks:
       - cinema_network
 
-  billing_cron:
-    build: billing_cron_service
-    env_file:
-      - .env
-    depends_on:
-      db_bill:
-        condition: service_started
-      redis_billing:
-        condition: service_started
-    restart: on-failure
-#    logging:
-#      driver: "fluentd"
-#      options:
-#        fluentd-address: "host.docker.internal:24224"
-#        tag: "Billing Scheduler"
-    networks:
-      - cinema_network
+#  tests_auth:
+#    build: tests_auth/functional
+#    volumes:
+#      - ./tests_auth:/tests_auth
+#    env_file:
+#      - .env
+#    depends_on:
+#      nginx_service:
+#        condition: service_started
+#      fastapi_service:
+#        condition: service_started
+#      elasticsearch:
+#        condition: service_healthy
+#      redis_cache:
+#        condition: service_healthy
+#    networks:
+#      - cinema_network
 
-  money_maker:
-    build: money_maker_service
-    env_file:
-      - .env
-    restart: on-failure
-    depends_on:
-      db_bill:
-        condition: service_started
-#    logging:
-#      driver: "fluentd"
-#      options:
-#        fluentd-address: "host.docker.internal:24224"
-#        tag: "Billing Scheduler"
-    networks:
-      - cinema_network
 
-  billing_payment_separator:
-    build: billing_payment_separator
-    env_file:
-      - .env
-    restart: on-failure
-    depends_on:
-      db_bill:
-        condition: service_started
-    networks:
-      - cinema_network
-
-  redis_billing:
-    build: redis_config
-    hostname: redis_billing
-#    ports:
-#      - "6379:6379"
-    volumes:
-      - ./_redis_billing_data:/opt/redis/db
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: "host.docker.internal:24224"
-        tag: "redis_ec_cache"
-    healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-    networks:
-      - cinema_network
-
-  front_demo_service:
-    build: front_demo
-    volumes:
-      - ./front_demo/static/:/opt/fastapi/static/:ro
-    env_file:
-      - .env
-    ports:
-      - "9000:9000"
-    depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - cinema_network
-
-  tests_ugc:
-    build: tests_analytic/functional
-    volumes:
-      - ./tests_analytic:/tests_analytic
-    env_file:
-      - .env
-    depends_on:
-      ugc_service:
-        condition: service_started
-    networks:
-      - cinema_network
+#  tests_ugc:
+#    build: tests_analytic/functional
+#    volumes:
+#      - ./tests_analytic:/tests_analytic
+#    env_file:
+#      - .env
+#    depends_on:
+#      ugc_service:
+#        condition: service_started
+#    networks:
+#      - cinema_network
 
 volumes:
   _postgres_data:

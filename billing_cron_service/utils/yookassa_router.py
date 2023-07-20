@@ -54,7 +54,7 @@ async def send_to_kafka(pay_data, pay_id):
         logging.info("Data sent to Kafka successfully!")
     except KafkaTimeoutError as e:
         logging.error(f"Failed to send data to Kafka, sending to Redis: {e}")
-        await send_to_redis(pay_data, pay_id)
+        await send_to_redis(pay_data)
     finally:
         await producer.stop()
         await send_redis_data_to_kafka()
@@ -62,20 +62,19 @@ async def send_to_kafka(pay_data, pay_id):
 
 async def send_to_redis(pay_data):
     """Send payment data to Redis."""
-    redis = await aioredis.create_redis_pool(REDIS_HOST)
+    redis = await aioredis.from_url('redis://' + REDIS_HOST)
 
     pay_data_json = json.dumps(pay_data)
     await redis.rpush('billing', pay_data_json)
 
-    redis.close()
-    await redis.wait_closed()
+    await redis.close()
 
     logging.info("Data sent to Redis successfully!")
 
 
 async def send_redis_data_to_kafka():
     """Send payment data from Redis to Kafka."""
-    redis = await aioredis.create_redis_pool(REDIS_HOST)
+    redis = await aioredis.from_url('redis://' + REDIS_HOST)
 
     while True:
         pay_data_json = await redis.lpop('billing')
@@ -87,8 +86,7 @@ async def send_redis_data_to_kafka():
 
         await send_to_kafka(pay_data, pay_id)
 
-    redis.close()
-    await redis.wait_closed()
+    await redis.close()
 
 
 async def main():
@@ -98,7 +96,7 @@ async def main():
     data = response.json()
 
     if response.status_code == 200:
-        if len(data) < 20:
+        if data['logs'] == {}:
             logging.error("No any data in external storage")
             exit()
         logs = data['logs']
@@ -106,6 +104,7 @@ async def main():
         pay_id = logs['pay_data']['object']['id']
 
         result = await check_and_rewrite_id(pay_id)
+
         if not result:
             logging.warning("No new data found")
             exit()
