@@ -29,7 +29,7 @@ async def activate_user_subs(payment_method_id):
         subscription_data = await result.fetchone()
         if subscription_data:
             user_id = subscription_data[0]
-
+            ###### TODO Здесь должна быть активация роли
             logging.info("Activate subs role for " + user_id)
 
             return True

@@ -141,6 +141,7 @@ volumes:
   _redis_billing_data:
   front_demo:
 
+
 networks:
   cinema_network:
     driver: bridge

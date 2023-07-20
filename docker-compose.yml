@@ -254,7 +254,6 @@ volumes:
   _es_data:
   _redis_data:
   tests_auth:
-  front_demo:
 
 networks:
   cinema_network:

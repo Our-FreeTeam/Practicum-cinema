@@ -39,6 +39,9 @@ async def activate_user_subs(payment_method_id):
                 ),
                 {"user_id": user_id}
             )
+
+            # TODO вместо кода выше с апдейдом код красивый Яны с ORM
+
             return True
         else:
             return False
