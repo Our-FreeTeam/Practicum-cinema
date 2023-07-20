@@ -21,21 +21,16 @@ headers = HEADERS
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    'answer_code, req_type, api_url, body',
-    [
-     (200, 'POST', 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
-     ],
-)
 async def test_create_and_pay_payment(
-        answer_code,
-        req_type,
-        api_url,
-        body,
-        create_remove_test_user_and_role,
+        create_test_user_and_role,
         get_user
 ):
     site_url = settings.auth_url
+    api_url = "v1/auth/login"
+    body = {
+        "user": "cinema_admin",
+        "password": "password"
+    }
     url_params = {
         "url": site_url + api_url,
         "json": body,
@@ -45,7 +40,7 @@ async def test_create_and_pay_payment(
     if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
         headers["access_token"] = result.headers.get("access_token")
         headers["refresh_token"] = result.headers.get("refresh_token")
-    assert result.status_code == answer_code
+    assert result.status_code == HTTPStatus.OK
 
     user_id = get_user(body["user"])
     subscription_id = await insert_active_subscription(user_id)
@@ -66,21 +61,19 @@ async def test_create_and_pay_payment(
 
     await insert_payment(subscription_id)
     payment = get_payment(subscription_id)
-    logging.info(f"payment: {payment}")
     body_step_2 = {
-        "user_id": user_id,
         "event": "payment.succeeded",
         "object": {
             "id": payment[0],
             "status": payment[3],
             "payment_method": {
-                "id": payment[4]
+                "id": payment[5]
             }
         }
     }
     url_step_2 = "api/v1/subscriptions/add_2_step"
-    response = requests.post(sub_url + url_step_2, json=body_step_2)
-    assert response.status_code == HTTPStatus.OK
+    response = requests.post(sub_url + url_step_2, json=body_step_2, headers=result.headers)
+    assert response.status_code == HTTPStatus.NOT_MODIFIED
     await delete_payment(payment[0])
     await delete_active_subscription(subscription_id)
 
@@ -110,6 +103,20 @@ async def test_create_and_pay_payment(
 )
 @pytest.mark.asyncio
 async def test_invalid_payment(body, status):
+    site_url = settings.auth_url
+    api_url = "v1/auth/login"
+    body_auth = {"user": "cinema_admin", "password": "password"}
+    url_params = {
+        "url": site_url + api_url,
+        "json": body_auth,
+        "headers": headers
+    }
+    result = requests.post(**url_params)
+    if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
+        headers["access_token"] = result.headers.get("access_token")
+        headers["refresh_token"] = result.headers.get("refresh_token")
+    assert result.status_code == HTTPStatus.OK
+
     url_step_1 = "api/v1/subscriptions/add_1_step"
     response = requests.post(sub_url + url_step_1, json=body)
     msg = response.json()["detail"][0]["msg"]
@@ -118,20 +125,10 @@ async def test_invalid_payment(body, status):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    'answer_code, req_type, api_url, body',
-    [
-     (200, 'POST', 'v1/auth/login', {"user": "cinema_admin", "password": "password"}),
-     ],
-)
-@pytest.mark.asyncio
-async def test_check_subscription(
-        answer_code,
-        req_type,
-        api_url,
-        body
-):
+async def test_check_subscription():
     site_url = settings.auth_url
+    api_url = "v1/auth/login"
+    body = {"user": "cinema_admin", "password": "password"}
     url_params = {
         "url": site_url + api_url,
         "json": body,
@@ -141,7 +138,7 @@ async def test_check_subscription(
     if result.headers.get("access_token") is not None and result.headers.get("refresh_token") is not None:
         headers["access_token"] = result.headers.get("access_token")
         headers["refresh_token"] = result.headers.get("refresh_token")
-    assert result.status_code == answer_code
+    assert result.status_code == HTTPStatus.OK
 
     body = {
         "user_id": "26e83050-29ef-4163-a99d-b546cac208f8",

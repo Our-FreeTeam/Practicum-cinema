@@ -1,52 +1,121 @@
-# This is special temporary script to route payments logs from external log service (in internet) to
-# local docker components
-
 import requests
-from settings import settings
 import logging
+import asyncio
+import json
+import aioredis
+
+from aiokafka import AIOKafkaProducer
+from aiokafka.errors import KafkaTimeoutError
+from settings import settings
+
+REDIS_HOST = settings.redis_host  # Update with your Redis host
 
 
-def main():
-    response = requests.get('https://yptst2023.omnitoring.ru:8443/get_logs')
+async def check_and_rewrite_id(id_var):
+    """Check and rewrite payment ID if it's new."""
+    temp_file_path = "/opt/app/id_file.txt"
+
+    try:
+        with open(temp_file_path, "r+") as file:
+            file_contents = file.read().strip()
+
+            if id_var == file_contents:
+                logging.info("ID already exists in the file. Exiting...")
+                return False
+
+            file.seek(0)
+            file.write(id_var)
+            file.truncate()
+            logging.info("ID written to the file successfully.")
+            return True
+    except FileNotFoundError:
+        logging.error("Temp file not found. Exiting...")
+        with open(temp_file_path, "w") as file:
+            file.write("0")
+        return False
+
+
+async def send_to_kafka(pay_data, pay_id):
+    """Send payment data to Kafka. If it fails, send the data to Redis."""
+    producer = AIOKafkaProducer(bootstrap_servers=settings.kafka_broker_url)
+
+    try:
+        await producer.start()
+
+        pay_data_json = json.dumps(pay_data)
+        value = str(pay_data_json).encode()
+
+        await producer.send_and_wait(
+            settings.topic_name,
+            value=value,
+            key=pay_id.encode(),
+        )
+
+        logging.info("Data sent to Kafka successfully!")
+    except KafkaTimeoutError as e:
+        logging.error(f"Failed to send data to Kafka, sending to Redis: {e}")
+        await send_to_redis(pay_data)
+    finally:
+        await producer.stop()
+        await send_redis_data_to_kafka()
+
+
+async def send_to_redis(pay_data):
+    """Send payment data to Redis."""
+    redis = await aioredis.from_url('redis://' + REDIS_HOST)
+
+    pay_data_json = json.dumps(pay_data)
+    await redis.rpush('billing', pay_data_json)
+
+    await redis.close()
+
+    logging.info("Data sent to Redis successfully!")
+
+
+async def send_redis_data_to_kafka():
+    """Send payment data from Redis to Kafka."""
+    redis = await aioredis.from_url('redis://' + REDIS_HOST)
+
+    while True:
+        pay_data_json = await redis.lpop('billing')
+        if pay_data_json is None:
+            break
+
+        pay_data = json.loads(pay_data_json)
+        pay_id = pay_data['object']['id']
+
+        await send_to_kafka(pay_data, pay_id)
+
+    await redis.close()
+
+
+async def main():
+    """Main function that fetches the latest logs and sends the payment data to Kafka."""
+    response = requests.get('https://yptst2023.omnitoring.ru:8443/get_last_log')
     response.raise_for_status()  # Raise exception if invalid response
-
     data = response.json()
+
     if response.status_code == 200:
+        if data['logs'] == {}:
+            logging.error("No any data in external storage")
+            exit()
         logs = data['logs']
-        try:
-            last_entry = sorted(logs, key=lambda x: x['id'])[-1]
-        except Exception:
-            logging.info("Error - webhook is empty")
+        pay_data = logs['pay_data']
+        pay_id = logs['pay_data']['object']['id']
+
+        result = await check_and_rewrite_id(pay_id)
+
+        if not result:
+            logging.warning("No new data found")
             exit()
 
-        pay_data = last_entry['pay_data']
-
-        logging.info(pay_data)
-        token_headers = get_token()
-        post_response = requests.post(
-            settings.billing_service_url + '/api/v1/subscriptions/add_2_step',
-            json=pay_data,
-            headers=token_headers
-        )
-        if post_response.status_code == 200:
-            logging.info("Job done")
-        post_response.raise_for_status()  # Raise exception if invalid response
+        await send_to_kafka(pay_data, pay_id)
     else:
-        logging.error("There is error with request to webhook_log_service {0}".format(response.status_code))
+        logging.error("There is an error with the request to webhook_log_service: {}".format(
+            response.status_code))
 
 
-def get_token():
-    token = requests.post(
-        f'{settings.AUTH_URL}v1/auth/login',
-        json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD})
-    headers = {}
-    if (token.headers.get("access_token") is not None and token.headers.get("refresh_token") is not None):
-        headers['access_token'] = token.headers.get("access_token")
-        headers['refresh_token'] = token.headers.get("refresh_token")
-    return headers
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     logging.basicConfig(format=settings.log_format, level=settings.log_level)
-    logging.info("Router started")
-    main()
+    logging.info("Webhook router started")
+    asyncio.run(main())

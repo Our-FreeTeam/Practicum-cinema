@@ -55,7 +55,7 @@ async def add_subscription_1_step(request: Request,
         session)
     payment_data['subscription_id'] = subscription_id
     payment_id = await subs_service.create_payment_db(payment_data, session)
-    logging.info(f'payment_data: {str(payment_id)} {dict(payment_data)}')
+    logging.info(f'payment_data: "{str(payment_id)}"; {dict(payment_data)}')
 
     await session.commit()
     return {'url': confirmation_url}

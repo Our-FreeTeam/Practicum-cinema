@@ -112,7 +112,7 @@ async def get_user_by_subscription(subscription_id: UUID, db: AsyncSession):
     return user_id[0] if user_id else None
 
 
-def parse_external_data(data: list[dict]):
+def parse_external_data(data: dict):
     parsed_data = {}
     if data['event'] == 'payment.succeeded':
         object_data = data['object']

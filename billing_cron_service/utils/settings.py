@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     keycloak_admin_password: str = Field(..., env='KK_ADMIN_PASSWORD')
     keycloak_service_email: str = Field(..., env='KEYCLOAK_SERVICE_EMAIL')
 
+    kafka_interface_url: str = Field(..., env='KAFKA_INTERFACE_URL')
+    kafka_broker_url: str = Field(..., env='KAFKA_BROKER_URL')
+    topic_name: str = Field(..., env='WHOOK_TOPIC_LOG')
+
     log_format: str = Field(..., env='LOG_FORMAT')
     log_level: int = Field(..., env='LOG_LEVEL')
 
@@ -53,6 +57,8 @@ class Settings(BaseSettings):
 
     billing_service_url: str = Field(..., env='BILLING_SERVICE_URL')
 
+    redis_host: str = Field(..., env='REDIS_BILLING_HOST')
+    redis_port: int = Field(..., env='REDIS_BILLING_PORT')
 
 class Config:
     env_file = '.env'

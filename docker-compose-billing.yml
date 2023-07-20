@@ -46,6 +46,8 @@ services:
     depends_on:
       db_bill:
         condition: service_started
+      redis_billing:
+        condition: service_started
     restart: on-failure
 #    logging:
 #      driver: "fluentd"
@@ -55,8 +57,8 @@ services:
     networks:
       - cinema_network
 
-  money_maker:
-    build: money_maker_service
+  billing_money_maker:
+    build: billing_money_maker_service
     env_file:
       - .env
     restart: on-failure
@@ -71,6 +73,57 @@ services:
     networks:
       - cinema_network
 
+  billing_payment_separator:
+    build: billing_payment_separator
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
+    networks:
+      - cinema_network
+
+  billing_role_activator:
+    build: billing_role_activator
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
+    networks:
+      - cinema_network
+
+  redis_billing:
+    build: redis_config
+    hostname: redis_billing
+    volumes:
+      - ./_redis_billing_data:/opt/redis/db
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: "host.docker.internal:24224"
+        tag: "redis_ec_cache"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    networks:
+      - cinema_network
+
+  front_demo_service:
+    build: front_demo
+    volumes:
+      - ./front_demo/static/:/opt/fastapi/static/:ro
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    depends_on:
+      db_bill:
+        condition: service_healthy
+    networks:
+      - cinema_network
+
   tests_billing:
     build: tests_billing
     volumes:
@@ -82,6 +135,12 @@ services:
         condition: service_started
     networks:
       - cinema_network
+
+volumes:
+  _postgres_data_bill:
+  _redis_billing_data:
+  front_demo:
+
 
 networks:
   cinema_network:

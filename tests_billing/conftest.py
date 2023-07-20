@@ -42,7 +42,7 @@ def remove_test_roles():
 
 
 @pytest.fixture(scope='session')
-def create_remove_test_user_and_role():
+def create_test_user_and_role():
     base_url = keycloak_url
 
     headers = get_auth_headers()
@@ -54,12 +54,6 @@ def create_remove_test_user_and_role():
 
     for role in TEST_ROLES_LIST:
         create_test_role(role, base_url, headers, client_id)
-
-    yield None
-
-    remove_all_test_roles(base_url, headers, client_id, realm_id)
-    for user in TEST_USERS_LIST:
-        remove_user(user, base_url, headers, realm_id)
 
 
 @pytest.fixture(scope='session')
@@ -76,4 +70,3 @@ def get_user():
         return user_id
 
     return inner
-
