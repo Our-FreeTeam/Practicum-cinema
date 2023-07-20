@@ -18,7 +18,7 @@ services:
       - cinema_network
 
   notification_db:
-    image: postgres:15.0-alpine
+    image: postgres:15.2-alpine
     hostname: notification_db
     container_name: notification_db
     restart: always
@@ -45,7 +45,9 @@ services:
       context: .
       dockerfile: rabbit_api/render/Dockerfile
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_started
+    restart: on-failure
     env_file:
       - .env
     networks:

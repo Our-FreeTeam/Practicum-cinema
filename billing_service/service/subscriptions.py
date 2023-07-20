@@ -19,8 +19,8 @@ async def get_active_subscription(user_id: UUID, db: AsyncSession):
     subscription = await db.execute(
         select(Subscription).where(and_(Subscription.user_id == user_id, Subscription.is_active.is_(True)))
     )
-
-    return subscription.fetchone()
+    subscription = subscription.fetchone()
+    return subscription[0] if subscription else None
 
 
 def check_saving_payment_method(subscription: Subscription):
@@ -102,7 +102,7 @@ async def get_subscription_by_payment(payment_id: UUID, db: AsyncSession):
                                                 PaymentModel.payment_status)
                                          .where(PaymentModel.id == payment_id))
     subscription_data = subscription_data.fetchone()
-    return subscription_data
+    return subscription_data[0] if subscription_data else None
 
 
 async def get_user_by_subscription(subscription_id: UUID, db: AsyncSession):

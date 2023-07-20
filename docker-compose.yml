@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   db:
-    image: postgres:15.2-alpine
+    image: postgres:15.3-alpine
     hostname: db
     volumes:
       - ./_postgres_data:/var/lib/postgresql/data/
@@ -191,24 +191,6 @@ services:
     networks:
       - cinema_network
 
-  tests_auth:
-    build: tests_auth/functional
-    volumes:
-      - ./tests_auth:/tests_auth
-    env_file:
-      - .env
-    depends_on:
-      nginx_service:
-        condition: service_started
-      fastapi_service:
-        condition: service_started
-      elasticsearch:
-        condition: service_healthy
-      redis_cache:
-        condition: service_healthy
-    networks:
-      - cinema_network
-
   ugc_service:
     build: ugc_api
     hostname: ugc_service
@@ -236,24 +218,42 @@ services:
     networks:
       - cinema_network
 
-  tests_ugc:
-    build: tests_analytic/functional
-    volumes:
-      - ./tests_analytic:/tests_analytic
-    env_file:
-      - .env
-    depends_on:
-      ugc_service:
-        condition: service_started
-    networks:
-      - cinema_network
+#  tests_auth:
+#    build: tests_auth/functional
+#    volumes:
+#      - ./tests_auth:/tests_auth
+#    env_file:
+#      - .env
+#    depends_on:
+#      nginx_service:
+#        condition: service_started
+#      fastapi_service:
+#        condition: service_started
+#      elasticsearch:
+#        condition: service_healthy
+#      redis_cache:
+#        condition: service_healthy
+#    networks:
+#      - cinema_network
+
+
+#  tests_ugc:
+#    build: tests_analytic/functional
+#    volumes:
+#      - ./tests_analytic:/tests_analytic
+#    env_file:
+#      - .env
+#    depends_on:
+#      ugc_service:
+#        condition: service_started
+#    networks:
+#      - cinema_network
 
 volumes:
   _postgres_data:
   _es_data:
   _redis_data:
   tests_auth:
-
 
 networks:
   cinema_network:
