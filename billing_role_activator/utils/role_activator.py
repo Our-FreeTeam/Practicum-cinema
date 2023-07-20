@@ -29,16 +29,9 @@ async def activate_user_subs(payment_method_id):
         subscription_data = await result.fetchone()
         if subscription_data:
             user_id = subscription_data[0]
-            await conn.execute(
-                text(
-                    """
-                    UPDATE subscription
-                    SET is_active = true
-                    WHERE user_id = :user_id LIMIT 1
-                    """
-                ),
-                {"user_id": user_id}
-            )
+
+            logging.info("Activate subs role for " + user_id)
+
             return True
         else:
             return False

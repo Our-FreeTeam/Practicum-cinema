@@ -10,17 +10,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core import messages
 from core.dependency import get_db
 from service import subscriptions as subs_service, auth
-from service.auth import get_user_id
+from service.auth import get_user_id, check_role
 from service.subscriptions import check_saving_payment_method, create_subscription_db, parse_external_data, \
-    get_subscription_by_payment, get_user_by_subscription
+    get_subscription_by_payment, get_user_by_subscription, update_subscription_db
 from sql_app.schemas import Subscription, ConfirmationUrl
 
 router = APIRouter()
 
 
 @router.post("/add_1_step", response_model=ConfirmationUrl)
-# TODO временно закоментировано
-# @get_user_id
+@get_user_id
 async def add_subscription_1_step(request: Request,
                                   subscription: Subscription,
                                   user_id: UUID | None = None,
@@ -29,14 +28,14 @@ async def add_subscription_1_step(request: Request,
     logging.info(f'user_id input: {user_id}')
     check_saving_payment_method(subscription)
 
-    active_subscription = await subs_service.get_active_subscription(user_id=subscription.user_id, db=session)
+    active_subscription = await subs_service.get_active_subscription(user_id=user_id, db=session)
     logging.info(f'active_subscription: {active_subscription}')
 
     subs_duration = subs_service.get_subscription_duration(subscription.subscription_type_id)
     if not subs_duration:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_TYPE_NOT_FOUND)
 
-    end_subs_date = (active_subscription[0].end_date if active_subscription else datetime.now()) + subs_duration
+    end_subs_date = (active_subscription.end_date if active_subscription else datetime.now()) + subs_duration
     logging.info(f'end_subs_date: {datetime.strftime(end_subs_date, "%Y-%m-%d %H:%M:%S")}')
 
     subscription_data = {
@@ -63,6 +62,7 @@ async def add_subscription_1_step(request: Request,
 
 
 @router.post("/add_2_step")
+@check_role(["theatre_admin"])
 async def add_subscription_2_step(request: Request,
                                   subscription: dict,
                                   session: AsyncSession = Depends(get_db)):
@@ -88,4 +88,20 @@ async def add_subscription_2_step(request: Request,
                                          db=session)
     await auth.update_subscription_role(user_id=user_id, role_name='subscriber')
     await subs_service.send_subscription_notification()
+    await session.commit()
+
+
+@router.post("/cancel")
+@get_user_id
+async def cancel_subscription(request: Request,
+                              user_id: UUID | None = None,
+                              session: AsyncSession = Depends(get_db)):
+    logging.info(f'subscription_input: {user_id}')
+
+    active_subscription = await subs_service.get_active_subscription(user_id=user_id, db=session)
+    logging.info(f'active_subscription: {active_subscription}')
+
+    if not active_subscription:
+        return HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_NOT_FOUND)
+    await update_subscription_db(id=active_subscription.id, is_repeatable=False, db=session)
     await session.commit()

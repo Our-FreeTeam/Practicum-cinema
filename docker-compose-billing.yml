@@ -57,8 +57,8 @@ services:
     networks:
       - cinema_network
 
-  money_maker:
-    build: money_maker_service
+  billing_money_maker:
+    build: billing_money_maker_service
     env_file:
       - .env
     restart: on-failure
@@ -75,6 +75,17 @@ services:
 
   billing_payment_separator:
     build: billing_payment_separator
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
+    networks:
+      - cinema_network
+
+  billing_role_activator:
+    build: billing_role_activator
     env_file:
       - .env
     restart: on-failure
