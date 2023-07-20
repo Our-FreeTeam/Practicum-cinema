@@ -61,7 +61,6 @@ async def test_create_and_pay_payment(
 
     await insert_payment(subscription_id)
     payment = get_payment(subscription_id)
-    print(f"payment: {payment}")
     body_step_2 = {
         "event": "payment.succeeded",
         "object": {
