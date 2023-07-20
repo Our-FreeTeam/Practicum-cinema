@@ -13,7 +13,7 @@ from settings import settings
 
 
 async def activate_user_subs(payment_method_id):
-    engine = create_async_engine(settings.construct_db_uri())
+    engine = create_async_engine(settings.DB_URI)
 
     async with engine.begin() as conn:
         result = await conn.execute(

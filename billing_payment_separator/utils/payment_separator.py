@@ -11,7 +11,7 @@ from settings import settings
 
 
 async def activate_user_subs(payment_method_id):
-    engine = create_async_engine(settings.construct_db_uri())
+    engine = create_async_engine(settings.DB_URI)
 
     async with engine.begin() as conn:
         result = await conn.execute(
@@ -28,7 +28,7 @@ async def activate_user_subs(payment_method_id):
         )
         subscription_data = await result.fetchone()
         if subscription_data:
-            user_id = subscription_data[0]
+            user_id = subscription_data[0].user_id
             await conn.execute(
                 text(
                     """
