@@ -126,6 +126,7 @@ async def main():
     while True:
         try:
             await consume_messages()
+            await asyncio.sleep(5)  # Sleep for a while before retrying
         except Exception as e:
             logging.error("An error occurred: " + str(e))
             await asyncio.sleep(5)  # Sleep for a while before retrying
