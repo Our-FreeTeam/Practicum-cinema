@@ -36,7 +36,6 @@ def pg_conn_context(*args, **kwargs):
 
 
 async def update_subscription_table(user_list):
-    print(f"user_lis {user_list}")
     if len(user_list) == 1:
         where = f"WHERE user_id = '{user_list[0]}'"
     else:
@@ -47,6 +46,9 @@ async def update_subscription_table(user_list):
             SET is_active = FALSE
             {where};
         """
+
+    logging.info("We have some user/s in list" + user_list + "/ Query will be" + sql_update)
+
     with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
         cur = pg_connect.cursor()
         cur.execute(sql_update)
