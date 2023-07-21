@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import aiohttp
 import json
 from uuid import UUID
 
@@ -10,8 +11,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from aiokafka import AIOKafkaConsumer
 
 from settings import settings
-
-
 
 
 def get_token():
@@ -58,7 +57,15 @@ async def process_message(message, consumer):
     if data['event'] == 'payment.succeeded':
         result = None
         # TODO сделать функицю отправки нотификации
-        logging.info("=====>>> " + key+ "## ====>" + data['object']['id'] )
+        async with aiohttp.ClientSession() as session:
+
+            await session.post(
+                f'http://{settings.notification_host}:{settings.notification_port}/api/v1/event',
+                json={'users': [str(user_id)], 'event': 'payment_success',
+                      'data': {'desciption': pay_description}},
+                headers="")
+
+        logging.info("=====>>> " + key + "## ====>" + data['object']['id'])
         # result = await activate_user_subs(data['object']['id'])
         if result:
             logging.info("User subscription Notification - added to RabbitMQ queue")
@@ -67,7 +74,6 @@ async def process_message(message, consumer):
 
     # Commit the offset to acknowledge the message
     await consumer.commit()
-
 
 
 async def consume_messages():
