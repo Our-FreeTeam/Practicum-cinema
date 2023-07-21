@@ -47,7 +47,7 @@ async def update_subscription_table(user_list):
             {where};
         """
 
-    logging.info("We have some user/s in list" + user_list + "/ Query will be" + sql_update)
+    logging.info("We have some user/s in list query will be" + sql_update)
 
     with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
         cur = pg_connect.cursor()
