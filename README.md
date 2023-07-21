@@ -12,7 +12,9 @@ docker-compose-mongo-solo.yml,
 docker-compose-authsubsys.yml,
 docker-compose-rabbit.yml,
 docker-compose-sender.yml,
-docker-compose.yml,
+docker-compose-kafka.yml
+docker-compose.yml
+docker-compose-billing.yml,
 
 Ссылка на репозиторий https://github.com/Our-FreeTeam/Practicum-cinema
 Ссылка на Sentry https://our-freeteam.sentry.io/issues/
@@ -22,11 +24,11 @@ docker-compose.yml,
 
 # Структура проекта
 ```
-├── UML_schema/                     # Папка с архитектурой проекта в UML (спринт 8)
+├── UML_schema/                     # Папка с архитектурой проекта в UML
+    ├── billing_diplom/                        
+        ├── billing_schema.png      # схема реализации дипломного Биллинг Сервиса
     ├── current/                        
         ├── c2-scheme.txt           # текущая - уровень C2
-    ├── planned/                        
-        ├── c2-scheme.txt           # новая - уровень C2 
 
 
 ├── billing_cron_service/           # Сервис биллинга на базе cron
@@ -42,23 +44,19 @@ docker-compose.yml,
     ├── requirements.txt            # файл с зависимостями
     ├── Dockerfile                  # Dockerfile контейнера
     ├── run.sh                      # скрипт entrypoint 
-             
+            
+        
+├── billing_money_maker_service/    # Сервис биллинга на базе cron        
+    
+├── billing_notif_sender/           # Сервис отправки сообщения в очередь на отправку нотиф пользователю
+       
+├── billing_payment_separator/      # Сервис обработки данных полученных в Kafka из Yookassa
 
+├── billing_role_activator/         # Сервис активации ролей пользователя
 
-├── mailercron_service/            
-    ├── current/                        
-        ├── c2-scheme.txt          
-
-
-├── money_maker_service/            
-    ├── current/                        
-        ├── c2-scheme.txt           
-
-
-├── billing_service/                
-    ├── current/                        
-        ├── c2-scheme.txt           
-
+├── billing_service/                # Сервис Fast API с эндпойнтами биллинга
+                
+├── mailercron_service/             # 
 
 ├── flaskapi-solution/              # API сервис на Flask для авторизации и регистрации
     ├── views/                        
