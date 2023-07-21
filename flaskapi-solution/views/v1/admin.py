@@ -1,4 +1,5 @@
 import json
+import logging
 from functools import wraps
 
 import messages
@@ -230,11 +231,31 @@ def grant_role():
               tags=['admin'])
 @check_role_wrap(['theatre_admin'])
 def grant_role_by_id():
-    """ Выдать роль пользователю """
+    """ Выдать роль пользователю по user id"""
+    try:
+        body = request.json
+        logging.info(f"body: {body}")
+        client_id, _, role_id = prep_user_data(body)
+        keycloak_admin.assign_client_role(client_id=client_id, user_id=body.get('user_id'), roles=role_id)
+        return jsonify({'result': True})
+    except KeycloakPostError as e:
+        return json.loads(e.response_body)['errorMessage'], e.response_code
+
+
+@app.route('/v1/admin/revoke_role_by_id', methods=['POST'])
+@rate_limiter(settings.rate_limit, settings.time_period)
+@api.validate(body=Request(UserIdRole),
+              resp=Response(HTTP_200=BoolResponse, HTTP_400=None, HTTP_409=None, HTTP_429=ErrorStr),
+              tags=['admin'])
+@check_role_wrap(['theatre_admin'])
+def revoke_subscription_role():
+    """
+    Удалить роль пользователя с истекшей подпиской
+    """
     try:
         body = request.json
         client_id, _, role_id = prep_user_data(body)
-        keycloak_admin.assign_client_role(client_id=client_id, user_id=body.get('user_id'), roles=role_id)
+        keycloak_admin.delete_client_roles_of_user(client_id=client_id, user_id=body.get('user_id'), roles=role_id)
         return jsonify({'result': True})
     except KeycloakPostError as e:
         return json.loads(e.response_body)['errorMessage'], e.response_code
