@@ -1,7 +1,8 @@
 from http import HTTPStatus
 
+import backoff
+import psycopg2
 import requests
-from utils.backoff import backoff
 
 
 class UserDataExtractor:
@@ -11,7 +12,11 @@ class UserDataExtractor:
         }
         self.url = endpoint
 
-    @backoff()
+    @backoff.on_exception(
+        backoff.expo,
+        exception=psycopg2.OperationalError,
+        max_tries=6
+    )
     def get_info(self, user_id: str) -> dict:
         response = requests.get(url=f"{ self.url}/{user_id}", headers=self.headers)
         if response.status_code != HTTPStatus.OK:

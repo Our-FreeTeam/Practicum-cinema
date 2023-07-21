@@ -18,7 +18,7 @@ router = APIRouter()
 disable_installed_extensions_check()
 
 
-@router.get("/subscriptions", response_model=Page[SubSchema])
+@router.get("/subscriptions", response_model=Page[SubSchema], tags=["subscription_statistic"])
 @check_role(["statistic_manager"])
 async def subscription_statistics(
         request: Request,
@@ -32,7 +32,7 @@ async def subscription_statistics(
     return paginate(result.scalars().all())
 
 
-@router.get("/payments", response_model=Page[PaySchema])
+@router.get("/payments", response_model=Page[PaySchema], tags=["payment_statistic"])
 @check_role(["statistic_manager"])
 async def payment_statistics(
         request: Request,

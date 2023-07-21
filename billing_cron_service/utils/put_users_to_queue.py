@@ -3,17 +3,22 @@ import logging
 
 from contextlib import contextmanager
 
+import backoff
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from backoff import backoff, log
+from backoff import log
 from sql import sql
 from settings import settings, pgdb
 from rabbit_connection import rabbit_conn
 
 
 @log
-@backoff(exception=psycopg2.OperationalError)
+@backoff.on_exception(
+    backoff.expo,
+    exception=psycopg2.OperationalError,
+    max_tries=6
+)
 def pg_conn(*args, **kwargs):
     return psycopg2.connect(*args, **kwargs)
 

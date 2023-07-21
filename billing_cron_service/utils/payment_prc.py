@@ -40,3 +40,6 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
         }, uuid.uuid4())
 
         return payment.json()
+
+    def process_response(self, response):
+        pass

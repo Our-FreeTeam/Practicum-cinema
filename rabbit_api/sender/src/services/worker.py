@@ -1,9 +1,10 @@
 import json
 import logging
 
+import backoff
 import pika
 import pika.exceptions
-from utils.backoff import backoff
+import psycopg2
 
 from config.settings import rabbit_settings
 from services.abstract_sender import AbstractSender
@@ -56,7 +57,11 @@ class Worker:
         logger.warning("Message was sent")
         channel.basic_ack(delivery_tag=method.delivery_tag)
 
-    @backoff()
+    @backoff.on_exception(
+        backoff.expo,
+        exception=psycopg2.OperationalError,
+        max_tries=6
+    )
     def start(self):
         """Запускает loop"""
         try:

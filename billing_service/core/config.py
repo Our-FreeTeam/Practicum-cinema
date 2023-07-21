@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
     AUTH_PASSWORD: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
+    origins: str = Field(..., env='ORIGINS')
+
     @validator('DB_URI')
     def construct_db_uri(cls, v: str | None, values: dict):
         if isinstance(v, str):
