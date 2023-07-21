@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseSettings, Field
 
 
@@ -7,7 +5,7 @@ class PGDB(BaseSettings):
     dbname: str = Field(..., env="BILL_DB_NAME")
     user: str = Field(..., env="BILL_DB_USERNAME")
     password: str = Field(..., env="BILL_DB_PASSWORD")
-    host: Optional[str] = Field(..., env="BILL_DB_HOST")
+    host: str | None = Field(..., env="BILL_DB_HOST")
     port: int = Field(..., env="BILL_DB_PORT")
 
 
@@ -50,10 +48,10 @@ class Settings(BaseSettings):
     rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
     rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
 
-    KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
-    KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
+    kassa_account_id: str = Field(..., env='KASSA_ACCOUNT_ID')
+    kassa_secret_key: str = Field(..., env='KASSA_SECRET_KEY')
 
-    CONFIRMATION_URL: str = Field(..., env='CONFIRMATION_URL')
+    confirmation_url: str = Field(..., env='CONFIRMATION_URL')
 
     billing_service_url: str = Field(..., env='BILLING_SERVICE_URL')
 
