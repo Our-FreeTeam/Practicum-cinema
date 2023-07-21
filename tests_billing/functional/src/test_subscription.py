@@ -11,7 +11,9 @@ from tests_billing.functional.utils.helpers import (
     get_active_subscription,
     HEADERS,
     duration,
-    insert_active_subscription
+    insert_active_subscription,
+    insert_payment,
+    get_payment, delete_payment, delete_active_subscription
 )
 
 sub_url = settings.subscription_url
@@ -56,6 +58,10 @@ async def test_create_and_pay_payment(
     url_step_1 = "api/v1/subscriptions/add_1_step"
     response = requests.post(sub_url + url_step_1, json=body_step_1, headers=result.headers)
     assert response.status_code == HTTPStatus.OK
+
+    payment = get_payment(subscription_id)
+    await delete_payment(payment[0])
+    await delete_active_subscription(subscription_id)
 
 
 @pytest.mark.parametrize(
