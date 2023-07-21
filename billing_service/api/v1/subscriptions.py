@@ -61,36 +61,6 @@ async def add_subscription_1_step(request: Request,
     return {'url': confirmation_url}
 
 
-@router.post("/add_2_step")
-@check_role(["theatre_admin"])
-async def add_subscription_2_step(request: Request,
-                                  subscription: dict,
-                                  session: AsyncSession = Depends(get_db)):
-    logging.info(f'subscription_input: {subscription}')
-
-    payment_data = parse_external_data(subscription)
-    logging.info(f'parsed_data: {payment_data}')
-
-    payment_id = payment_data['id']
-    subscription_id, payment_status = await get_subscription_by_payment(payment_id, session)
-    logging.info(f'subscription_id: {str(subscription_id)}, payment_status: {payment_status}')
-
-    if payment_status == 'succeeded':
-        return Response(status_code=HTTPStatus.NOT_MODIFIED.value)
-
-    user_id = await get_user_by_subscription(subscription_id, session)
-    logging.info(f'user_id: {str(user_id)}')
-
-    await subs_service.update_subscription_db(id=subscription_id, is_active=True, db=session)
-    await subs_service.update_payment_db(id=payment_id,
-                                         payment_method_id=payment_data['payment_method_id'],
-                                         payment_status=payment_data['status'],
-                                         db=session)
-    await auth.update_subscription_role(user_id=user_id, role_name='subscriber')
-    await subs_service.send_subscription_notification()
-    await session.commit()
-
-
 @router.post("/cancel")
 @get_user_id
 async def cancel_subscription(request: Request,

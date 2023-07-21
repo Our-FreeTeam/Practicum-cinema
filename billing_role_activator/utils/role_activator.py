@@ -1,7 +1,9 @@
 import asyncio
 import logging
 import json
+from uuid import UUID
 
+import requests
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
@@ -11,7 +13,7 @@ from settings import settings
 
 
 async def activate_user_subs(payment_method_id):
-    engine = create_async_engine(settings.construct_db_uri())
+    engine = create_async_engine(settings.DB_URI)
 
     async with engine.begin() as conn:
         result = await conn.execute(
@@ -29,12 +31,43 @@ async def activate_user_subs(payment_method_id):
         subscription_data = await result.fetchone()
         if subscription_data:
             user_id = subscription_data[0]
-            ###### TODO Здесь должна быть активация роли
+
+            token_headers = get_token()
+            grant_role(user_id=user_id, role_name='subscriber', token_headers=token_headers)
+
             logging.info("Activate subs role for " + user_id)
 
             return True
         else:
             return False
+
+
+def get_token():
+    token_response = requests.post(
+        f'{settings.AUTH_URL}v1/auth/login',
+        json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD})
+    headers = {}
+    if (token_response.headers.get("access_token") is not None and token_response.headers.get(
+            "refresh_token") is not None):
+        headers['access_token'] = token_response.headers.get("access_token")
+        headers['refresh_token'] = token_response.headers.get("refresh_token")
+
+        logging.info("Get token to grant role SUCCEEDED")
+    else:
+        logging.error("Get token to grant role FAILED")
+    return headers
+
+
+def grant_role(user_id: UUID, role_name: str, headers: dict):
+    response = requests.post(
+        f'{settings.AUTH_URL}v1/admin/grant_role_by_id',
+        json={"user_id": str(user_id), "role_name": role_name},
+        headers=headers
+    )
+    if response.status != 200:
+        logging.error("Grant role FAILED")
+
+    logging.info("Grant role SUCCEEDED")
 
 
 async def process_message(message, consumer):
@@ -53,8 +86,6 @@ async def process_message(message, consumer):
     if data['event'] == 'payment.succeeded':
         default_topic = settings.success_pay_topic
 
-
-
     producer = AIOKafkaProducer(bootstrap_servers=settings.kafka_broker_url)
     await producer.start()
     try:
@@ -67,14 +98,12 @@ async def process_message(message, consumer):
 
         logging.info(f"Data sent to Kafka successfully! (topic: {default_topic} / id: {data['object']['id']})")
 
-
         if data['event'] == 'payment.succeeded':
             result = await activate_user_subs(data['object']['id'])
             if result:
                 logging.info("User subscription - activated")
             else:
                 logging.warning("User subscription - activate FAILED")
-
 
     finally:
         await producer.stop()
