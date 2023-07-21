@@ -13,12 +13,12 @@ class Settings(BaseSettings):
 
     debug_mode: int = Field(0, env='BILLING_DEBUG')
 
-    DB_NAME: str = Field("postgres", env="BILL_DB_NAME")
-    DB_USER: str = Field("user", env="BILL_DB_USERNAME")
-    DB_PASSWORD: str = Field("password", env="BILL_DB_PASSWORD")
-    DB_HOST: str = Field("localhost", env="BILL_DB_HOST")
-    DB_PORT: str = Field('5438', env="BILL_DB_PORT")
-    DB_URI: AsyncPostgresDsn | None
+    db_name: str = Field("postgres", env="BILL_DB_NAME")
+    db_user: str = Field("user", env="BILL_DB_USERNAME")
+    db_password: str = Field("password", env="BILL_DB_PASSWORD")
+    db_host: str = Field("localhost", env="BILL_DB_HOST")
+    db_port: str = Field('5438', env="BILL_DB_PORT")
+    db_uri: AsyncPostgresDsn | None
 
     kafka_interface_url: str = Field(..., env='KAFKA_INTERFACE_URL')
     kafka_broker_url: str = Field(..., env='KAFKA_BROKER_URL')
@@ -28,22 +28,23 @@ class Settings(BaseSettings):
     notif_pay_topic: str = Field(..., env='NOTIF_PAY_LOG')
     error_pay_topic: str = Field(..., env='ERROR_PAY_LOG')
 
-    AUTH_URL: str = Field(..., env='AUTH_URL')
-    AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
-    AUTH_PASSWORD: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
+    auth_url: str = Field(..., env='AUTH_URL')
+    auth_user: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
+    auth_password: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
-    @validator('DB_URI', pre=True)
+    @validator('db_uri')
     def construct_db_uri(cls, v: str | None, values: dict):
         if isinstance(v, str):
             return v
         return AsyncPostgresDsn.build(
             scheme='postgresql+asyncpg',
-            user=values.get('DB_USER'),
-            password=values.get('DB_PASSWORD'),
-            host=values.get('DB_HOST'),
-            path=f'/{values.get("DB_NAME")}',
-            port=values.get('DB_PORT'),
+            user=values.get('db_user'),
+            password=values.get('db_password'),
+            host=values.get('db_host'),
+            path=f'/{values.get("db_name")}',
+            port=values.get('db_port'),
         )
+
 
 class Config:
     env_file = '.env'

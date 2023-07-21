@@ -15,8 +15,8 @@ from settings import settings
 
 def get_token():
     token_response = requests.post(
-        f'{settings.AUTH_URL}v1/auth/login',
-        json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD})
+        f'{settings.auth_url}v1/auth/login',
+        json={"user": settings.auth_user, "password": settings.auth_password})
     headers = {}
     if (token_response.headers.get("access_token") is not None and token_response.headers.get(
             "refresh_token") is not None):
@@ -31,7 +31,7 @@ def get_token():
 
 def grant_role(user_id: UUID, role_name: str, headers: dict):
     response = requests.post(
-        f'{settings.AUTH_URL}v1/admin/grant_role_by_id',
+        f'{settings.auth_url}v1/admin/grant_role_by_id',
         json={"user_id": str(user_id), "role_name": role_name},
         headers=headers
     )
