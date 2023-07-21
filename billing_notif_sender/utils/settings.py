@@ -18,7 +18,6 @@ class Settings(BaseSettings):
     DB_PASSWORD: str = Field("password", env="BILL_DB_PASSWORD")
     DB_HOST: str = Field("localhost", env="BILL_DB_HOST")
     DB_PORT: str = Field('5438', env="BILL_DB_PORT")
-
     DB_URI: AsyncPostgresDsn | None
 
     kafka_interface_url: str = Field(..., env='KAFKA_INTERFACE_URL')
@@ -29,7 +28,9 @@ class Settings(BaseSettings):
     notif_pay_topic: str = Field(..., env='NOTIF_PAY_LOG')
     error_pay_topic: str = Field(..., env='ERROR_PAY_LOG')
 
-
+    AUTH_URL: str = Field(..., env='AUTH_URL')
+    AUTH_USER: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
+    AUTH_PASSWORD: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
     @validator('DB_URI', pre=True)
     def construct_db_uri(cls, v: str | None, values: dict):

@@ -31,6 +31,8 @@ services:
     depends_on:
       db_bill:
         condition: service_healthy
+      redis_billing:
+        condition: service_started
 #    logging:
 #      driver: "fluentd"
 #      options:
@@ -94,6 +96,19 @@ services:
         condition: service_started
     networks:
       - cinema_network
+
+
+  billing_notif_sender:
+    build: billing_notif_sender
+    env_file:
+      - .env
+    restart: on-failure
+    depends_on:
+      db_bill:
+        condition: service_started
+    networks:
+      - cinema_network
+
 
   redis_billing:
     build: redis_config

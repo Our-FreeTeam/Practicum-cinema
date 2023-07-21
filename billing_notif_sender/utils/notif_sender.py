@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import aiohttp
 import json
 from uuid import UUID
 
@@ -10,36 +11,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from aiokafka import AIOKafkaConsumer
 
 from settings import settings
-
-
-async def activate_user_subs(payment_method_id):
-    engine = create_async_engine(settings.DB_URI)
-
-    async with engine.begin() as conn:
-        result = await conn.execute(
-            text(
-                """
-                SELECT sub.user_id
-                FROM subscription sub
-                LEFT JOIN subscription_type sub_type on sub.subscription_type_id = sub_type.id
-                LEFT JOIN payment p on sub.id = p.subscription_id
-                WHERE p.payment_method_id = :payment_method_id
-                """
-            ),
-            {"payment_method_id": payment_method_id}
-        )
-        subscription_data = await result.fetchone()
-        if subscription_data:
-            user_id = subscription_data[0]
-
-            token_headers = get_token()
-            grant_role(user_id=user_id, role_name='subscriber', token_headers=token_headers)
-
-            logging.info("Activate subs role for " + user_id)
-
-            return True
-        else:
-            return False
 
 
 def get_token():
@@ -80,18 +51,29 @@ async def process_message(message, consumer):
     """
     # Parse the corrected JSON string
     data = json.loads(message.value.decode())
+    key = json.loads(message.key.decode())
     logging.info("Start process message")
 
     if data['event'] == 'payment.succeeded':
-        result = await activate_user_subs(data['object']['id'])
+        result = None
+        # TODO сделать функицю отправки нотификации
+        async with aiohttp.ClientSession() as session:
+
+            await session.post(
+                f'http://{settings.notification_host}:{settings.notification_port}/api/v1/event',
+                json={'users': [str(user_id)], 'event': 'payment_success',
+                      'data': {'desciption': pay_description}},
+                headers="")
+
+        logging.info("=====>>> " + key + "## ====>" + data['object']['id'])
+        # result = await activate_user_subs(data['object']['id'])
         if result:
-            logging.info("User subscription - activated")
+            logging.info("User subscription Notification - added to RabbitMQ queue")
         else:
-            logging.warning("User subscription - activate FAILED")
+            logging.warning("User subscription notification - FAILED")
 
     # Commit the offset to acknowledge the message
     await consumer.commit()
-
 
 
 async def consume_messages():
@@ -99,7 +81,7 @@ async def consume_messages():
     Consume messages from the Kafka topic and process them.
     """
     consumer = AIOKafkaConsumer(
-        settings.success_pay_topic,
+        settings.notif_pay_topic,
         bootstrap_servers=settings.kafka_broker_url,
         group_id='my_consumer_group',
         auto_offset_reset='latest',
@@ -134,5 +116,5 @@ async def main():
 
 if __name__ == '__main__':
     logging.basicConfig(format=settings.log_format, level="INFO")
-    logging.info("Start consuming from " + settings.success_pay_topic)
+    logging.info("Start consuming from " + settings.notif_pay_topic)
     asyncio.run(main())

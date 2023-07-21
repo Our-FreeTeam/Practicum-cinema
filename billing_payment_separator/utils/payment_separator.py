@@ -42,7 +42,7 @@ async def activate_user_subs(payment_method_id):
 
             # TODO вместо кода выше с апдейдом код красивый Яны с ORM
 
-            return True
+            return user_id
         else:
             return False
 
@@ -68,12 +68,15 @@ async def process_message(message, consumer):
     producer = AIOKafkaProducer(bootstrap_servers=settings.kafka_broker_url)
     await producer.start()
     try:
-        # Produce the message to Kafka
+        # Produce the message to Kafka error or ok payment queue
         await producer.send_and_wait(
             default_topic,
             value=str(data).encode(),
             key=str(data['object']['id']).encode(),
         )
+
+
+
 
         logging.info(f"Data sent to Kafka successfully! (topic: {default_topic} / id: {data['object']['id']})")
 
@@ -82,9 +85,16 @@ async def process_message(message, consumer):
             result = await activate_user_subs(data['object']['id'])
             if result:
                 logging.info("User subscription - activated")
+
+                # Produce the message to Kafka NOTIFICATION of payment status queue
+                await producer.send_and_wait(
+                    settings.notif_pay_topic,
+                    value=str(result).encode(),
+                    key=str(data['object']['id']).encode(),
+                )
+
             else:
                 logging.warning("User subscription - activate FAILED")
-
 
     finally:
         await producer.stop()

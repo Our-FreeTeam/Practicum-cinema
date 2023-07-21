@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     kafka_interface_url: str = Field(..., env='KAFKA_INTERFACE_URL')
     kafka_broker_url: str = Field(..., env='KAFKA_BROKER_URL')
     topic_name: str = Field(..., env='WHOOK_TOPIC_LOG')
+    success_pay_topic: str = Field(..., env='SUCCESS_PAY_LOG')
+    notif_pay_topic: str = Field(..., env='NOTIF_PAY_LOG')
+    error_pay_topic: str = Field(..., env='ERROR_PAY_LOG')
+
 
     log_format: str = Field(..., env='LOG_FORMAT')
     log_level: int = Field(..., env='LOG_LEVEL')
