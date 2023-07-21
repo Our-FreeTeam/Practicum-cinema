@@ -20,8 +20,8 @@ async def update_subscription_role(user_id: UUID, role_name: str = 'subscriber')
 
 async def get_token(session):
     async with session.post(
-            f'{settings.AUTH_URL}v1/auth/login',
-            json={"user": settings.AUTH_USER, "password": settings.AUTH_PASSWORD}) as token:
+            f'{settings.auth_url}v1/auth/login',
+            json={"user": settings.auth_user, "password": settings.auth_password}) as token:
         headers = {}
         if (token.headers.get("access_token") is not None and token.headers.get("refresh_token") is not None):
             headers['access_token'] = token.headers.get("access_token")
@@ -31,7 +31,7 @@ async def get_token(session):
 
 async def grant_role(user_id: UUID, role_name: str, session: aiohttp.ClientSession, headers: dict):
     async with session.post(
-            f'{settings.AUTH_URL}v1/admin/grant_role_by_id',
+            f'{settings.auth_url}v1/admin/grant_role_by_id',
             json={"user_id": str(user_id), "role_name": role_name},
             headers=headers
     ) as response:
@@ -69,7 +69,7 @@ def get_user_id(func):
 async def get_user_id_auth(*args, **kwargs):
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            f'{settings.AUTH_URL}v1/admin/get_user_id_by_token',
+            f'{settings.auth_url}v1/admin/get_user_id_by_token',
             headers={'Content-Type': 'application/json'} | kwargs.pop('tokens'),
         ) as response:
             if response.status != HTTPStatus.OK:
@@ -104,7 +104,7 @@ def check_role(roles: list[str]):
                       jitter=None)
 async def request_auth(*args, **kwargs):
     async with aiohttp.ClientSession() as session:
-        async with session.post(settings.AUTH_URL + '/v1/admin/check_role',
+        async with session.post(settings.auth_url + '/v1/admin/check_role',
                                 data=json.dumps({'roles': kwargs.pop('roles')}),
                                 headers={'Content-Type': 'application/json'} | kwargs.pop('tokens')) as response:
             if response.status != 200:

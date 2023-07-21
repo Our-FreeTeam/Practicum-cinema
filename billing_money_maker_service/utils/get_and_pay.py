@@ -28,8 +28,8 @@ async def main():
                     if user_id and payment_id and payment_description and amount:
                         logging.info("Going to make autopayment for user", user_id)
 
-                        payment_processor = YooKassaPaymentProcessor(account_id=settings.KASSA_ACCOUNT_ID,
-                                                                     secret_key=settings.KASSA_SECRET_KEY)
+                        payment_processor = YooKassaPaymentProcessor(account_id=settings.kassa_account_id,
+                                                                     secret_key=settings.kassa_secret_key)
 
                         result = await payment_processor.make_payment(payment_id,
                                                                       float(amount),
