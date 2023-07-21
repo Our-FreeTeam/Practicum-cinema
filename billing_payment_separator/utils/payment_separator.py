@@ -26,7 +26,7 @@ async def activate_user_subs(payment_method_id):
             ),
             {"payment_method_id": payment_method_id}
         )
-        subscription_data = await result.fetchone()
+        subscription_data = result.fetchone()
         if subscription_data:
             user_id = subscription_data[0].user_id
             await conn.execute(
@@ -39,8 +39,6 @@ async def activate_user_subs(payment_method_id):
                 ),
                 {"user_id": user_id}
             )
-
-            # TODO вместо кода выше с апдейдом код красивый Яны с ORM
 
             return user_id
         else:
@@ -63,8 +61,6 @@ async def process_message(message, consumer):
     if data['event'] == 'payment.succeeded':
         default_topic = settings.success_pay_topic
 
-
-
     producer = AIOKafkaProducer(bootstrap_servers=settings.kafka_broker_url)
     await producer.start()
     try:
@@ -75,11 +71,7 @@ async def process_message(message, consumer):
             key=str(data['object']['id']).encode(),
         )
 
-
-
-
         logging.info(f"Data sent to Kafka successfully! (topic: {default_topic} / id: {data['object']['id']})")
-
 
         if data['event'] == 'payment.succeeded':
             result = await activate_user_subs(data['object']['id'])
