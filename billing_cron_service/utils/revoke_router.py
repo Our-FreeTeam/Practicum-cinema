@@ -36,17 +36,23 @@ def pg_conn_context(*args, **kwargs):
 
 
 async def update_subscription_table(user_list):
+    print(f"user_lis {user_list}")
+    if len(user_list) == 1:
+        where = f"WHERE user_id = '{user_list[0]}'"
+    else:
+        where = f'WHERE user_id in {tuple(user_list)}'
+
     sql_update = f"""
             UPDATE subscription
             SET is_active = FALSE
-            WHERE user_id in {tuple(user_list)};
+            {where};
         """
     with pg_conn_context(**dict(pgdb), cursor_factory=DictCursor) as pg_connect:
         cur = pg_connect.cursor()
         cur.execute(sql_update)
         pg_connect.commit()
 
-    return f"Success_update of {len(user_list)} users"
+    return logging.info(f"Success_update of {len(user_list)} users")
 
 
 async def get_subscription_users():
@@ -57,7 +63,7 @@ async def get_subscription_users():
         users = cur.fetchall()
 
     for user in users:
-        result_list.append(user(0))
+        result_list.append(user[0])
     logging.info(f"result_list: {result_list}")
 
     return result_list
@@ -65,7 +71,6 @@ async def get_subscription_users():
 
 async def revoke_subscription_roles():
     # авторизация администратора
-    site_url = settings.auth_url
     api_url = "v1/auth/login"
     body = {
         "user": "cinema_admin",
@@ -100,13 +105,18 @@ async def revoke_subscription_roles():
                     "role_name": "subscriber",
                     "user_id": user_id
                 }
-                result = requests.post(**url_params, headers=headers)
+                result = requests.post(**url_params)
                 if result.status_code == 200:
                     count += 1
             logging.info(f"Success {count} requests. Start updating table")
 
-        # Обновление таблицы подписок
-        logging.info(f"{update_subscription_table(user_list)}")
+            # Обновление таблицы подписок
+            await update_subscription_table(user_list)
+            logging.info("Revoke router sleep for 5 minutes...")
+        else:
+            logging.warning("No users. Revoke router sleep for 5 minutes...")
+    else:
+        logging.warning(f"Status code: {result.status_code}. Revoke router sleep for 5 minutes...")
 
 if __name__ == "__main__":
     logging.info("Revoke router started...")
