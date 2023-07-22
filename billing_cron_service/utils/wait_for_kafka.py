@@ -4,6 +4,7 @@ import logging
 from aiokafka import AIOKafkaProducer
 from settings import settings
 
+
 async def wait_for_kafka():
     while True:
         try:

@@ -31,15 +31,6 @@ app = FastAPI(
     default_response_class=ORJSONResponse,
 )
 
-origins = [settings.origins, ]  # Update with your front-end URL
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
-
 
 @app.on_event('startup')
 async def startup():

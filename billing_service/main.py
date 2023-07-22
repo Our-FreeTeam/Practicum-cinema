@@ -62,15 +62,6 @@ app = FastAPI(
     openapi_tags=tags_metadata
 )
 
-origins = [settings.origins, ]  # Update with your front-end URL
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
-)
-
 
 app.include_router(subscriptions.router, prefix='/api/v1/subscriptions', tags=['subscriptions'])
 app.include_router(statistics.router, prefix='/api/v1/statistics', tags=['statistics'])

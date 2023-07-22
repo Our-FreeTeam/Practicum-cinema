@@ -7,7 +7,7 @@ import psycopg2
 import requests
 from psycopg2.extras import DictCursor
 
-from backoff import log
+from utils import log
 from settings import settings, pgdb
 
 headers = {

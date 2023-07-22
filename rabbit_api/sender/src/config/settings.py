@@ -1,5 +1,3 @@
-from logging import config as logging_config
-
 from pydantic import BaseSettings, Field
 
 

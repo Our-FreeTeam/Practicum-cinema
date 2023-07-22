@@ -7,10 +7,10 @@ import backoff
 import psycopg2
 from psycopg2.extras import DictCursor
 
-from backoff import log
 from sql import sql
 from settings import settings, pgdb
 from rabbit_connection import rabbit_conn
+from utils import log
 
 
 @log

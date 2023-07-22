@@ -30,8 +30,6 @@ class Settings(BaseSettings):
     recapcha_api_key: str = Field(..., env='RECAPCHA_API_KEY')
     recapcha_enabled: bool = Field(..., env='RECAPCHA_ENABLED')
 
-    origins: str = Field(..., env='ORIGINS')
-
 
 
 class Config:

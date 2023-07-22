@@ -2,6 +2,7 @@ import asyncio
 from aiokafka import AIOKafkaConsumer
 from settings import settings
 
+
 async def consume_messages():
     consumer = AIOKafkaConsumer(
         settings.topic_name,
