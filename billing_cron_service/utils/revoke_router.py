@@ -2,11 +2,12 @@ import asyncio
 import logging
 from contextlib import contextmanager
 
+import backoff
 import psycopg2
 import requests
 from psycopg2.extras import DictCursor
 
-from backoff import log, backoff
+from utils import log
 from settings import settings, pgdb
 
 headers = {
@@ -23,7 +24,11 @@ sql_select = f"""
 
 
 @log
-@backoff(exception=psycopg2.OperationalError)
+@backoff.on_exception(
+    backoff.expo,
+    exception=psycopg2.OperationalError,
+    max_tries=6
+)
 def pg_conn(*args, **kwargs):
     return psycopg2.connect(*args, **kwargs)
 

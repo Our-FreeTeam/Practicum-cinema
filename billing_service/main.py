@@ -5,23 +5,61 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 
 from api.v1 import subscriptions, statistics
+from core.config import settings
+
+
+description = """
+Billing API для приема и возврата платежей за подписку. 🚀
+
+## Subscriptions
+
+Возможность создавать платежи для попдписки, оплачивать их или отменять уже оплаченные
+* **Add step 1**
+* **cancel**
+
+
+## Statistics
+
+Возможность просматривать статистику по платежам и подпискам.
+Имеется фильтрация по каждому из переменных таблиц с сортировкой по дате подписки/оплаты
+Для удобства чтения применена пагинация
+"""
+
+tags_metadata = [
+    {
+        "name": "add_1_step",
+        "description": "Формирование платежа и отправление данных в ЮKassa",
+    },
+    {
+        "name": "cancel",
+        "description": "Отмена платежа",
+    },
+    {
+        "name": "subscription_statistic",
+        "description": "Статистика по подпискам",
+    },
+    {
+        "name": "payment_statistic",
+        "description": "Статистика по платежам",
+    },
+]
 
 app = FastAPI(
     title="API для приема и возврата платежей за подписку",
-    description="API для приема и возврата платежей за подписку",
+    description=description,
     version="1.0.0",
     docs_url='/api/openapi',
     openapi_url='/api/openapi.json',
+    contact={
+        "name": "Team № 14",
+        "url": "https://github.com/Our-FreeTeam/Practicum-cinema"
+    },
     default_response_class=ORJSONResponse,
-)
-
-origins = ["http://localhost:9000"]  # Update with your front-end URL
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    license_info={
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
+    },
+    openapi_tags=tags_metadata
 )
 
 

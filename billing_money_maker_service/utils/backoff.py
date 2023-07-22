@@ -34,7 +34,6 @@ def backoff(start_sleep_time=0.1, factor=2, border_sleep_time=10, exception=None
                     t = start_sleep_time * factor ** n if t < border_sleep_time else border_sleep_time
                     sleep(t)
                     continue
-                logger.critical('DB is not available')
         return inner
     return func_wrapper
 

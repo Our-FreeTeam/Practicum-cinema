@@ -44,17 +44,17 @@ class Subscription(BaseOrjsonModel):
 
 
 class SubscriptionFilter(Filter):
-    user_id: Optional[UUID]
-    start_date: Optional[datetime]
-    end_date: Optional[datetime]
-    start_date__lt: Optional[datetime]
-    start_date__gte: Optional[datetime]
-    end_date__lt: Optional[datetime]
-    end_date__gte: Optional[datetime]
-    is_active: Optional[bool]
-    is_repeatable: Optional[bool]
-    save_payment_method: Optional[bool]
-    order_by: Optional[list[str]] = ["start_date"]
+    user_id: UUID | None
+    start_date: datetime | None
+    end_date: datetime | None
+    start_date__lt: datetime | None
+    start_date__gte: datetime | None
+    end_date__lt: datetime | None
+    end_date__gte: datetime | None
+    is_active: bool | None
+    is_repeatable: bool | None
+    save_payment_method: bool | None
+    order_by: list[str] | None = ["start_date"]
 
     class Constants(Filter.Constants):
         model = SubModel
@@ -83,14 +83,14 @@ class Payment(BaseOrjsonModel):
 
 
 class PaymentFilter(Filter):
-    subscription_id: Optional[UUID]
-    payment_amount: Optional[Decimal]
-    payment_status: Optional[str]
-    payment_method_id: Optional[str]
-    payment_date: Optional[datetime]
-    payment_date__lt: Optional[datetime]
-    payment_date__gte: Optional[datetime]
-    order_by: Optional[list[str]] = ["payment_date"]
+    subscription_id: UUID | None
+    payment_amount: Decimal | None
+    payment_status: str | None
+    payment_method_id: str | None
+    payment_date: datetime | None
+    payment_date__lt: datetime | None
+    payment_date__gte: datetime | None
+    order_by: list[str] | None = ["payment_date"]
 
     class Constants(Filter.Constants):
         model = PayModel

@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     recapcha_enabled: bool = Field(..., env='RECAPCHA_ENABLED')
 
 
+
 class Config:
     env_file = '.env'
     env_file_encoding = 'utf-8'

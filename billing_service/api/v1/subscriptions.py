@@ -4,21 +4,19 @@ from http import HTTPStatus
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, HTTPException
-from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core import messages
 from core.dependency import get_db
-from service import subscriptions as subs_service, auth
-from service.auth import get_user_id, check_role
-from service.subscriptions import check_saving_payment_method, create_subscription_db, parse_external_data, \
-    get_subscription_by_payment, get_user_by_subscription, update_subscription_db
+from service import subscriptions as subs_service
+from service.auth import get_user_id
+from service.subscriptions import check_saving_payment_method, create_subscription_db, update_subscription_db
 from sql_app.schemas import Subscription, ConfirmationUrl
 
 router = APIRouter()
 
 
-@router.post("/add_1_step", response_model=ConfirmationUrl)
+@router.post("/add_1_step", response_model=ConfirmationUrl, tags=["add_1_step"])
 @get_user_id
 async def add_subscription_1_step(request: Request,
                                   subscription: Subscription,
@@ -61,7 +59,7 @@ async def add_subscription_1_step(request: Request,
     return {'url': confirmation_url}
 
 
-@router.post("/cancel")
+@router.post("/cancel", tags=["cancel"])
 @get_user_id
 async def cancel_subscription(request: Request,
                               user_id: UUID | None = None,

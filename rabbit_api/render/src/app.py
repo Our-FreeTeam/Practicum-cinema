@@ -1,5 +1,4 @@
 import logging
-import asyncio
 
 from config.settings import settings
 from services.consumer import RabbitConsumer
