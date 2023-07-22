@@ -32,7 +32,7 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
             "capture": True,
             "confirmation": {
                 "type": "redirect",
-                "return_url": settings.CONFIRMATION_URL
+                "return_url": settings.confirmation_url
             },
             "description": f" Оплата подписки '{description}'"
         }

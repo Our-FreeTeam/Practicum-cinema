@@ -43,8 +43,8 @@ async def send_subscription_external(
         save_payment_method: bool,
         db: AsyncSession):
 
-    Configuration.account_id = settings.KASSA_ACCOUNT_ID
-    Configuration.secret_key = settings.KASSA_SECRET_KEY
+    Configuration.account_id = settings.kassa_account_id
+    Configuration.secret_key = settings.kassa_secret_key
 
     subscription_data = await db.execute(select(SubscriptionType).
                                          where(SubscriptionType.id == subscription_type_id))
@@ -54,8 +54,8 @@ async def send_subscription_external(
     else:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_TYPE_NOT_FOUND)
 
-    payment_processor = YooKassaPaymentProcessor(account_id=settings.KASSA_ACCOUNT_ID,
-                                                 secret_key=settings.KASSA_SECRET_KEY)
+    payment_processor = YooKassaPaymentProcessor(account_id=settings.kassa_account_id,
+                                                 secret_key=settings.kassa_secret_key)
 
     payment = await payment_processor.make_payment(subscription_data.amount,
                                                    subscription_data.name,

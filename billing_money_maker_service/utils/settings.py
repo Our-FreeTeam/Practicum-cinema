@@ -41,8 +41,8 @@ class Settings(BaseSettings):
     rabbit_api_host: str = Field(..., env='NOTIFICATION_GUNICORN_HOST')
     rabbit_api_port: str = Field(..., env='NOTIFICATION_GUNICORN_PORT')
 
-    KASSA_ACCOUNT_ID: str = Field(..., env='KASSA_ACCOUNT_ID')
-    KASSA_SECRET_KEY: str = Field(..., env='KASSA_SECRET_KEY')
+    kassa_account_id: str = Field(..., env='KASSA_ACCOUNT_ID')
+    kassa_secret_key: str = Field(..., env='KASSA_SECRET_KEY')
 
 
 class Config:

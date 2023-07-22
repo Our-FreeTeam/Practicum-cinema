@@ -32,7 +32,7 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
             },
             "confirmation": {
                 "type": "redirect",
-                "return_url": settings.CONFIRMATION_URL
+                "return_url": settings.confirmation_url
             },
             "capture": True,
             "payment_method_id": payment_id,
