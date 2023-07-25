@@ -34,7 +34,7 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
                 "type": "redirect",
                 "return_url": settings.confirmation_url
             },
-            "description": f" Оплата подписки '{description}'"
+            "description": f" Оплата подписки <{description}>"
         }
 
         payment = json.loads((await Payment.create(body, uuid.uuid4())).json())

@@ -27,7 +27,7 @@ Billing API для приема и возврата платежей за под
 
 tags_metadata = [
     {
-        "name": "add_1_step",
+        "name": "add",
         "description": "Формирование платежа и отправление данных в ЮKassa",
     },
     {

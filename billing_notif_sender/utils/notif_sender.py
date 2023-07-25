@@ -1,5 +1,7 @@
 import asyncio
 import logging
+import traceback
+
 import aiohttp
 import json
 from uuid import UUID
@@ -50,27 +52,25 @@ async def process_message(message, consumer):
         consumer: The Kafka consumer instance.
     """
     # Parse the corrected JSON string
-    data = json.loads(message.value.decode())
-    key = json.loads(message.key.decode())
+    data = message.value.decode()
+    key = message.key.decode()
     logging.info("Start process message")
 
-    if data['event'] == 'payment.succeeded':
-        result = None
-        # TODO сделать функицю отправки нотификации
-        async with aiohttp.ClientSession() as session:
+    result = None
+    # TODO сделать функицю отправки нотификации
+    async with aiohttp.ClientSession() as session:
 
-            await session.post(
-                f'http://{settings.notification_host}:{settings.notification_port}/api/v1/event',
-                json={'users': [str(user_id)], 'event': 'payment_success',
-                      'data': {'desciption': pay_description}},
-                headers="")
+        await session.post(
+            f'http://{settings.notification_host}:{settings.notification_port}/api/v1/event',
+            json={'users': [str(data)], 'event': 'payment_success'},
+            headers="")
 
-        logging.info("=====>>> " + key + "## ====>" + data['object']['id'])
-        # result = await activate_user_subs(data['object']['id'])
-        if result:
-            logging.info("User subscription Notification - added to RabbitMQ queue")
-        else:
-            logging.warning("User subscription notification - FAILED")
+    logging.info("=====>>> " + key + "## ====>" + data['object']['id'])
+    # result = await activate_user_subs(data['object']['id'])
+    if result:
+        logging.info("User subscription Notification - added to RabbitMQ queue")
+    else:
+        logging.warning("User subscription notification - FAILED")
 
     # Commit the offset to acknowledge the message
     await consumer.commit()
@@ -110,7 +110,7 @@ async def main():
             await consume_messages()
             await asyncio.sleep(5)  # Sleep for a while before retrying
         except Exception as e:
-            logging.error("An error occurred: " + str(e))
+            logging.error("An error occurred: " + str(traceback.format_exc()))
             await asyncio.sleep(5)  # Sleep for a while before retrying
 
 

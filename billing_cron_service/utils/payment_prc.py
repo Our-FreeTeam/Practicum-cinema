@@ -36,7 +36,7 @@ class YooKassaPaymentProcessor(AbstractPaymentProcessor):
             },
             "capture": True,
             "payment_method_id": payment_id,
-            "description": f" Оплата подписки '{description}'"
+            "description": f" Оплата подписки <{description}>"
         }, uuid.uuid4())
 
         return payment.json()

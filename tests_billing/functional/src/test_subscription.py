@@ -53,7 +53,7 @@ async def test_create_and_pay_payment(
         "save_payment_method": True
     }
 
-    url_step_1 = "api/v1/subscriptions/add_1_step"
+    url_step_1 = "api/v1/subscriptions/add"
     response = requests.post(sub_url + url_step_1, json=body_step_1, headers=result.headers)
     assert response.status_code == HTTPStatus.OK
 
@@ -97,7 +97,7 @@ async def test_invalid_payment(body, status):
         headers["refresh_token"] = result.headers.get("refresh_token")
     assert result.status_code == HTTPStatus.OK
 
-    url_step_1 = "api/v1/subscriptions/add_1_step"
+    url_step_1 = "api/v1/subscriptions/add"
     response = requests.post(sub_url + url_step_1, json=body)
     msg = response.json()["detail"][0]["msg"]
     assert response.status_code == status
