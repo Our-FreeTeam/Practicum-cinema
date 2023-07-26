@@ -79,7 +79,7 @@ async def cancel_subscription(request: Request,
     await session.commit()
 
 
-@router.post("/prolong", tags=["prolong"])
+@router.post("/prolong")
 @check_role(["subscriber"])
 async def prolong_subscription(request: Request,
                                subs_info: ProlongedSubscription,

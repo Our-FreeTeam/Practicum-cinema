@@ -25,25 +25,6 @@ Billing API для приема и возврата платежей за под
 Для удобства чтения применена пагинация
 """
 
-tags_metadata = [
-    {
-        "name": "add",
-        "description": "Формирование платежа и отправление данных в ЮKassa",
-    },
-    {
-        "name": "cancel",
-        "description": "Отмена платежа",
-    },
-    {
-        "name": "subscription_statistic",
-        "description": "Статистика по подпискам",
-    },
-    {
-        "name": "payment_statistic",
-        "description": "Статистика по платежам",
-    },
-]
-
 app = FastAPI(
     title="API для приема и возврата платежей за подписку",
     description=description,
@@ -58,8 +39,7 @@ app = FastAPI(
     license_info={
         "name": "Apache 2.0",
         "url": "https://www.apache.org/licenses/LICENSE-2.0.html",
-    },
-    openapi_tags=tags_metadata
+    }
 )
 
 
