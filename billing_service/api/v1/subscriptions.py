@@ -4,24 +4,28 @@ from http import HTTPStatus
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, HTTPException
+from sqlalchemy import update, and_, func
+from sqlalchemy.dialects.postgresql import INTERVAL
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import concat
 
 from core import messages
 from core.dependency import get_db
 from service import subscriptions as subs_service
-from service.auth import get_user_id
+from service.auth import get_user_id, check_role
 from service.subscriptions import check_saving_payment_method, create_subscription_db, update_subscription_db
-from sql_app.schemas import Subscription, ConfirmationUrl
+from sql_app.schemas import Subscription, ConfirmationUrl, ProlongedSubscription
+from models import models
 
 router = APIRouter()
 
 
-@router.post("/add_1_step", response_model=ConfirmationUrl)
+@router.post("/add", response_model=ConfirmationUrl, tags=["add"])
 @get_user_id
-async def add_subscription_1_step(request: Request,
-                                  subscription: Subscription,
-                                  user_id: UUID | None = None,
-                                  session: AsyncSession = Depends(get_db)):
+async def add_subscription(request: Request,
+                           subscription: Subscription,
+                           user_id: UUID | None = None,
+                           session: AsyncSession = Depends(get_db)):
     logging.info(f'subscription_input: {subscription}')
     logging.info(f'user_id input: {user_id}')
     check_saving_payment_method(subscription)
@@ -72,4 +76,22 @@ async def cancel_subscription(request: Request,
     if not active_subscription:
         return HTTPException(status_code=HTTPStatus.NOT_FOUND, detail=messages.SUBS_NOT_FOUND)
     await update_subscription_db(id=active_subscription.id, is_repeatable=False, db=session)
+    await session.commit()
+
+
+@router.post("/prolong", tags=["prolong"])
+@check_role(["subscriber"])
+async def prolong_subscription(request: Request,
+                               subs_info: ProlongedSubscription,
+                               session: AsyncSession = Depends(get_db)):
+    logging.info(f'subscription info_input: {subs_info}')
+
+    await session.execute(
+        update(models.Subscription)
+        .where(and_(models.Subscription.user_id == subs_info.user_id,
+                    models.Subscription.is_active.is_(True)))
+        .values(end_date=models.Subscription.end_date + func.cast(concat(subs_info.days, ' DAYS'), INTERVAL)))
+    logging.info(func.cast(concat(subs_info.days, ' DAYS'), INTERVAL))
+    logging.info('Subscription succesfully prolonged')
+
     await session.commit()

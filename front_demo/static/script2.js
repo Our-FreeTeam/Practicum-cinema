@@ -53,7 +53,7 @@ window.addEventListener('DOMContentLoaded', function() {
       console.log('Pay Button clicked');  // Log the pay button click event
 
       // Send payment request
-      fetch('http://localhost:8200/api/v1/subscriptions/add_1_step', {
+      fetch('http://localhost:8200/api/v1/subscriptions/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

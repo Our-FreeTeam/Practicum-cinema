@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import json
+import traceback
 from uuid import UUID
 
 import requests
@@ -28,14 +29,14 @@ async def activate_user_subs(payment_method_id):
             ),
             {"payment_method_id": payment_method_id}
         )
-        subscription_data = await result.fetchone()
+        subscription_data = result.fetchone()
         if subscription_data:
             user_id = subscription_data[0]
 
             token_headers = get_token()
-            grant_role(user_id=user_id, role_name='subscriber', token_headers=token_headers)
+            grant_role(user_id=user_id, role_name='subscriber', headers=token_headers)
 
-            logging.info("Activate subs role for " + user_id)
+            logging.info("Activate subs role for " + str(user_id))
 
             return True
         else:
@@ -64,7 +65,8 @@ def grant_role(user_id: UUID, role_name: str, headers: dict):
         json={"user_id": str(user_id), "role_name": role_name},
         headers=headers
     )
-    if response.status != 200:
+    logging.info(response)
+    if response.status_code != 200:
         logging.error("Grant role FAILED")
 
     logging.info("Grant role SUCCEEDED")
@@ -79,7 +81,8 @@ async def process_message(message, consumer):
         consumer: The Kafka consumer instance.
     """
     # Parse the corrected JSON string
-    data = json.loads(message.value.decode())
+    logging.info(message.value.decode().replace("\'", "\""))
+    data = json.loads(message.value.decode().replace("\'", "\""))
     logging.info("Start process message")
 
     if data['event'] == 'payment.succeeded':
@@ -128,7 +131,7 @@ async def main():
             await consume_messages()
             await asyncio.sleep(5)  # Sleep for a while before retrying
         except Exception as e:
-            logging.error("An error occurred: " + str(e))
+            logging.error("An error occurred: " + str(traceback.format_exc()))
             await asyncio.sleep(5)  # Sleep for a while before retrying
 
 

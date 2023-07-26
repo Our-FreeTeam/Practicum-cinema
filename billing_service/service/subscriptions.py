@@ -122,7 +122,3 @@ def parse_external_data(data: dict):
             'payment_method_id': object_data['payment_method']['id']
         }
     return parsed_data
-
-
-async def send_subscription_notification():
-    pass

@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import json
+import traceback
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -28,13 +29,13 @@ async def activate_user_subs(payment_method_id):
         )
         subscription_data = result.fetchone()
         if subscription_data:
-            user_id = subscription_data[0].user_id
+            user_id = subscription_data.user_id
             await conn.execute(
                 text(
                     """
                     UPDATE subscription
                     SET is_active = true
-                    WHERE user_id = :user_id LIMIT 1
+                    WHERE user_id = :user_id
                     """
                 ),
                 {"user_id": user_id}
@@ -54,7 +55,8 @@ async def process_message(message, consumer):
         consumer: The Kafka consumer instance.
     """
     # Parse the corrected JSON string
-    data = json.loads(message.value.decode())
+
+    data = json.loads(message.value.decode().replace("\'", "\""))
     logging.info("Start process message")
     default_topic = settings.error_pay_topic
 
@@ -67,7 +69,7 @@ async def process_message(message, consumer):
         # Produce the message to Kafka error or ok payment queue
         await producer.send_and_wait(
             default_topic,
-            value=str(data).encode(),
+            value=json.dumps(data, default=str).encode(),
             key=str(data['object']['id']).encode(),
         )
 
@@ -81,7 +83,7 @@ async def process_message(message, consumer):
                 # Produce the message to Kafka NOTIFICATION of payment status queue
                 await producer.send_and_wait(
                     settings.notif_pay_topic,
-                    value=str(result).encode(),
+                    value=json.dumps(result, default=str).encode(),
                     key=str(data['object']['id']).encode(),
                 )
 
@@ -128,7 +130,7 @@ async def main():
         try:
             await consume_messages()
         except Exception as e:
-            logging.error("An error occurred: " + str(e))
+            logging.error("An error occurred: " + str(traceback.format_exc()))
             await asyncio.sleep(5)  # Sleep for a while before retrying
 
 
