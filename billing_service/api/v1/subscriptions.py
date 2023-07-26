@@ -16,7 +16,7 @@ from sql_app.schemas import Subscription, ConfirmationUrl
 router = APIRouter()
 
 
-@router.post("/add_1_step", response_model=ConfirmationUrl, tags=["add_1_step"])
+@router.post("/add_1_step", response_model=ConfirmationUrl)
 @get_user_id
 async def add_subscription_1_step(request: Request,
                                   subscription: Subscription,
@@ -59,7 +59,7 @@ async def add_subscription_1_step(request: Request,
     return {'url': confirmation_url}
 
 
-@router.post("/cancel", tags=["cancel"])
+@router.post("/cancel")
 @get_user_id
 async def cancel_subscription(request: Request,
                               user_id: UUID | None = None,
