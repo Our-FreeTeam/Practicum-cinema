@@ -20,7 +20,7 @@ from models import models
 router = APIRouter()
 
 
-@router.post("/add", response_model=ConfirmationUrl, tags=["add"])
+@router.post("/add", response_model=ConfirmationUrl)
 @get_user_id
 async def add_subscription(request: Request,
                            subscription: Subscription,
