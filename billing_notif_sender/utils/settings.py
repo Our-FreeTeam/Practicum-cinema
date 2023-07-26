@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     auth_user: str = Field(..., env='KEYCLOAK_CINEMAREALM_SU')
     auth_password: str = Field(..., env='KK_CINEMAREALM_SU_PSW')
 
+    notification_host: str = Field("0.0.0.0", env="NOTIFICATION_GUNICORN_HOST")
+    notification_port: int = Field(8000, env="NOTIFICATION_GUNICORN_PORT")
+
     @validator('db_uri')
     def construct_db_uri(cls, v: str | None, values: dict):
         if isinstance(v, str):
