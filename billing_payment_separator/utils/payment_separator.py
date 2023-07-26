@@ -11,7 +11,7 @@ from aiokafka import AIOKafkaConsumer, AIOKafkaProducer
 from settings import settings
 
 
-async def activate_user_subs(payment_method_id):
+async def activate_user_subs(payment_method_id, payment_status):
     engine = create_async_engine(settings.db_uri)
 
     async with engine.begin() as conn:
@@ -39,6 +39,17 @@ async def activate_user_subs(payment_method_id):
                     """
                 ),
                 {"user_id": user_id}
+            )
+
+            await conn.execute(
+                text(
+                    """
+                    UPDATE payment
+                    SET payment_status = :payment_status
+                    WHERE id = :payment_method_id
+                    """
+                ),
+                {"payment_method_id": payment_method_id, "payment_status": payment_status}
             )
 
             return user_id
@@ -76,7 +87,7 @@ async def process_message(message, consumer):
         logging.info(f"Data sent to Kafka successfully! (topic: {default_topic} / id: {data['object']['id']})")
 
         if data['event'] == 'payment.succeeded':
-            result = await activate_user_subs(data['object']['id'])
+            result = await activate_user_subs(data['object']['id'], data['object']['status'])
             if result:
                 logging.info("User subscription - activated")
 
